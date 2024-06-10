@@ -1,0 +1,52 @@
+{
+  "movie_data":{
+    "id": 0,
+    "title": "sample",
+    "description": "sampleファイルです。",
+    "date": "2021-07-01"
+  }, 
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "rate": 30,
+    "scale": 1,
+    "length": 523,
+    "audio_rate": 44100,
+    "audio_ch": 2
+  },
+  "tracks": [
+    {
+      "id": 0,
+      "start": 1,
+      "end": 290,
+      "layer": 1,
+      "overlay": true,
+      "camera": false,
+      "elements": [
+        {
+          "type": "text",
+          "settings": {
+            "size": 60,
+            "display_speed": 0.0,
+            "individual_object": false,
+            "display_coordinates": false,
+            "auto_scroll": false,
+            "bold": false,
+            "italic": false,
+            "autoadjust": false,
+            "soft": true,
+            "monospace": false,
+            "align": 4,
+            "spacing_x": 0,
+            "spacing_y": 0,
+            "precision": 1,
+            "color": "ffffff",
+            "color2": "000000",
+            "font": "小塚ゴシック Pr6N B",
+            "text": "53006f006d006500740069006d0065007300013055006e0066006f007200740075006e006100740065006c007900"
+          }
+        }
+      ]
+    }
+  ]
+}
