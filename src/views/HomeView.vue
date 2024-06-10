@@ -29,7 +29,7 @@ onMounted(() => {
 })
 
 function getThumbnail(movie: MovieObject) {
-  return `/userdata/sample.jpg`
+  return `public/userdata/sample/sample.jpg`
 }
 
 // サムネイルをクリックしたら、PlayMoviePanelを表示する
@@ -43,7 +43,7 @@ function playMovie(movie: MovieObject) {
     <v-row>
       <v-col v-for="movie in movies" :key="movie.id" cols="12" sm="6" md="4">
         <v-card>
-          <v-img :src="getThumbnail(movie)"></v-img>
+          <v-img :src="getThumbnail(movie)" class="thumbnail"></v-img>
           <v-card-title>{{ movie.title }}</v-card-title>
           <v-card-subtitle>{{ movie.date }}</v-card-subtitle>
           <v-card-actions>
@@ -54,3 +54,10 @@ function playMovie(movie: MovieObject) {
     </v-row>
   </v-container>
 </template>
+
+<style scoped>
+.thumbnail {
+  height: 100px;
+}
+
+</style>
