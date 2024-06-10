@@ -16,8 +16,6 @@
 
 <script setup lang="ts">
 import { computed, ref, defineProps } from 'vue'
-import TextObject from './objects/TextObject.vue'
-import ImageObject from './objects/ImageObject.vue'
 
 // TimelinePanel上で現在再生されているオブジェクトを取得
 const props = defineProps(['objects']); // EditViewから渡されたCurrentObjects
