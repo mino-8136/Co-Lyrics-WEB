@@ -1,6 +1,6 @@
 // settingsをuserdataに移設
 
-export interface BaseSettings {
+export interface TrackSettings {
   id: number
   start: number
   end: number
@@ -24,7 +24,7 @@ export interface StandardRenderSettings {
   //blend: number
 }
 
-export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
+export interface TextSettings extends TrackSettings, AnimationSettings, StandardRenderSettings {
   //type: string
   //name: string
   size: number
@@ -95,7 +95,7 @@ class TextObject implements TextSettings {
   }
 }
 
-export interface ImageSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
+export interface ImageSettings extends TrackSettings, AnimationSettings, StandardRenderSettings {
   file: string
 }
 
