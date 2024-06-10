@@ -1,12 +1,30 @@
 // settingsをuserdataに移設
 
-export interface TrackSettings {
+export interface BaseSettings {
   id: number
   start: number
   end: number
   layer: number
   //overlay: number
   //camera: number
+}
+
+class BaseObject implements BaseSettings {
+  id: number
+  start: number
+  end: number
+  layer: number
+  //overlay: number
+  //camera: number
+
+  constructor(settings: BaseSettings) {
+    this.id = settings.id
+    this.start = settings.start
+    this.end = settings.end
+    this.layer = settings.layer
+    //this.overlay = settings.overlay
+    //this.camera = settings.camera
+  }
 }
 
 export interface AnimationSettings {
@@ -24,7 +42,7 @@ export interface StandardRenderSettings {
   //blend: number
 }
 
-export interface TextSettings extends TrackSettings, AnimationSettings, StandardRenderSettings {
+export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   //type: string
   //name: string
   size: number
@@ -95,7 +113,7 @@ class TextObject implements TextSettings {
   }
 }
 
-export interface ImageSettings extends TrackSettings, AnimationSettings, StandardRenderSettings {
+export interface ImageSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   file: string
 }
 
