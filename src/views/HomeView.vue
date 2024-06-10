@@ -1,56 +1,56 @@
+<script setup lang="ts">
+// TODO : ファイル内のsample.jsonを読み込む部分を、複数のファイルを読み込むように変更する(要サーバープログラム)
+import { onMounted, ref } from 'vue'
+
+interface MovieObject {
+  id: number
+  title: string
+  description: string
+  date: string
+}
+const movies = ref<MovieObject[]>([])
+
+// @/public/userdata/sample.jsonから、ムービーデータを取得してmoviesにセット
+onMounted(() => {
+  fetch('public/userdata/sample/sample.json')
+    .then((res) => res.json())
+    .then((data) => {
+      const movieData = data.movie_data
+      movies.value.push({
+        id: movieData.id,
+        title: movieData.title,
+        description: movieData.description,
+        date: movieData.date
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+})
+
+function getThumbnail(movie: MovieObject) {
+  return `/userdata/sample.jpg`
+}
+
+// サムネイルをクリックしたら、PlayMoviePanelを表示する
+function playMovie(movie: MovieObject) {
+  // TODO:ここにモーダルを読み出す処理を追加
+}
+</script>
+
 <template>
   <v-container>
     <v-row>
-      <v-col
-        v-for="animation in animations"
-        :key="animation.id"
-        cols="12"
-        sm="6"
-        md="4">
+      <v-col v-for="movie in movies" :key="movie.id" cols="12" sm="6" md="4">
         <v-card>
-          <v-img :src="getThumbnail(animation)"></v-img>
-          <v-card-title>{{ animation.title }}</v-card-title>
-          <v-card-subtitle>{{ animation.date }}</v-card-subtitle>
+          <v-img :src="getThumbnail(movie)"></v-img>
+          <v-card-title>{{ movie.title }}</v-card-title>
+          <v-card-subtitle>{{ movie.date }}</v-card-subtitle>
           <v-card-actions>
-            <v-btn color="primary" @click="playAnimation(animation)">再生</v-btn>
+            <v-btn color="primary" @click="playMovie(movie)">再生</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
 </template>
-
-<script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
-import { useStore } from '@/stores/index.ts';
-
-export default defineComponent({
-  name: 'HomeView',
-  setup() {
-    const store = useStore();
-    const animations = ref([]);
-
-    onMounted(async () => {
-      animations.value = await fetchAnimations();
-    });
-
-    const getThumbnail = (animation) => {
-      return animation.thumbnailUrl; // アニメーションのサムネイル画像URLを返す
-    };
-
-    const playAnimation = (animation) => {
-      // アニメーション再生のためのロジック
-    };
-
-    const fetchAnimations = async () => {
-      // サーバーからアニメーションデータをフェッチする想定
-      return [
-        { id: 1, title: "アニメーション1", date: "2022/01/01", thumbnailUrl: "/path/to/thumbnail1.jpg" },
-        { id: 2, title: "アニメーション2", date: "2022/02/01", thumbnailUrl: "/path/to/thumbnail2.jpg" }
-      ];
-    };
-
-    return { animations, getThumbnail, playAnimation };
-  }
-});
-</script>
