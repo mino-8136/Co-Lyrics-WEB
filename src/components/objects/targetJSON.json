@@ -1,0 +1,173 @@
+{
+  "settings": {
+    "width": 1920,
+    "height": 1080,
+    "rate": 30,
+    "scale": 1,
+    "length": 523,
+    "audio_rate": 44100,
+    "audio_ch": 2
+  },
+  "tracks": [
+    {
+      "id": 0,
+      "start": 1,
+      "end": 290,
+      "layer": 1,
+      "overlay": 1,
+      "camera": 0,
+      "elements": [
+        {
+          "type": "text",
+          "name": "テキスト",
+          "size": 60,
+          "display_speed": 0.0,
+          "individual_object": false,
+          "display_coordinates": false,
+          "auto_scroll": false,
+          "bold": false,
+          "italic": false,
+          "autoadjust": false,
+          "soft": true,
+          "monospace": false,
+          "align": 4,
+          "spacing_x": 0,
+          "spacing_y": 0,
+          "precision": 1,
+          "color": "ffffff",
+          "color2": "000000",
+          "font": "小塚ゴシック Pr6N B",
+          "text": "53006f006d006500740069006d0065007300013055006e0066006f007200740075006e006100740065006c0079"
+        },
+        {
+          "type": "animation_effect",
+          "name": "画像ループ3@ANM1",
+          "parameters": "vx=0;vy=0;vxa=0;vya=0;"
+        },
+        {
+          "type": "standard_render",
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0,
+          "scale": 100.0,
+          "transparency": 0.0,
+          "rotation": 0.0,
+          "blend": 0
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "start": 357,
+      "end": 523,
+      "layer": 1,
+      "overlay": 1,
+      "camera": 0,
+      "elements": [
+        {
+          "type": "text",
+          "name": "テキスト",
+          "size": 60,
+          "display_speed": 0.0,
+          "individual_object": false,
+          "display_coordinates": false,
+          "auto_scroll": false,
+          "bold": false,
+          "italic": false,
+          "autoadjust": false,
+          "soft": true,
+          "monospace": false,
+          "align": 4,
+          "spacing_x": 0,
+          "spacing_y": 0,
+          "precision": 1,
+          "color": "ffffff",
+          "color2": "000000",
+          "font": "小塚ゴシック Pr6N B",
+          "text": "0000423042300000423042304230423042304230423042304230423042304230"
+        },
+        {
+          "type": "standard_render",
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0,
+          "scale": 100.0,
+          "transparency": 0.0,
+          "rotation": 0.0,
+          "blend": 0
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "start": 45,
+      "end": 287,
+      "layer": 2,
+      "overlay": 1,
+      "camera": 0,
+      "elements": [
+        {
+          "type": "text",
+          "name": "テキスト",
+          "size": 60,
+          "display_speed": 0.0,
+          "individual_object": false,
+          "display_coordinates": false,
+          "auto_scroll": false,
+          "bold": false,
+          "italic": false,
+          "autoadjust": false,
+          "soft": true,
+          "monospace": false,
+          "align": 4,
+          "spacing_x": 0,
+          "spacing_y": 0,
+          "precision": 1,
+          "color": "ffffff",
+          "color2": "000000",
+          "font": "小塚ゴシック Pr6N B",
+          "text": "530075006400640065006e006c0079002c00000042304230423042304230423"
+        },
+        {
+          "type": "animation_effect",
+          "name": "TA字間XY",
+          "parameters": ""
+        },
+        {
+          "type": "standard_render",
+          "X": 18.0,
+          "Y": 137.0,
+          "Z": 0.0,
+          "scale": 100.0,
+          "transparency": 0.0,
+          "rotation": 0.0,
+          "blend": 0
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "start": 148,
+      "end": 454,
+      "layer": 3,
+      "overlay": 1,
+      "camera": 0,
+      "elements": [
+        {
+          "type": "image_file",
+          "file": ""
+        },
+        {
+          "type": "standard_render",
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0,
+          "scale": 100.0,
+          "transparency": 0.0,
+          "rotation": 0.0,
+          "blend": 0
+        }
+      ]
+    }
+  ]
+}
