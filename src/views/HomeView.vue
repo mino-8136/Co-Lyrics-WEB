@@ -12,7 +12,7 @@ const movies = ref<MovieObject[]>([])
 
 // @/public/userdata/sample.jsonから、ムービーデータを取得してmoviesにセット
 onMounted(() => {
-  fetch('public/userdata/sample/sample.json')
+  fetch('src/assets/userdata/sample/sample.json')
     .then((res) => res.json())
     .then((data) => {
       const movieData = data.movie_data
@@ -29,7 +29,7 @@ onMounted(() => {
 })
 
 function getThumbnail(movie: MovieObject) {
-  return `public/userdata/sample/sample.jpg`
+  return `src/assets/userdata/sample/sample.jpg`
 }
 
 // サムネイルをクリックしたら、PlayMoviePanelを表示する

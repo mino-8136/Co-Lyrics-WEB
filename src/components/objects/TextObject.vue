@@ -4,15 +4,8 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import BaseObject from './BaseObject.vue';
-import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'TextObject',
-  extends: BaseObject,
-  setup() {
-    // テキスト固有のロジック
-  }
-});
+const objectData = defineProps(['objectData']);
 </script>

@@ -3,64 +3,39 @@
     <v-btn color="primary" @click="saveData">保存</v-btn>
     <v-btn color="secondary" @click="loadData">読み込み</v-btn>
     <div class="preview-area">
-      <div
-        v-for="object in objects"
-        :key="object.id"
-        :style="getStyle(object)"
-        class="preview-object"
-      >
-        <component :is="getObjectComponent(object.type)" :object-data="object" />
+
+      <!-- ここでオブジェクトのコンポーネントを表示 -->
+      <div v-for="object in props.objects" :key="object.id">
+        <component :is="getObjectComponent(object.type)" /> 
+        <!-- TODO : 表示する位置を指定できるようにする-->
       </div>
+
     </div>
   </v-container>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed } from 'vue'
-import { useStore } from '@/stores/index.ts'
+<script setup lang="ts">
+import { computed, ref, defineProps } from 'vue'
 import TextObject from './objects/TextObject.vue'
 import ImageObject from './objects/ImageObject.vue'
 
-export default defineComponent({
-  name: 'PreviewPanel',
-  components: { TextObject, ImageObject },
-  setup() {
-    const store = useStore()
+// TimelinePanel上で現在再生されているオブジェクトを取得
+const props = defineProps(['objects']); // EditViewから渡されたCurrentObjects
 
-    const objects = computed(() => store.objects)
 
-    const getObjectComponent = (type) => {
-      if (type === 'text') return TextObject
-      if (type === 'image') return ImageObject
-    }
+function getObjectComponent(type: string) {
+  if (type === 'text') return 'TextObject'
+  if (type === 'image') return 'ImageObject'
+}
 
-    const getStyle = (object) => {
-      return {
-        position: 'absolute',
-        top: `${object.position.y}px`,
-        left: `${object.position.x}px`,
-        zIndex: object.layer
-      }
-    }
 
-    const saveData = () => {
-      localStorage.setItem('savedObjects', JSON.stringify(store.objects))
-      alert('データを保存しました')
-    }
+const saveData = () => {
+  // TODO: データを保存する処理を追加
+}
 
-    const loadData = () => {
-      const savedObjects = localStorage.getItem('savedObjects')
-      if (savedObjects) {
-        store.objects = JSON.parse(savedObjects)
-        alert('データを読み込みました')
-      } else {
-        alert('保存されたデータがありません')
-      }
-    }
-
-    return { objects, getObjectComponent, getStyle, saveData, loadData }
-  }
-})
+const loadData = () => {
+  // TODO: データを読み込む処理を追加
+}
 </script>
 
 <style scoped>

@@ -1,32 +1,83 @@
 <template>
-  <div class="timeline-panel">
-    <div v-for="(layer, index) in layers" :key="index" class="layer" >
-        <div
-          v-for="object in layer.objects"
-          :key="object.id"
-          :is="getObjectComponent(object.type)"
-          :object-data="object"/>
+  <v-card>
+    <v-card-title>Timeline</v-card-title>
+    <v-card-text>
+      <v-virtual-scroll
+        :items="layers"
+        height="200"
+        item-height="40"
+      >
+        <template v-slot="{ item, index }">
+          <v-sheet
+            :key="index"
+            class="pa-2"
+            outlined
+            tile
+            @contextmenu.prevent="openMenu($event, index)"
+          >
+            Layer {{ index + 1 }}: {{ item.name }}
+            <div class="objects-container">
+              <base-object v-for="(object, i) in item.objects" :key="i"></base-object>
+            </div>
+          </v-sheet>
+        </template>
+      </v-virtual-scroll>
+    </v-card-text>
+  </v-card>
 
-    </div>
-  </div>
+  <v-menu
+  class="menu"
+    v-model="menu"
+    :position-x="menuX"
+    :position-y="menuY"
+    absolute
+    offset-y
+  >
+    <v-list>
+      <v-list-item @click="addObject(currentLayerIndex)">
+        <v-list-item-title>オブジェクトを追加</v-list-item-title>
+      </v-list-item>
+    </v-list>
+  </v-menu>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import TextObject from './objects/TextObject.vue';
-import ImageObject from './objects/ImageObject.vue';
+import BaseObject from './objects/BaseObject.vue';
 
-const layers = ref([
-  { id: 1, objects: [] }
-]);
+// TODO : 各レイヤーで保持する情報は今後EditViewで管理する
+const layers = ref(Array.from({ length: 10 }, () => ({
+  name: "Layer",
+  objects: []
+})));
 
-const getObjectComponent = (type) => {
-  if (type === 'text') return TextObject;
-  if (type === 'image') return ImageObject;
+const menu = ref(false);
+const menuX = ref(0);
+const menuY = ref(0);
+const currentLayerIndex = ref(0);
+
+const openMenu = (event:any, index:number) => {
+  menuX.value = event.clientX;
+  menuY.value = event.clientY;
+  currentLayerIndex.value = index;
+  menu.value = true;
 };
 
+const addObject = (layerIndex:number) => {
+  layers.value[layerIndex].objects.push({});
+  menu.value = false;
+};
 </script>
 
 <style scoped>
-/* 必要に応じてスタイルを追加 */
+.objects-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.menu {
+  position: absolute;
+  offset: 100px;
+}
 </style>

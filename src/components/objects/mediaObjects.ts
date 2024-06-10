@@ -9,7 +9,7 @@ export interface BaseSettings {
   //camera: number
 }
 
-class BaseObject implements BaseSettings {
+export class BaseObject implements BaseSettings {
   id: number
   start: number
   end: number
@@ -65,7 +65,7 @@ export interface TextSettings extends BaseSettings, AnimationSettings, StandardR
   text: string
 }
 
-class TextObject implements TextSettings {
+export class TextObject implements TextSettings {
   id: number
   start: number
   end: number
@@ -117,7 +117,7 @@ export interface ImageSettings extends BaseSettings, AnimationSettings, Standard
   file: string
 }
 
-class ImageObject implements ImageSettings {
+export class ImageObject implements ImageSettings {
   id: number
   start: number
   end: number
