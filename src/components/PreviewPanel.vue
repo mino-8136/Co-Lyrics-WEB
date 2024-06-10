@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { defineComponent, computed } from 'vue'
-import { useStore } from '@/store'
+import { useStore } from '@/stores/index.ts'
 import TextObject from './objects/TextObject.vue'
 import ImageObject from './objects/ImageObject.vue'
 

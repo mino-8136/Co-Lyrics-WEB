@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
-import { useStore } from '@/store';
+import { useStore } from '@/stores/index.ts';
 
 export default defineComponent({
   name: 'HomeView',

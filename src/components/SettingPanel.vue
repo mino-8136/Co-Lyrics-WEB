@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { useMainStore } from '@/store';
+import { useMainStore } from '@/stores/index.ts';
 
 export default defineComponent({
   name: 'SettingPanel',
