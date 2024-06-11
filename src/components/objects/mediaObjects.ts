@@ -1,4 +1,5 @@
 // settingsをuserdataに移設
+// selectedを追加
 
 export interface BaseSettings {
   id: number
@@ -7,6 +8,7 @@ export interface BaseSettings {
   layer: number
   //overlay: number
   //camera: number
+  selected: boolean
 }
 
 export class BaseObject implements BaseSettings {
@@ -16,6 +18,7 @@ export class BaseObject implements BaseSettings {
   layer: number
   //overlay: number
   //camera: number
+  selected: boolean
 
   constructor(settings: BaseSettings) {
     this.id = settings.id
@@ -24,6 +27,7 @@ export class BaseObject implements BaseSettings {
     this.layer = settings.layer
     //this.overlay = settings.overlay
     //this.camera = settings.camera
+    this.selected = false
   }
 }
 
@@ -70,6 +74,7 @@ export class TextObject implements TextSettings {
   start: number
   end: number
   layer: number
+  selected: boolean
   X: number
   Y: number
   scale: number
@@ -91,6 +96,7 @@ export class TextObject implements TextSettings {
     this.start = settings.start
     this.end = settings.end
     this.layer = settings.layer
+    this.selected = false
     this.X = settings.X
     this.Y = settings.Y
     this.scale = settings.scale
@@ -122,6 +128,7 @@ export class ImageObject implements ImageSettings {
   start: number
   end: number
   layer: number
+  selected: boolean
   X: number
   Y: number
   scale: number
@@ -136,6 +143,7 @@ export class ImageObject implements ImageSettings {
     this.start = settings.start
     this.end = settings.end
     this.layer = settings.layer
+    this.selected = false
     this.X = settings.X
     this.Y = settings.Y
     this.scale = settings.scale

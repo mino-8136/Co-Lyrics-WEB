@@ -45,12 +45,13 @@
 import { ref } from 'vue';
 import BaseObject from './objects/BaseObject.vue';
 
-// TODO : 各レイヤーで保持する情報は今後EditViewで管理する
+// TODO : 各レイヤーで保持する情報は今後Storeで管理する
 const layers = ref(Array.from({ length: 10 }, () => ({
   name: "Layer",
   objects: []
 })));
 
+// メニューの表示制御
 const menu = ref(false);
 const menuX = ref(0);
 const menuY = ref(0);
@@ -63,6 +64,7 @@ const openMenu = (event:any, index:number) => {
   menu.value = true;
 };
 
+// TODO : 今後の追加先はStoreで管理する
 const addObject = (layerIndex:number) => {
   layers.value[layerIndex].objects.push({});
   menu.value = false;
@@ -78,6 +80,5 @@ const addObject = (layerIndex:number) => {
 
 .menu {
   position: absolute;
-  offset: 100px;
 }
 </style>
