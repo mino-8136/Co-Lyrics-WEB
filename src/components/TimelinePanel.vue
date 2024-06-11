@@ -2,11 +2,7 @@
   <v-card>
     <v-card-title>Timeline</v-card-title>
     <v-card-text>
-      <v-virtual-scroll
-        :items="layers"
-        height="200"
-        item-height="40"
-      >
+      <v-virtual-scroll :items="layers" height="200" item-height="40">
         <template v-slot="{ item, index }">
           <v-sheet
             :key="index"
@@ -17,7 +13,11 @@
           >
             Layer {{ index + 1 }}: {{ item.name }}
             <div class="objects-container">
-              <base-object v-for="(object, i) in item.objects" :key="i"></base-object>
+              <base-object
+                v-for="object in objectStore.objects.filter((o) => o.layer === index)"
+                :key="object.id"
+                :object="object"
+              ></base-object>
             </div>
           </v-sheet>
         </template>
@@ -25,14 +25,7 @@
     </v-card-text>
   </v-card>
 
-  <v-menu
-  class="menu"
-    v-model="menu"
-    :position-x="menuX"
-    :position-y="menuY"
-    absolute
-    offset-y
-  >
+  <v-menu class="menu" v-model="menu" :position-x="menuX" :position-y="menuY" absolute offset-y>
     <v-list>
       <v-list-item @click="addObject(currentLayerIndex)">
         <v-list-item-title>オブジェクトを追加</v-list-item-title>
@@ -42,33 +35,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import BaseObject from './objects/BaseObject.vue';
-
-// TODO : 各レイヤーで保持する情報は今後Storeで管理する
-const layers = ref(Array.from({ length: 10 }, () => ({
-  name: "Layer",
-  objects: []
-})));
+import { ref } from 'vue'
+import BaseObject from './objects/BaseObject.vue'
+import { useObjectStore } from '@/stores/objectStore'
 
 // メニューの表示制御
-const menu = ref(false);
-const menuX = ref(0);
-const menuY = ref(0);
-const currentLayerIndex = ref(0);
+const menu = ref(false)
+const menuX = ref(0)
+const menuY = ref(0)
+const currentLayerIndex = ref(0)
+const openMenu = (event: any, index: number) => {
+  menuX.value = event.clientX
+  menuY.value = event.clientY
+  currentLayerIndex.value = index
+  menu.value = true
+}
 
-const openMenu = (event:any, index:number) => {
-  menuX.value = event.clientX;
-  menuY.value = event.clientY;
-  currentLayerIndex.value = index;
-  menu.value = true;
-};
+// TODO : 各レイヤーで保持する情報は今後Storeで管理する
+const layers = ref(
+  Array.from({ length: 10 }, () => ({
+    name: 'Layer',
+  }))
+)
 
-// TODO : 今後の追加先はStoreで管理する
-const addObject = (layerIndex:number) => {
-  layers.value[layerIndex].objects.push({});
-  menu.value = false;
-};
+// オブジェクト情報の管理
+const objectStore = useObjectStore()
+const addObject = (layerIndex: number) => {
+  objectStore.addObject({
+    id: objectStore.counter,
+    start: 0,
+    end: 100,
+    layer: layerIndex,
+    selected:false
+  })
+  menu.value = false
+}
 </script>
 
 <style scoped>

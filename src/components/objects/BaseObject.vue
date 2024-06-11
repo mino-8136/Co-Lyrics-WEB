@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { BaseObject } from './mediaObjects'
 
 // 仮でBaseObjectを作成。TODO : PropsでTimeline？から受け取るようにする
@@ -23,10 +23,8 @@ const objectStyle = computed(() => ({
   left: `${baseObject.value.start}px`,
   width: `${baseObject.value.end - baseObject.value.start}px`,
   position: 'absolute',
-  cursor: isMoving.value ? 'grabbing' : 'grab',
-  }
-  )
-)
+  cursor: isMoving.value ? 'grabbing' : 'grab'
+}))
 
 const startMove = (event: MouseEvent) => {
   isMoving.value = true
@@ -40,7 +38,6 @@ const move = (event: MouseEvent) => {
     baseObject.value.start += dx
     baseObject.value.end += dx
   }
-  // console.log(baseObject.value.start, baseObject.value.end)
 }
 
 const stopMove = () => {
@@ -70,10 +67,10 @@ const stopResize = () => {
   isResizing.value = false
 }
 
-window.addEventListener('mouseup', stopResize);
-window.addEventListener('mousemove', resize);
-window.addEventListener('mouseup', stopMove);
-window.addEventListener('mousemove', move);
+window.addEventListener('mouseup', stopResize)
+window.addEventListener('mousemove', resize)
+window.addEventListener('mouseup', stopMove)
+window.addEventListener('mousemove', move)
 </script>
 
 <template>
