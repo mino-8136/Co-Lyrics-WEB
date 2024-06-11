@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { BaseObject } from './mediaObjects'
 
-// 仮でBaseObjectを作成。TODO : PropsでTimeline？から受け取るようにする
-const baseObject = ref<BaseObject>(
-  new BaseObject({
-    id: 0,
-    start: 0,
-    end: 100,
-    layer: 0
-  })
-)
+const props = defineProps<{
+  object: BaseObject
+}>()
+
+const baseObject = ref(props.object)
 
 // 横幅の定義方法 : end-startで定義する
 // ドラッグ時の挙動 : 右端を掴んだらendを変更、左端を掴んだらstartを変更
