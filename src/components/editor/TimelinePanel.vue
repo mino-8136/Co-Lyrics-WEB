@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import BaseObject from './objects/BaseObject.vue'
+import BaseObject from '../objects/BaseObject.vue'
 import { useObjectStore } from '@/stores/objectStore'
 
 // メニューの表示制御
