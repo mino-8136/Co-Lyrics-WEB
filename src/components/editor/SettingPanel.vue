@@ -4,8 +4,13 @@
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
 
       <div v-if="selectedObject.type === 'text'">
-        <label>テキスト:</label>
-        <input v-model="selectedObject.text" type="text" />
+
+        <textarea v-model="selectedObject.text" type="text" />
+
+        <v-slider label="val1"></v-slider>
+        <v-slider label="val1"></v-slider>
+        <v-slider label="val1"></v-slider>
+        <v-slider label="val1"></v-slider>
       </div>
 
       <div v-if="selectedObject.type === 'image'">
@@ -29,11 +34,19 @@ const selectedObject = ref({
 
 <style scoped>
 .setting-panel {
-  padding: 10px;
-  border: 1px solid #ccc;
-  position: relative;
   width: 100%;
   height: 500px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  overflow-y: auto
+}
+
+textarea {
+  width: 100%;
+  height: 120px;
+  padding: 8px 12px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
 }
 
 </style>
