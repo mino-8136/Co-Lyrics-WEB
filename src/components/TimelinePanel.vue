@@ -6,7 +6,7 @@
         <template v-slot="{ item, index }">
           <v-sheet
             :key="index"
-            class="pa-2"
+            class="pa-2 grid-line"
             outlined
             tile
             @contextmenu.prevent="openMenu($event, index)"
@@ -81,5 +81,10 @@ const addObject = (layerIndex: number) => {
 
 .menu {
   position: absolute;
+}
+
+.grid-line {
+  background-image: linear-gradient(90deg, #ccc 1px, transparent 1px);
+  background-size: 10px 10px;
 }
 </style>
