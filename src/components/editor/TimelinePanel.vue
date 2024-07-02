@@ -3,7 +3,7 @@
     <v-card-title>Timeline</v-card-title>
     <v-card-text>
       <v-virtual-scroll :items="layers" height="200" item-height="40">
-        <template v-slot="{ item, index }">
+        <template v-slot="{ index }">
           <v-sheet
             :key="index"
             class="pa-2 grid-line"
@@ -11,8 +11,8 @@
             tile
             @contextmenu.prevent="openMenu($event, index)"
           >
-            Layer {{ index + 1 }}: {{ item.name }}
-            <div class="objects-container">
+            Layer {{ index + 1 }}
+            <div class="layer">
               <base-object
                 v-for="object in objectStore.objects.filter((o) => o.layer === index)"
                 :key="object.id"
@@ -25,7 +25,12 @@
     </v-card-text>
   </v-card>
 
-  <v-menu class="menu" v-model="menu" :position-x="menuX" :position-y="menuY" absolute offset-y>
+  <v-menu 
+  class="menu" 
+  v-model="menu"       
+  :offset-x="true"
+      :offset-y="true"
+      :position-x="menuX" :position-y="menuY" absolute offset-y>
     <v-list>
       <v-list-item @click="addObject(currentLayerIndex)">
         <v-list-item-title>オブジェクトを追加</v-list-item-title>
@@ -54,7 +59,7 @@ const openMenu = (event: any, index: number) => {
 // TODO : 各レイヤーで保持する情報は今後Storeで管理する
 const layers = ref(
   Array.from({ length: 10 }, () => ({
-    name: 'Layer',
+    name: 'Layer'
   }))
 )
 
@@ -66,17 +71,18 @@ const addObject = (layerIndex: number) => {
     start: 0,
     end: 100,
     layer: layerIndex,
-    selected:false
+    selected: false
   })
   menu.value = false
 }
 </script>
 
 <style scoped>
-.objects-container {
+.layer {
   display: flex;
   flex-wrap: wrap;
   margin-top: 10px;
+  border: #ccc 1px solid;
 }
 
 .menu {
