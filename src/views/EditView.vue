@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import PreviewPanel from '../components/PreviewPanel.vue'
-import TimelinePanel from '../components/TimelinePanel.vue'
-import SettingPanel from '../components/SettingPanel.vue'
+import PreviewPanel from '../components/editor/PreviewPanel.vue'
+import TimelinePanel from '../components/editor/TimelinePanel.vue'
+import SettingPanel from '../components/editor/SettingPanel.vue'
 </script>
