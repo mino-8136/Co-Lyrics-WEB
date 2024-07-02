@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <header>
-    <nav>
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/edit">Edit</RouterLink>
-      <RouterLink to="/debug">Debug</RouterLink>
-    </nav>
-  </header>
-
-  <RouterView />
+  <v-app>
+    <v-toolbar app color="primary" class="mb-4">
+      <v-toolbar-title>研究用リリック</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <!-- <v-btn text to="/">Home</v-btn>でいいのか疑問 -->
+      <v-btn text @click="()=>$router.push('/')">Home</v-btn>
+      <v-btn text  @click="()=>$router.push('/edit')">Edit</v-btn>
+      <v-btn text  @click="()=>$router.push('/debug')">Debug</v-btn>
+    </v-toolbar>
+    <v-main>
+      <RouterView />
+    </v-main>
+  </v-app>
 </template>

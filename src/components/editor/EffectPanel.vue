@@ -2,7 +2,6 @@
   <v-dialog v-model="showEffects" max-width="500px">
     <v-card>
       <v-card-title> テキストエフェクトを選択 </v-card-title>
-      <v-card-text>
         <v-container>
           <v-row>
             <v-col v-for="effect in effects" :key="effect.id" cols="4" >
@@ -12,7 +11,6 @@
             </v-col>
           </v-row>
         </v-container>
-      </v-card-text>
       <v-card-actions>
         <v-btn color="primary" @click="close">閉じる</v-btn>
       </v-card-actions>
