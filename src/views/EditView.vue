@@ -1,10 +1,3 @@
-<script setup lang="ts">
-import { ref, computed } from 'vue'
-import PreviewPanel from '../components/PreviewPanel.vue'
-import TimelinePanel from '../components/TimelinePanel.vue'
-import SettingPanel from '../components/SettingPanel.vue'
-</script>
-
 <template>
   <v-container>
     <v-row>
@@ -18,3 +11,10 @@ import SettingPanel from '../components/SettingPanel.vue'
     <timeline-panel />
   </v-container>
 </template>
+
+<script setup lang="ts">
+import PreviewPanel from '../components/PreviewPanel.vue'
+import TimelinePanel from '../components/TimelinePanel.vue'
+import SettingPanel from '../components/SettingPanel.vue'
+</script>
+
