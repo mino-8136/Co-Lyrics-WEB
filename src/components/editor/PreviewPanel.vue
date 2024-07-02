@@ -8,17 +8,14 @@
     <div v-for="object in props.objects" :key="object.id">
       <component :is="getObjectComponent(object.type)" />
     </div>
-    
-    <button v-on:click="creatBalls">Create Balls</button>
-    <!--全ボール削除ボタン-->
-    <button v-on:click="clearCanvas">Clear Canvas</button>
+
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import p5 from "p5";
-import { p5Setup, addBalls, clearBalls } from '../p5/SetupP5';
+import { sketch } from '../p5/sketch';
 
 // TimelinePanel上で現在再生されているオブジェクトを取得
 const props = defineProps(['objects']) // EditViewから渡されたCurrentObjects
@@ -28,20 +25,13 @@ function getObjectComponent(type: string) {
   if (type === 'image') return 'ImageObject'
 }
 
-const P5 = ref();
+const p = ref();
 
 // マウント時に canvas を生成
 onMounted(() => {
-  P5.value = new p5(p5Setup);
+  p.value = new p5(sketch);
+  p.value.changeColor();
 });
-// ボールを追加
-const creatBalls = () => {
-  addBalls();
-};
-// ボールを全て削除
-const clearCanvas = () => {
-  clearBalls();
-};
 
 </script>
 

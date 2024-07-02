@@ -6,6 +6,10 @@
 - npm install p5
 - npm install -D @types/p5
 
+## 参考メモ
+p5js 
+https://qiita.com/mitsuya_bauhaus/items/b6f3d1aec07a9e07bb3a
+
 
 ## Project Setup
 
