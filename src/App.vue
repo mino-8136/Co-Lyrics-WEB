@@ -4,7 +4,7 @@ import { RouterView } from 'vue-router'
 
 <template>
   <v-app>
-    <v-toolbar app>
+    <v-toolbar app color="primary" class="mb-4">
       <v-toolbar-title>研究用リリック</v-toolbar-title>
       <v-spacer></v-spacer>
       <!-- <v-btn text to="/">Home</v-btn>でいいのか疑問 -->
