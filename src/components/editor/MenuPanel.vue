@@ -1,7 +1,7 @@
 <template>
   <v-menu>
     <template v-slot:activator="{ props }">
-      <v-btn color="primary" v-bind="props" density="comfortable"> ファイル </v-btn>
+      <v-btn color="secondary" v-bind="props" density="comfortable"> ファイル </v-btn>
     </template>
 
     <v-list>
@@ -17,10 +17,10 @@
 
 <script setup lang="ts">
 const saveFile = () => {
-  // TODO: データを保存する処理を追加
+  // TODO: storeのデータを保存する処理を追加
 }
 
 const openFile = () => {
-  // TODO: データを読み込む処理を追加
+  // TODO: jsonのデータを読み込む処理を追加
 }
 </script>
