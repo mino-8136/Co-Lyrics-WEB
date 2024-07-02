@@ -1,4 +1,5 @@
 <template>
+  <menu-panel />
   <v-row>
     <v-col>
       <preview-panel />
@@ -14,4 +15,5 @@
 import PreviewPanel from '../components/editor/PreviewPanel.vue'
 import TimelinePanel from '../components/editor/TimelinePanel.vue'
 import SettingPanel from '../components/editor/SettingPanel.vue'
+import MenuPanel from '../components/editor/MenuPanel.vue'
 </script>
