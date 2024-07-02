@@ -4,6 +4,7 @@
 ## 開発要件
 
 - npm install p5
+- npm install -D @types/p5
 
 
 ## Project Setup
