@@ -1,36 +1,24 @@
 <template>
-  <v-card>
-    <v-card-title>Timeline</v-card-title>
-    <v-card-text>
-      <v-virtual-scroll :items="layers" height="200" item-height="40">
-        <template v-slot="{ index }">
-          <v-sheet
-            :key="index"
-            class="pa-2 grid-line"
-            outlined
-            tile
-            @contextmenu.prevent="openMenu($event, index)"
-          >
-            Layer {{ index + 1 }}
-            <div class="layer">
-              <base-object
-                v-for="object in objectStore.objects.filter((o) => o.layer === index)"
-                :key="object.id"
-                :object="object"
-              ></base-object>
-            </div>
-          </v-sheet>
-        </template>
-      </v-virtual-scroll>
-    </v-card-text>
-  </v-card>
+  <v-container class="timeline-panel">
+    <h3>Timeline</h3>
 
-  <v-menu 
-  class="menu" 
-  v-model="menu"       
-  :offset-x="true"
-      :offset-y="true"
-      :position-x="menuX" :position-y="menuY" absolute offset-y>
+    <v-virtual-scroll :items="layers" height="200" item-height="40">
+      <template v-slot="{ item, index }">
+        <div class="layer">
+          <div class="layerIndex">{{ item.name }} {{ index }}</div>
+          <div class="layerTimeline" @contextmenu.prevent="openMenu($event, index)">
+            <base-object
+              v-for="object in objectStore.objects.filter((o) => o.layer === index)"
+              :key="object.id"
+              :object="object"
+            ></base-object>
+          </div>
+        </div>
+      </template>
+    </v-virtual-scroll>
+  </v-container>
+
+  <v-menu v-model="menu" :offset-x="true" :offset-y="true" :position-x="menuX" :position-y="menuY">
     <v-list>
       <v-list-item @click="addObject(currentLayerIndex)">
         <v-list-item-title>オブジェクトを追加</v-list-item-title>
@@ -41,8 +29,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import BaseObject from '../objects/BaseObject.vue'
 import { useObjectStore } from '@/stores/objectStore'
+import BaseObject from '../objects/BaseObject.vue'
 
 // メニューの表示制御
 const menu = ref(false)
@@ -78,19 +66,26 @@ const addObject = (layerIndex: number) => {
 </script>
 
 <style scoped>
+.timeline-panel {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
 .layer {
   display: flex;
-  flex-wrap: wrap;
-  margin-top: 10px;
-  border: #ccc 1px solid;
 }
 
-.menu {
-  position: absolute;
+.layerIndex {
+  border: 1px solid black;
+  width: 80px;
+  padding: 8px;
 }
 
-.grid-line {
-  background-image: linear-gradient(90deg, #ccc 1px, transparent 1px);
-  background-size: 10px 10px;
+.layerTimeline {
+  border: 1px solid black;
+  background: linear-gradient(90deg, #ccc 1px, transparent 1px);
+  background-size: 10px;
+  width: 90%;
+  padding: 8px;
 }
 </style>
