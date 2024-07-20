@@ -2,10 +2,3 @@
   margin: 0 auto;
   font-weight: normal;
 }
-
-@media (min-width: 1024px) {
-  #app {
-    display: grid;
-    margin: 0 1rem;
-  }
-}
