@@ -8,7 +8,7 @@
           <div class="layerIndex">{{ item.name }} {{ index }}</div>
           <div class="layerTimeline" @contextmenu.prevent="openMenu($event, index)">
             <base-object
-              v-for="object in objectStore.objects.filter((o) => o.layer === index)"
+              v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
               :key="object.id"
               :object="object"
             ></base-object>
