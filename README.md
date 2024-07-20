@@ -5,6 +5,7 @@
 
 - npm install p5
 - npm install -D @types/p5
+- npm install -save @imengyu/vue3-context-menu
 
 ## 参考メモ
 p5js 

@@ -6,7 +6,7 @@
       <template v-slot="{ item, index }">
         <div class="layer">
           <div class="layerIndex">{{ item.name }} {{ index }}</div>
-          <div class="layerTimeline" @contextmenu.prevent="openMenu($event, index)">
+          <div class="layerTimeline" @contextmenu.prevent="onContextMenu($event, index)">
             <base-object
               v-for="object in objectStore.objects.filter((o) => o.layer === index)"
               :key="object.id"
@@ -17,31 +17,39 @@
       </template>
     </v-virtual-scroll>
   </v-container>
-
-  <v-menu v-model="menu" :offset-x="true" :offset-y="true" :position-x="menuX" :position-y="menuY">
-    <v-list>
-      <v-list-item @click="addObject(currentLayerIndex)">
-        <v-list-item-title>オブジェクトを追加</v-list-item-title>
-      </v-list-item>
-    </v-list>
-  </v-menu>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
+import ContextMenu from '@imengyu/vue3-context-menu'
 import BaseObject from '../objects/BaseObject.vue'
+const objectStore = useObjectStore()
+
 
 // メニューの表示制御
-const menu = ref(false)
-const menuX = ref(0)
-const menuY = ref(0)
-const currentLayerIndex = ref(0)
-const openMenu = (event: any, index: number) => {
-  menuX.value = event.clientX
-  menuY.value = event.clientY
-  currentLayerIndex.value = index
-  menu.value = true
+function onContextMenu(event: MouseEvent, index: number) {
+  event.preventDefault()
+  ContextMenu.showContextMenu({
+    x: event.clientX,
+    y: event.clientY,
+    items: [
+      {
+        label: 'オブジェクトを追加',
+        onClick: () => {
+          addObject(index)
+        }
+      },
+      { 
+        label: "A submenu", 
+        children: [
+          { label: "Item1" },
+          { label: "Item2" },
+          { label: "Item3" },
+        ]
+      },
+    ],
+  })
 }
 
 // TODO : 各レイヤーで保持する情報は今後Storeで管理する
@@ -51,9 +59,8 @@ const layers = ref(
   }))
 )
 
-// オブジェクト情報の管理
-const objectStore = useObjectStore()
-const addObject = (layerIndex: number) => {
+// オブジェクトの追加
+function addObject(layerIndex: number){
   objectStore.addObject({
     id: objectStore.counter,
     start: 0,
@@ -61,7 +68,6 @@ const addObject = (layerIndex: number) => {
     layer: layerIndex,
     selected: false
   })
-  menu.value = false
 }
 </script>
 
