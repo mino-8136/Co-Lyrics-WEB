@@ -24,8 +24,10 @@ export const useObjectStore = defineStore('objects', {
       this.counter++
     },
     removeObject(index: number) {
-      this.objects.splice(index, 1)
+      this.objects.splice(
+        this.objects.findIndex((object) => object.id === index),
+        1
+      )
     }
-    
   }
 })
