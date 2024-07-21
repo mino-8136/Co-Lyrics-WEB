@@ -35,9 +35,15 @@ function onContextMenu(event: MouseEvent, index: number) {
     y: event.clientY,
     items: [
       {
-        label: 'オブジェクトを追加',
+        label: 'テキストオブジェクトを追加',
         onClick: () => {
-          addObject(index)
+          addObject(index, "text")
+        }
+      },
+      {
+        label: '画像オブジェクトを追加',
+        onClick: () => {
+          addObject(index, "image")
         }
       },
       { 
@@ -60,7 +66,7 @@ const layers = ref(
 )
 
 // オブジェクトの追加
-function addObject(layerIndex: number){
+function addObject(layerIndex: number, type: string){
   objectStore.addObject({
     id: objectStore.counter,
     start: 0,
@@ -92,6 +98,5 @@ function addObject(layerIndex: number){
   background: linear-gradient(90deg, #ccc 1px, transparent 1px);
   background-size: 10px;
   width: 90%;
-  padding: 8px;
 }
 </style>

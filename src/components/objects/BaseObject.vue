@@ -1,9 +1,29 @@
+<template>
+  <div
+    class="base-object"
+    :style="objectStyle"
+    @mousedown="startMove"
+    @mousemove="move"
+    @mouseup="stopMove"
+    @contextmenu.prevent="onObjectContextMenu($event)"
+  >
+    <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
+    <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
+  </div>
+
+  <context-menu v-model:show="show" :options="optionsComponent">
+    <context-menu-item label="オブジェクトを削除" @click="console.log('x')" />
+  </context-menu>
+</template>
+
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { BaseObject } from './mediaObjects'
+import ContextMenu from '@imengyu/vue3-context-menu'
 
 const props = defineProps<{
   object: BaseObject
+  type : string
 }>()
 
 const baseObject = ref(props.object)
@@ -14,6 +34,21 @@ const isResizing = ref(false)
 const isMoving = ref(false)
 const lastMouseX = ref(0)
 const side = ref('')
+
+// ContextMenu
+const show = ref(false)
+const optionsComponent = ref({
+  zIndex: 3,
+  minWidth: 230,
+  x: 500,
+  y: 1200
+})
+function onObjectContextMenu(event: MouseEvent) {
+  show.value = true
+  optionsComponent.value.x = event.x
+  optionsComponent.value.y = event.y
+  event.stopPropagation()
+}
 
 const objectStyle = computed(() => ({
   left: `${baseObject.value.start}px`,
@@ -68,19 +103,6 @@ window.addEventListener('mousemove', resize)
 window.addEventListener('mouseup', stopMove)
 window.addEventListener('mousemove', move)
 </script>
-
-<template>
-  <div
-    class="base-object"
-    :style="objectStyle"
-    @mousedown="startMove"
-    @mousemove="move"
-    @mouseup="stopMove"
-  >
-    <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
-    <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
-  </div>
-</template>
 
 <style scoped>
 .base-object {
