@@ -11,6 +11,7 @@
               v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
               :key="object.id"
               :object="object"
+              @contextmenu.prevent="onObjectContextMenu($event, object.id)"
             ></base-object>
           </div>
         </div>
@@ -27,7 +28,7 @@ import BaseObject from '../objects/BaseObject.vue'
 const objectStore = useObjectStore()
 
 
-// メニューの表示制御
+// タイムラインメニュー
 function onTimelineContextMenu(event: MouseEvent, index: number) {
   event.preventDefault()
   ContextMenu.showContextMenu({
@@ -45,18 +46,34 @@ function onTimelineContextMenu(event: MouseEvent, index: number) {
         onClick: () => {
           addObject(index, "image")
         }
-      },
-      { 
-        label: "A submenu", 
-        children: [
-          { label: "Item1" },
-          { label: "Item2" },
-          { label: "Item3" },
-        ]
+      }
+    ],
+  })
+  event.stopPropagation()
+}
+
+// オブジェクトメニュー
+function onObjectContextMenu(event: MouseEvent, index: number) {
+  event.preventDefault()
+  ContextMenu.showContextMenu({
+    x: event.clientX,
+    y: event.clientY,
+    items: [
+      {
+        label: 'オブジェクトを削除',
+        onClick: () => {
+          removeObject(index)
+        }
       },
     ],
   })
+  event.stopPropagation()
 }
+
+function removeObject(index: number) {
+  objectStore.removeObject(index)
+}
+
 
 // TODO : 各レイヤーで保持する情報は今後Storeで管理する
 const layers = ref(

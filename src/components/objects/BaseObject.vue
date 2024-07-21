@@ -5,7 +5,6 @@
     @mousedown="startMove"
     @mousemove="move"
     @mouseup="stopMove"
-    @contextmenu.prevent="onObjectContextMenu($event)"
   >
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
@@ -15,7 +14,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { BaseObject } from './mediaObjects'
-import ContextMenu from '@imengyu/vue3-context-menu'
 
 const props = defineProps<{
   object: BaseObject
@@ -83,24 +81,6 @@ window.addEventListener('mouseup', stopResize)
 window.addEventListener('mousemove', resize)
 window.addEventListener('mouseup', stopMove)
 window.addEventListener('mousemove', move)
-
-// ContextMenu
-function onObjectContextMenu(event: MouseEvent) {
-  event.preventDefault()
-  ContextMenu.showContextMenu({
-    x: event.clientX,
-    y: event.clientY,
-    items: [
-      {
-        label: 'オブジェクトを削除',
-        onClick: () => {
-          console.log('delete object')
-        }
-      },
-    ],
-  })
-  event.stopPropagation()
-}
 
 </script>
 
