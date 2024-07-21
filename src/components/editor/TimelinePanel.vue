@@ -26,7 +26,11 @@ import { useObjectStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import BaseObject from '../objects/BaseObject.vue'
 const objectStore = useObjectStore()
-
+const layers = ref(
+  Array.from({ length: 10 }, () => ({
+    name: 'Layer'
+  }))
+)
 
 // タイムラインメニュー
 function onTimelineContextMenu(event: MouseEvent, index: number) {
@@ -70,18 +74,6 @@ function onObjectContextMenu(event: MouseEvent, index: number) {
   event.stopPropagation()
 }
 
-function removeObject(index: number) {
-  objectStore.removeObject(index)
-}
-
-
-// TODO : 各レイヤーで保持する情報は今後Storeで管理する
-const layers = ref(
-  Array.from({ length: 10 }, () => ({
-    name: 'Layer'
-  }))
-)
-
 // オブジェクトの追加
 function addObject(layerIndex: number, type: string){
   objectStore.addObject({
@@ -92,6 +84,11 @@ function addObject(layerIndex: number, type: string){
     selected: false
   })
 }
+
+function removeObject(index: number) {
+  objectStore.removeObject(index)
+}
+
 </script>
 
 <style scoped>
