@@ -6,7 +6,7 @@
       <template v-slot="{ item, index }">
         <div class="layer">
           <div class="layerIndex">{{ item.name }} {{ index }}</div>
-          <div class="layerTimeline" @contextmenu.prevent="onContextMenu($event, index)">
+          <div class="layerTimeline" @contextmenu.prevent="onTimelineContextMenu($event, index)">
             <base-object
               v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
               :key="object.id"
@@ -28,7 +28,7 @@ const objectStore = useObjectStore()
 
 
 // メニューの表示制御
-function onContextMenu(event: MouseEvent, index: number) {
+function onTimelineContextMenu(event: MouseEvent, index: number) {
   event.preventDefault()
   ContextMenu.showContextMenu({
     x: event.clientX,

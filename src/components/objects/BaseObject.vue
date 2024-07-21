@@ -10,10 +10,6 @@
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
   </div>
-
-  <context-menu v-model:show="show" :options="optionsComponent">
-    <context-menu-item label="オブジェクトを削除" @click="console.log('x')" />
-  </context-menu>
 </template>
 
 <script setup lang="ts">
@@ -34,21 +30,6 @@ const isResizing = ref(false)
 const isMoving = ref(false)
 const lastMouseX = ref(0)
 const side = ref('')
-
-// ContextMenu
-const show = ref(false)
-const optionsComponent = ref({
-  zIndex: 3,
-  minWidth: 230,
-  x: 500,
-  y: 1200
-})
-function onObjectContextMenu(event: MouseEvent) {
-  show.value = true
-  optionsComponent.value.x = event.x
-  optionsComponent.value.y = event.y
-  event.stopPropagation()
-}
 
 const objectStyle = computed(() => ({
   left: `${baseObject.value.start}px`,
@@ -102,6 +83,25 @@ window.addEventListener('mouseup', stopResize)
 window.addEventListener('mousemove', resize)
 window.addEventListener('mouseup', stopMove)
 window.addEventListener('mousemove', move)
+
+// ContextMenu
+function onObjectContextMenu(event: MouseEvent) {
+  event.preventDefault()
+  ContextMenu.showContextMenu({
+    x: event.clientX,
+    y: event.clientY,
+    items: [
+      {
+        label: 'オブジェクトを削除',
+        onClick: () => {
+          console.log('delete object')
+        }
+      },
+    ],
+  })
+  event.stopPropagation()
+}
+
 </script>
 
 <style scoped>
