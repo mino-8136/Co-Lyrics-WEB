@@ -23,13 +23,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useObjectStore } from '@/stores/objectStore'
+const objectStore = useObjectStore()
 
-// TODO : 仮で入れているだけ
-const selectedObject = ref({
-  type: 'text',
-  text: 'Hello, World!'
+// 選択されたオブジェクトの情報
+const selectedObject = computed(() => {
+  return objectStore.objects.find(obj => obj.selected)
 })
+
 </script>
 
 <style scoped>

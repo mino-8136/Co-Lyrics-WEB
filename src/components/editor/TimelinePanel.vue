@@ -12,6 +12,7 @@
               :key="object.id"
               :object="object"
               @contextmenu.prevent="onObjectContextMenu($event, object.id)"
+              @click="selectObject(object.id)"
             ></base-object>
           </div>
         </div>
@@ -25,6 +26,7 @@ import { ref } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import BaseObject from '../objects/BaseObject.vue'
+
 const objectStore = useObjectStore()
 const layers = ref(
   Array.from({ length: 10 }, () => ({
@@ -56,7 +58,18 @@ function onTimelineContextMenu(event: MouseEvent, index: number) {
   event.stopPropagation()
 }
 
-// オブジェクトメニュー
+// オブジェクトクリックで選択
+function selectObject(objectId: number) {
+  // すべてのオブジェクトの選択を解除
+  objectStore.objects.forEach((obj) => {
+    obj.selected = false
+  })
+
+  // クリックしたオブジェクトを選択
+  objectStore.objects[objectId].selected = true
+}
+
+// オブジェクトを右クリックした場合のメニュー
 function onObjectContextMenu(event: MouseEvent, index: number) {
   event.preventDefault()
   ContextMenu.showContextMenu({
@@ -68,8 +81,8 @@ function onObjectContextMenu(event: MouseEvent, index: number) {
         onClick: () => {
           removeObject(index)
         }
-      },
-    ],
+      }
+    ]
   })
   event.stopPropagation()
 }
