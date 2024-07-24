@@ -48,8 +48,6 @@ export class BaseObject implements BaseSettings {
   }
 }
 
-
-
 export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   //type: string
   //name: string
@@ -73,12 +71,7 @@ export interface TextSettings extends BaseSettings, AnimationSettings, StandardR
   text: string
 }
 
-export class TextObject implements TextSettings {
-  id: number
-  start: number
-  end: number
-  layer: number
-  selected: boolean
+export class TextObject extends BaseObject implements TextSettings {
   X: number
   Y: number
   scale: number
@@ -95,27 +88,24 @@ export class TextObject implements TextSettings {
   font: string
   text: string
 
-  constructor(settings: TextSettings) {
-    this.id = settings.id
-    this.start = settings.start
-    this.end = settings.end
-    this.layer = settings.layer
-    this.selected = false
-    this.X = settings.X
-    this.Y = settings.Y
-    this.scale = settings.scale
-    this.transparency = settings.transparency
-    this.rotation = settings.rotation
-    this.name = settings.name
-    this.parameters = settings.parameters
-    this.size = settings.size
-    this.individual_object = settings.individual_object
-    this.align = settings.align
-    this.spacing_x = settings.spacing_x
-    this.spacing_y = settings.spacing_y
-    this.color = settings.color
-    this.font = settings.font
-    this.text = settings.text
+  constructor(settings: BaseSettings) {
+    // 追加時は結局BaseSettingくらいの中身になる
+    super(settings)
+    this.X = 0
+    this.Y = 0
+    this.scale = 100
+    this.transparency = 100
+    this.rotation = 0
+    this.name = ''
+    this.parameters = []
+    this.size = 90
+    this.individual_object = false
+    this.align = 0
+    this.spacing_x = 0
+    this.spacing_y = 0
+    this.color = 'ffffff'
+    this.font = 'ＭＳ ゴシック'
+    this.text = 'サンプルテキスト'
   }
 
   render(): void {
@@ -127,12 +117,7 @@ export interface ImageSettings extends BaseSettings, AnimationSettings, Standard
   file: string
 }
 
-export class ImageObject implements ImageSettings {
-  id: number
-  start: number
-  end: number
-  layer: number
-  selected: boolean
+export class ImageObject extends BaseObject implements ImageSettings {
   X: number
   Y: number
   scale: number
@@ -142,19 +127,15 @@ export class ImageObject implements ImageSettings {
   name: string
   parameters: any
 
-  constructor(settings: ImageSettings) {
-    this.id = settings.id
-    this.start = settings.start
-    this.end = settings.end
-    this.layer = settings.layer
-    this.selected = false
-    this.X = settings.X
-    this.Y = settings.Y
-    this.scale = settings.scale
-    this.transparency = settings.transparency
-    this.rotation = settings.rotation
-    this.file = settings.file
-    this.name = settings.name
-    this.parameters = settings.parameters
+  constructor(settings: BaseSettings) {
+    super(settings)
+    this.X = 0
+    this.Y = 0
+    this.scale = 100
+    this.transparency = 100
+    this.rotation = 0
+    this.file = ''
+    this.name = ''
+    this.parameters = []
   }
 }

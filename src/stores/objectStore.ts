@@ -5,7 +5,7 @@ export const useObjectStore = defineStore('objects', {
   state: () => ({
     currentFrame: 0,
     counter: 0,
-    objects: [] as BaseObject[]
+    objects: [] as (BaseObject | TextObject)[]
   }),
   getters: {
     currentObjects: (state) => {
@@ -19,7 +19,7 @@ export const useObjectStore = defineStore('objects', {
     }
   },
   actions: {
-    addObject(object: BaseObject) {
+    addObject(object: BaseObject | TextObject) {
       this.objects.push(object)
       this.counter++
     },

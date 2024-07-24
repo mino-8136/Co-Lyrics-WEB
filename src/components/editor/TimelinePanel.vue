@@ -26,6 +26,7 @@ import { ref } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import BaseObject from '../objects/BaseObject.vue'
+import { type BaseSettings, TextObject } from '@/components/objects/mediaObjects'
 
 const objectStore = useObjectStore()
 const layers = ref(
@@ -44,16 +45,23 @@ function onTimelineContextMenu(event: MouseEvent, index: number) {
       {
         label: 'テキストオブジェクトを追加',
         onClick: () => {
-          addObject(index, "text")
+          addObject(index, 'text')
         }
       },
       {
         label: '画像オブジェクトを追加',
         onClick: () => {
-          addObject(index, "image")
+          addObject(index, 'image')
         }
-      }
-    ],
+      },
+            {
+        label: '基底オブジェクトを追加',
+        onClick: () => {
+          addObject(index, '')
+        }
+      },
+
+    ]
   })
   event.stopPropagation()
 }
@@ -88,20 +96,28 @@ function onObjectContextMenu(event: MouseEvent, index: number) {
 }
 
 // オブジェクトの追加
-function addObject(layerIndex: number, type: string){
-  objectStore.addObject({
+function addObject(layerIndex: number, type: string) {
+  const settings: BaseSettings = {
     id: objectStore.counter,
     start: 0,
     end: 100,
     layer: layerIndex,
     selected: false
-  })
+  }
+
+  if (type === 'text') {
+    objectStore.addObject(new TextObject(settings))
+    console.log(objectStore.objects)
+  } else if (type === 'image') {
+    // 画像オブジェクトを追加
+  } else{
+    objectStore.addObject(new BaseObject(settings))
+  }
 }
 
 function removeObject(index: number) {
   objectStore.removeObject(index)
 }
-
 </script>
 
 <style scoped>

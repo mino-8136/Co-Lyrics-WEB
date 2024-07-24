@@ -17,7 +17,6 @@ import { BaseObject } from './mediaObjects'
 
 const props = defineProps<{
   object: BaseObject
-  type : string
 }>()
 
 const baseObject = ref(props.object)
