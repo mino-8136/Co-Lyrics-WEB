@@ -107,10 +107,6 @@ export class TextObject extends BaseObject implements TextSettings {
     this.font = 'ＭＳ ゴシック'
     this.text = 'サンプルテキスト'
   }
-
-  render(): void {
-    // ここでテキストオブジェクトのレンダリングロジックを実装する
-  }
 }
 
 export interface ImageSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
