@@ -1,6 +1,6 @@
 <template>
   <div
-    class="base-object"
+    class="object"
     :style="objectStyle"
     @mousedown="startMove"
     @mousemove="move"
@@ -17,7 +17,6 @@ import { BaseObject } from './mediaObjects'
 
 const props = defineProps<{
   object: BaseObject
-  type : string
 }>()
 
 const baseObject = ref(props.object)
@@ -85,7 +84,7 @@ window.addEventListener('mousemove', move)
 </script>
 
 <style scoped>
-.base-object {
+.object {
   position: relative;
   background-color: lightgray;
   width: 150px;

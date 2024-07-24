@@ -7,12 +7,13 @@
         <div class="layer">
           <div class="layerIndex">{{ item.name }} {{ index }}</div>
           <div class="layerTimeline" @contextmenu.prevent="onTimelineContextMenu($event, index)">
-            <base-object
+            <object-bar
               v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
               :key="object.id"
               :object="object"
               @contextmenu.prevent="onObjectContextMenu($event, object.id)"
-            ></base-object>
+              @click="selectObject(object.id)"
+            ></object-bar>
           </div>
         </div>
       </template>
@@ -24,7 +25,9 @@
 import { ref } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
-import BaseObject from '../objects/BaseObject.vue'
+import ObjectBar from '../objects/ObjectBar.vue'
+import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/mediaObjects'
+
 const objectStore = useObjectStore()
 const layers = ref(
   Array.from({ length: 10 }, () => ({
@@ -42,21 +45,39 @@ function onTimelineContextMenu(event: MouseEvent, index: number) {
       {
         label: 'テキストオブジェクトを追加',
         onClick: () => {
-          addObject(index, "text")
+          addObject(index, 'text')
         }
       },
       {
         label: '画像オブジェクトを追加',
         onClick: () => {
-          addObject(index, "image")
+          addObject(index, 'image')
         }
-      }
-    ],
+      },
+            {
+        label: '基底オブジェクトを追加',
+        onClick: () => {
+          addObject(index, '')
+        }
+      },
+
+    ]
   })
   event.stopPropagation()
 }
 
-// オブジェクトメニュー
+// オブジェクトクリックで選択
+function selectObject(objectId: number) {
+  // すべてのオブジェクトの選択を解除
+  objectStore.objects.forEach((obj) => {
+    obj.selected = false
+  })
+
+  // クリックしたオブジェクトを選択
+  objectStore.objects[objectId].selected = true
+}
+
+// オブジェクトを右クリックした場合のメニュー
 function onObjectContextMenu(event: MouseEvent, index: number) {
   event.preventDefault()
   ContextMenu.showContextMenu({
@@ -68,27 +89,35 @@ function onObjectContextMenu(event: MouseEvent, index: number) {
         onClick: () => {
           removeObject(index)
         }
-      },
-    ],
+      }
+    ]
   })
   event.stopPropagation()
 }
 
 // オブジェクトの追加
-function addObject(layerIndex: number, type: string){
-  objectStore.addObject({
+function addObject(layerIndex: number, type: string) {
+  const settings: BaseSettings = {
     id: objectStore.counter,
     start: 0,
     end: 100,
     layer: layerIndex,
     selected: false
-  })
+  }
+
+  if (type === 'text') {
+    objectStore.addObject(new TextObject(settings))
+  } else if (type === 'image') {
+    // 画像オブジェクトを追加
+  } else{
+    objectStore.addObject(new BaseObject(settings))
+  }
+  console.log(objectStore.objects)
 }
 
 function removeObject(index: number) {
   objectStore.removeObject(index)
 }
-
 </script>
 
 <style scoped>
