@@ -20,6 +20,8 @@ const props = defineProps<{
 }>()
 
 const baseObject = ref(props.object)
+const tempStart = ref(baseObject.value.start)
+const tempEnd = ref(baseObject.value.end)
 
 // 横幅の定義方法 : end-startで定義する
 // ドラッグ時の挙動 : 右端を掴んだらendを変更、左端を掴んだらstartを変更
@@ -29,8 +31,8 @@ const lastMouseX = ref(0)
 const side = ref('')
 
 const objectStyle = computed(() => ({
-  left: `${baseObject.value.start}px`,
-  width: `${baseObject.value.end - baseObject.value.start}px`,
+  left: `${tempStart.value}px`,
+  width: `${tempEnd.value - tempStart.value}px`,
   position: 'absolute',
   cursor: isMoving.value ? 'grabbing' : 'grab'
 }))
@@ -44,12 +46,16 @@ const move = (event: MouseEvent) => {
   if (isMoving.value) {
     const dx = event.clientX - lastMouseX.value
     lastMouseX.value = event.clientX
-    baseObject.value.start += dx
-    baseObject.value.end += dx
+    tempStart.value += dx
+    tempEnd.value += dx
   }
 }
 
 const stopMove = () => {
+  if (isMoving.value) {
+    baseObject.value.start = tempStart.value
+    baseObject.value.end = tempEnd.value
+  }
   isMoving.value = false
 }
 
@@ -65,14 +71,18 @@ const resize = (event: MouseEvent) => {
     const dx = event.clientX - lastMouseX.value
     lastMouseX.value = event.clientX
     if (side.value === 'right') {
-      baseObject.value.end += dx
+      tempEnd.value += dx
     } else {
-      baseObject.value.start += dx
+      tempStart.value += dx
     }
   }
 }
 
 const stopResize = () => {
+  if (isResizing.value) {
+    baseObject.value.start = tempStart.value
+    baseObject.value.end = tempEnd.value
+  }
   isResizing.value = false
 }
 
@@ -82,6 +92,7 @@ window.addEventListener('mouseup', stopMove)
 window.addEventListener('mousemove', move)
 
 </script>
+
 
 <style scoped>
 .object {
