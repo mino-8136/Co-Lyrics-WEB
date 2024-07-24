@@ -7,13 +7,13 @@
         <div class="layer">
           <div class="layerIndex">{{ item.name }} {{ index }}</div>
           <div class="layerTimeline" @contextmenu.prevent="onTimelineContextMenu($event, index)">
-            <base-object
+            <object-bar
               v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
               :key="object.id"
               :object="object"
               @contextmenu.prevent="onObjectContextMenu($event, object.id)"
               @click="selectObject(object.id)"
-            ></base-object>
+            ></object-bar>
           </div>
         </div>
       </template>
@@ -25,8 +25,8 @@
 import { ref } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
-import BaseObject from '../objects/BaseObject.vue'
-import { type BaseSettings, TextObject } from '@/components/objects/mediaObjects'
+import ObjectBar from '../objects/ObjectBar.vue'
+import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/mediaObjects'
 
 const objectStore = useObjectStore()
 const layers = ref(

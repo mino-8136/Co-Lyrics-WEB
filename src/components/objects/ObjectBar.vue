@@ -1,6 +1,6 @@
 <template>
   <div
-    class="base-object"
+    class="object"
     :style="objectStyle"
     @mousedown="startMove"
     @mousemove="move"
@@ -84,7 +84,7 @@ window.addEventListener('mousemove', move)
 </script>
 
 <style scoped>
-.base-object {
+.object {
   position: relative;
   background-color: lightgray;
   width: 150px;
