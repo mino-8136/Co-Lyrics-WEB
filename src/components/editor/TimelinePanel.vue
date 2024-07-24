@@ -107,12 +107,12 @@ function addObject(layerIndex: number, type: string) {
 
   if (type === 'text') {
     objectStore.addObject(new TextObject(settings))
-    console.log(objectStore.objects)
   } else if (type === 'image') {
     // 画像オブジェクトを追加
   } else{
     objectStore.addObject(new BaseObject(settings))
   }
+  console.log(objectStore.objects)
 }
 
 function removeObject(index: number) {
