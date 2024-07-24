@@ -4,16 +4,17 @@
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
       <div v-for="(value, key) in selectedObject" :key="key" class="parameter-row">
         <template v-if="isNumber(value)">
-          <div class="parameter-label">{{ key }}:</div>
+          <div class="parameter-label">{{ key }}</div>
           <div class="parameter-value">{{ value }}</div>
           <v-slider
             v-model="selectedObject[key]"
             :min="0"
             :max="100"
+            step="1"
           ></v-slider>
         </template>
         <template v-else-if="isString(value)">
-          <div class="parameter-label">{{ key }}:</div>
+          <div class="parameter-label">{{ key }}</div>
           <input :id="key" v-model="selectedObject[key]" type="text" />
         </template>
       </div>
@@ -50,13 +51,14 @@ const isString = (value: unknown): value is string => typeof value === 'string'
 .parameter-row {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
 }
 
 .parameter-label {
   width: 100px;
   font-weight: bold;
   margin-right: 10px;
+  text-align: center;
+  border: 1px solid #555;
 }
 
 .parameter-value {
