@@ -1,5 +1,6 @@
-// settingsをuserdataに移設
-// selectedを追加
+// [Aviutlからの変更点]
+// "settings"をuserdataに移設
+// "selected"を追加
 
 export interface BaseSettings {
   id: number
@@ -10,6 +11,22 @@ export interface BaseSettings {
   //camera: number
   selected: boolean
 }
+
+export interface AnimationSettings {
+  name: string
+  parameters: {}
+}
+
+export interface StandardRenderSettings {
+  X: number
+  Y: number
+  //Z: number
+  scale: number
+  transparency: number
+  rotation: number
+  //blend: number
+}
+
 
 export class BaseObject implements BaseSettings {
   id: number
@@ -31,20 +48,7 @@ export class BaseObject implements BaseSettings {
   }
 }
 
-export interface AnimationSettings {
-  name: string
-  parameters: {}
-}
 
-export interface StandardRenderSettings {
-  X: number
-  Y: number
-  //Z: number
-  scale: number
-  transparency: number
-  rotation: number
-  //blend: number
-}
 
 export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   //type: string
