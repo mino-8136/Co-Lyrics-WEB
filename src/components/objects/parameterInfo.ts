@@ -15,17 +15,17 @@ export const parameterInfo: {
     max?: number
   }
 } = {
-  X: { name: 'X', min: -2048, max: 2048, type: UIType.slider },
-  Y: { name: 'Y', min: -2048, max: 2048, type: UIType.slider },
-  scale: { name: '拡大率', min: 0, max: 100, type: UIType.slider },
-  opacity: { name: '不透明度', min: 0, max: 100, type: UIType.slider },
-  rotation: { name: '回転', min: -360, max: 360, type: UIType.slider },
-  size: { name: 'サイズ', min: 1, max: 100, type: UIType.slider },
-  individual_object: { name: '個別オブジェクト', min: 0, max: 1, type: UIType.none },
-  align: { name: '整列', min: 0, max: 2, type: UIType.none },
-  spacing_x: { name: '水平間隔', min: 0, max: 100, type: UIType.none },
-  spacing_y: { name: '垂直間隔', min: 0, max: 100, type: UIType.none },
-  color: { name: '色', min: 0, max: 0xffffff, type: UIType.color },
+  X: { name: 'X', type: UIType.slider, min: -2048, max: 2048 },
+  Y: { name: 'Y', type: UIType.slider, min: -2048, max: 2048 },
+  scale: { name: '拡大率', type: UIType.slider, min: 0, max: 100 },
+  opacity: { name: '不透明度', type: UIType.slider, min: 0, max: 100 },
+  rotation: { name: '回転', type: UIType.slider, min: -360, max: 360 },
+  size: { name: 'サイズ', type: UIType.slider, min: 1, max: 100 },
+  individual_object: { name: '個別オブジェクト', type: UIType.none, min: 0, max: 1 },
+  align: { name: '整列', type: UIType.none, min: 0, max: 2 },
+  spacing_x: { name: '水平間隔', type: UIType.none, min: 0, max: 100 },
+  spacing_y: { name: '垂直間隔', type: UIType.none, min: 0, max: 100 },
+  color: { name: '色', type: UIType.color, min: 0, max: 0xffffff },
   font: { name: 'フォント', type: UIType.select },
   text: { name: 'テキスト', type: UIType.text }
 }
