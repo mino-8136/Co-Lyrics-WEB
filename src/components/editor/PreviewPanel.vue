@@ -3,6 +3,7 @@
 
     <!-- ここでp5.jsのCanvasを表示 -->
     <div id="canvas"></div>
+    <v-btn @click="renderObjects">Render</v-btn>
 
   </v-container>
 </template>
@@ -19,12 +20,11 @@ const objectStore = useObjectStore()
 const p = ref();
 onMounted(() => {
   p.value = new p5(sketch);
-  p.value.changeColor(); // おためし
 });
 
-// 現在の全オブジェクトを取得
+// 現在のオブジェクトをp5.canvasに登録
 function renderObjects(){
-  const objects = objectStore.objects;
+  p.value.addRenderObjects(objectStore.objects);
 }
 
 

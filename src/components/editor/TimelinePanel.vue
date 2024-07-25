@@ -112,7 +112,7 @@ function addObject(layerIndex: number, type: string) {
   } else{
     objectStore.addObject(new BaseObject(settings))
   }
-  console.log(objectStore.objects)
+  // console.log(objectStore.objects)
 }
 
 function removeObject(index: number) {
