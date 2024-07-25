@@ -26,7 +26,7 @@ import { ref } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '../objects/ObjectBar.vue'
-import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/mediaObjects'
+import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
 
 const objectStore = useObjectStore()
 const layers = ref(

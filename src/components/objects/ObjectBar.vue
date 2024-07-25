@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { BaseObject } from './mediaObjects'
+import { BaseObject } from './objectInfo'
 
 const props = defineProps<{
   object: BaseObject
