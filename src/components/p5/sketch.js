@@ -7,6 +7,7 @@ export function sketch(p) {
     canvas.parent('canvas');
     p.background(0);
     p.smooth();
+    p.noLoop();
   };
 
   p.draw = () => {
@@ -20,11 +21,17 @@ export function sketch(p) {
       }
     }
     p.ellipse(p.mouseX, p.mouseY, 50, 50);
+
+    p.renderTextObject({ text: 'Hello, World!', x: 50, y: 50 });
   };
 
   p.changeColor = () => {
     console.log('changeColor');
     changeColorFlag = true;
+  }
+
+  p.renderTextObject = (textObject) => {
+    p.text(textObject.text, textObject.x, textObject.y);
   }
 }
 
