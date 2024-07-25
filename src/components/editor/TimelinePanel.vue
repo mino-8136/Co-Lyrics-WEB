@@ -1,6 +1,11 @@
 <template>
   <v-container class="timeline-panel">
-    <h3>Timeline</h3>
+    <div class="header">
+      <h3>Timeline: {{ objectStore.currentFrame }}</h3>
+    </div>
+
+    <div class="ruler">
+    </div>
 
     <v-virtual-scroll :items="layers" height="200" item-height="40">
       <template v-slot="{ item, index }">
