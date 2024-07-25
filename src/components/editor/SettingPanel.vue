@@ -2,20 +2,20 @@
   <v-container class="setting-panel">
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-      <div v-for="(value, key) in selectedObject" :key="key" class="parameter-row">
+      <div v-for="(value, param) in selectedObject" :key="param" class="parameter-row">
         <template v-if="isNumber(value)">
-          <div class="parameter-label">{{ key }}</div>
+          <div class="parameter-name">{{getName(param)}}</div>
           <div class="parameter-value">{{ value }}</div>
           <v-slider
-            v-model="selectedObject[key]"
-            :min="0"
-            :max="100"
+            v-model="selectedObject[param]"
+            :min="getMinValue(param) || 0"
+            :max="getMaxValue(param) || 1000"
             step="1"
           ></v-slider>
         </template>
         <template v-else-if="isString(value)">
-          <div class="parameter-label">{{ key }}</div>
-          <input :id="key" v-model="selectedObject[key]" type="text" />
+          <div class="parameter-name">{{ param }}</div>
+          <input :id="param" v-model="selectedObject[param]" type="text" />
         </template>
       </div>
     </div>
@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
+import { parameterInfo } from '../objects/parameterInfo'
 const objectStore = useObjectStore()
 
 // 選択されたオブジェクトの情報が自動的に表示される
@@ -35,6 +36,20 @@ const selectedObject = computed(() => {
 // 型チェック関数
 const isNumber = (value: unknown): value is number => typeof value === 'number'
 const isString = (value: unknown): value is string => typeof value === 'string'
+
+function getName(key: string) {
+  return parameterInfo[key]?.name ?? key
+}
+
+function getMaxValue(key: string) {
+  return parameterInfo[key]?.max
+}
+
+function getMinValue(key: string) {
+  return parameterInfo[key]?.min
+}
+
+
 </script>
 
 <style scoped>
@@ -53,7 +68,7 @@ const isString = (value: unknown): value is string => typeof value === 'string'
   align-items: center;
 }
 
-.parameter-label {
+.parameter-name {
   width: 100px;
   font-weight: bold;
   margin-right: 10px;

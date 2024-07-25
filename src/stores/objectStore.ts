@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { BaseObject, TextObject } from '@/components/objects/mediaObjects'
+import { BaseObject, TextObject } from '@/components/objects/objectInfo'
 
 export const useObjectStore = defineStore('objects', {
   state: () => ({

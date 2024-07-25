@@ -22,7 +22,7 @@ export interface StandardRenderSettings {
   Y: number
   //Z: number
   scale: number
-  transparency: number
+  opacity: number
   rotation: number
   //blend: number
 }
@@ -75,7 +75,7 @@ export class TextObject extends BaseObject implements TextSettings {
   X: number
   Y: number
   scale: number
-  transparency: number
+  opacity: number
   rotation: number
   name: string
   parameters: any
@@ -94,7 +94,7 @@ export class TextObject extends BaseObject implements TextSettings {
     this.X = 0
     this.Y = 0
     this.scale = 100
-    this.transparency = 100
+    this.opacity = 100
     this.rotation = 0
     this.name = ''
     this.parameters = []
@@ -117,7 +117,7 @@ export class ImageObject extends BaseObject implements ImageSettings {
   X: number
   Y: number
   scale: number
-  transparency: number
+  opacity: number
   rotation: number
   file: string
   name: string
@@ -128,7 +128,7 @@ export class ImageObject extends BaseObject implements ImageSettings {
     this.X = 0
     this.Y = 0
     this.scale = 100
-    this.transparency = 100
+    this.opacity = 100
     this.rotation = 0
     this.file = ''
     this.name = ''
