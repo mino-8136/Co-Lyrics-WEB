@@ -3,8 +3,8 @@
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
       <div v-for="(value, param) in selectedObject" :key="param" class="parameter-row">
-        <template v-if="isNumber(value)">
-          <div class="parameter-name">{{getName(param)}}</div>
+        <template v-if="getType(param) == UIType.slider">
+          <div class="parameter-name">{{ getName(param) }}</div>
           <div class="parameter-value">{{ value }}</div>
           <v-slider
             v-model="selectedObject[param]"
@@ -13,9 +13,23 @@
             step="1"
           ></v-slider>
         </template>
-        <template v-else-if="isString(value)">
+        <template v-if="getType(param) == UIType.text">
           <div class="parameter-name">{{ param }}</div>
-          <input :id="param" v-model="selectedObject[param]" type="text" />
+          <textarea :id="param" v-model="selectedObject[param]" type="text" />
+        </template>
+        <template v-if="getType(param) == UIType.select">
+          <div class="parameter-name">{{ getName(param) }}</div>
+          <select v-model="selectedObject[param]">
+            <option value="Arial" selected>Arial</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Courier New">Courier New</option>
+          </select>
+        </template>
+
+        <template v-if="getType(param) === UIType.color">
+          <div class="parameter-name">{{ getName(param) }}</div>
+          <input type="color" v-model="selectedObject[param]" />
         </template>
       </div>
     </div>
@@ -25,35 +39,30 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
-import { parameterInfo } from '../objects/parameterInfo'
+import { parameterInfo, UIType } from '../objects/parameterInfo'
 const objectStore = useObjectStore()
 
 // 選択されたオブジェクトの情報が自動的に表示される
 const selectedObject = computed(() => {
-  return objectStore.objects.find(obj => obj.selected)
+  return objectStore.objects.find((obj) => obj.selected)
 })
 
-// 型チェック関数
-const isNumber = (value: unknown): value is number => typeof value === 'number'
-const isString = (value: unknown): value is string => typeof value === 'string'
-
-function getName(key: string) {
+// パラメータを取得する関数
+const getName = (key: string) => {
   return parameterInfo[key]?.name ?? key
 }
-
-function getMaxValue(key: string) {
+const getMaxValue = (key: string) => {
   return parameterInfo[key]?.max
 }
-
-function getMinValue(key: string) {
+const getMinValue = (key: string) => {
   return parameterInfo[key]?.min
 }
-
-
+const getType = (key: string): UIType => {
+  return parameterInfo[key]?.type
+}
 </script>
 
 <style scoped>
-
 .setting-panel {
   width: 100%;
   height: 500px;
@@ -61,7 +70,6 @@ function getMinValue(key: string) {
   border: 1px solid #ccc;
   overflow-y: auto;
 }
-
 
 .parameter-row {
   display: flex;

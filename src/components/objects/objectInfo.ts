@@ -103,7 +103,7 @@ export class TextObject extends BaseObject implements TextSettings {
     this.align = 0
     this.spacing_x = 0
     this.spacing_y = 0
-    this.color = 'ffffff'
+    this.color = '#ffffff'
     this.font = 'ＭＳ ゴシック'
     this.text = 'サンプルテキスト'
   }
