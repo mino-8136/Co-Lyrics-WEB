@@ -49,7 +49,7 @@ export class BaseObject implements BaseSettings {
 }
 
 export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
-  //type: string
+  type: string
   //name: string
   size: number
   //display_speed: number
@@ -79,6 +79,7 @@ export class TextObject extends BaseObject implements TextSettings {
   rotation: number
   name: string
   parameters: any
+  type: string
   size: number
   individual_object: boolean
   align: number
@@ -98,6 +99,7 @@ export class TextObject extends BaseObject implements TextSettings {
     this.rotation = 0
     this.name = ''
     this.parameters = []
+    this.type = 'text'
     this.size = 90
     this.individual_object = false
     this.align = 0
