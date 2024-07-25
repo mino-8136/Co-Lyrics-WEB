@@ -20,16 +20,17 @@ export function sketch(p) {
     })
   }
 
-  p.addRenderObjects = (objects) => {
-    renderObjects = objects
-  }
-
-  p.renderTextObject = (object) => {4
+  // レンダリングを担当する関数
+  p.renderTextObject = (object) => {
     p.textSize(object.size)
     p.fill(object.color)
     p.text(object.text, object.X, object.Y)
   }
-}
 
+  // 外部に公開するための関数
+  p.addRenderObjects = (objects) => {
+    renderObjects = objects
+  }
+}
 
 // export function hoge(){} で公開して呼び出してもいい
