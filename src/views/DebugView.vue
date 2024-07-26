@@ -1,14 +1,14 @@
 <template>
   <div class="ruler">
     <ul class="ruler-x">
-      <li v-for="n in numItems" :key="n"></li>
+      <li v-for="n in ticks" :key="n"></li>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-const numItems = ref(20); 
+const ticks = ref(20); 
 </script>
 
 <style scoped>
