@@ -23,7 +23,7 @@ export interface StandardRenderSettings {
   //Z: number
   scale: number
   opacity: number
-  rotation: number
+  angle: number
   //blend: number
 }
 
@@ -76,7 +76,7 @@ export class TextObject extends BaseObject implements TextSettings {
   Y: number
   scale: number
   opacity: number
-  rotation: number
+  angle: number
   name: string
   parameters: any
   type: string
@@ -96,11 +96,11 @@ export class TextObject extends BaseObject implements TextSettings {
     this.Y = 0
     this.scale = 100
     this.opacity = 100
-    this.rotation = 0
+    this.angle = 0
     this.name = ''
     this.parameters = []
     this.type = 'text'
-    this.size = 90
+    this.size = 28
     this.individual_object = false
     this.align = 0
     this.spacing_x = 0
@@ -120,7 +120,7 @@ export class ImageObject extends BaseObject implements ImageSettings {
   Y: number
   scale: number
   opacity: number
-  rotation: number
+  angle: number
   file: string
   name: string
   parameters: any
@@ -131,7 +131,7 @@ export class ImageObject extends BaseObject implements ImageSettings {
     this.Y = 0
     this.scale = 100
     this.opacity = 100
-    this.rotation = 0
+    this.angle = 0
     this.file = ''
     this.name = ''
     this.parameters = []

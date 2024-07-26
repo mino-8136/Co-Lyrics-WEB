@@ -3,7 +3,7 @@
 
     <!-- ここでp5.jsのCanvasを表示 -->
     <div id="canvas"></div>
-    <v-btn @click="renderObjects">Render</v-btn>
+    <v-btn @click="renderObjects" icon="mdi-play"></v-btn>
 
   </v-container>
 </template>
@@ -26,8 +26,6 @@ onMounted(() => {
 function renderObjects(){
   p.value.addRenderObjects(objectStore.objects);
 }
-
-
 
 </script>
 
