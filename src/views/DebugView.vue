@@ -1,14 +1,22 @@
 <template>
-  <div class="ruler">
+  <div class="ruler" @mousedown="moveSeekbar">
     <ul class="ruler-x">
       <li v-for="n in ticks" :key="n"></li>
     </ul>
   </div>
+  <div class="seekbar" :style="{ left: seekbarPosition + 'px' }"></div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-const ticks = ref(20); 
+import { ref } from 'vue'
+const ticks = ref(20)
+const seekbarPosition = ref(0);
+
+const moveSeekbar = (event: MouseEvent) => {
+  const rulerElement = event.currentTarget as HTMLElement;
+  const rulerRect = rulerElement.getBoundingClientRect();
+  seekbarPosition.value = event.clientX - rulerRect.left;
+};
 </script>
 
 <style scoped>
@@ -60,5 +68,12 @@ const ticks = ref(20);
   content: counter(frameCounter);
   line-height: 1;
   padding-inline-start: 1.75px;
+}
+
+.seekbar {
+  width: 2px;
+  height: 100%;
+  background: #626262;
+  position: absolute;
 }
 </style>
