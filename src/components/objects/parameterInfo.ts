@@ -15,8 +15,8 @@ export const parameterInfo: {
     max?: number
   }
 } = {
-  X: { name: 'X', type: UIType.slider, min: -2048, max: 2048 },
-  Y: { name: 'Y', type: UIType.slider, min: -2048, max: 2048 },
+  X: { name: 'X', type: UIType.slider, min: -1024, max: 1024 },
+  Y: { name: 'Y', type: UIType.slider, min: -1024, max: 1024 },
   scale: { name: '拡大率', type: UIType.slider, min: 0, max: 100 },
   opacity: { name: '不透明度', type: UIType.slider, min: 0, max: 100 },
   angle: { name: '回転', type: UIType.slider, min: -360, max: 360 },

@@ -4,8 +4,7 @@
       <h3>Timeline: {{ objectStore.currentFrame }}</h3>
     </div>
 
-    <div class="ruler">
-    </div>
+    <Timelinebar></Timelinebar>
 
     <v-virtual-scroll :items="layers" height="200" item-height="40">
       <template v-slot="{ item, index }">
@@ -31,6 +30,7 @@ import { ref } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '../objects/ObjectBar.vue'
+import Timelinebar from '../objects/TimelineBar.vue'
 import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
 
 const objectStore = useObjectStore()
