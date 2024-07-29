@@ -6,6 +6,7 @@
 - npm install p5
 - npm install -D @types/p5
 - npm install -save @imengyu/vue3-context-menu
+- npm install gsap
 
 ## 参考メモ
 p5js 
