@@ -3,25 +3,21 @@
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
       <div v-for="(value, param) in selectedObject" :key="param" class="parameter-row">
-        <v-chip v-if="getType(param) != UIType.none" class="parameter-name" @click="animationDialog = true">{{ getName(param) }}</v-chip>
+        <v-chip v-if="getType(param) != UIType.none" class="parameter-name" @click="animationDialog = true">{{
+          getName(param) }}</v-chip>
         <template v-if="getType(param) == UIType.slider">
           <div class="parameter-value">{{ value }}</div>
-          <v-slider
-            v-model="selectedObject[param]"
-            :min="getMinValue(param) || 0"
-            :max="getMaxValue(param) || 1000"
-            step="1"
-          ></v-slider>
+          <v-slider v-model="selectedObject[param]" :min="getMinValue(param) || 0" :max="getMaxValue(param) || 1000"
+            step="1" class="mx-6"></v-slider>
           <v-btn icon="mdi-plus"></v-btn>
         </template>
+
         <template v-if="getType(param) == UIType.text">
           <textarea :id="param" v-model="selectedObject[param]" type="text" />
         </template>
+
         <template v-if="getType(param) == UIType.select">
-          <v-select 
-            v-model="selectedObject[param]"
-            :items="fontList"
-          >
+          <v-select v-model="selectedObject[param]" :items="fontList">
           </v-select>
         </template>
 
@@ -33,7 +29,7 @@
 
     <!-- アニメーション設定の「呼び出し-->
     <v-dialog v-model="animationDialog">
-      <AnimationPanel />
+      <AnimationPanel :getParameter="ad" @callAddAnimaton="addAnimation" />
     </v-dialog>
   </v-container>
 </template>
@@ -52,6 +48,11 @@ const animationDialog = ref(false)
 const selectedObject = computed(() => {
   return objectStore.objects.find((obj) => obj.selected)
 })
+
+function addAnimation(arg1, arg2) {
+  // 指定したプロパティにアニメーションを追加
+
+}
 
 // パラメータを取得する関数
 const getName = (key: string) => {
