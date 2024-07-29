@@ -3,8 +3,8 @@
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
       <div v-for="(value, param) in selectedObject" :key="param" class="parameter-row">
+        <v-chip v-if="getType(param) != UIType.none" class="parameter-name" @click="animationDialog = true">{{ getName(param) }}</v-chip>
         <template v-if="getType(param) == UIType.slider">
-          <div class="parameter-name">{{ getName(param) }}</div>
           <div class="parameter-value">{{ value }}</div>
           <v-slider
             v-model="selectedObject[param]"
@@ -12,35 +12,41 @@
             :max="getMaxValue(param) || 1000"
             step="1"
           ></v-slider>
+          <v-btn icon="mdi-plus"></v-btn>
         </template>
         <template v-if="getType(param) == UIType.text">
-          <div class="parameter-name">{{ param }}</div>
           <textarea :id="param" v-model="selectedObject[param]" type="text" />
         </template>
         <template v-if="getType(param) == UIType.select">
-          <div class="parameter-name">{{ getName(param) }}</div>
-          <select v-model="selectedObject[param]">
-            <option value="Arial" selected>Arial</option>
-            <option value="Verdana">Verdana</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Courier New">Courier New</option>
-          </select>
+          <v-select 
+            v-model="selectedObject[param]"
+            :items="fontList"
+          >
+          </v-select>
         </template>
 
         <template v-if="getType(param) === UIType.color">
-          <div class="parameter-name">{{ getName(param) }}</div>
           <input type="color" v-model="selectedObject[param]" />
         </template>
       </div>
     </div>
+
+    <!-- アニメーション設定の「呼び出し-->
+    <v-dialog v-model="animationDialog">
+      <AnimationPanel />
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import { parameterInfo, UIType } from '../objects/parameterInfo'
+import AnimationPanel from './AnimationPanel.vue';
+
 const objectStore = useObjectStore()
+const fontList = ['Arial', 'Verdana', 'Times New Roman', 'Courier New']
+const animationDialog = ref(false)
 
 // 選択されたオブジェクトの情報が自動的に表示される
 const selectedObject = computed(() => {
@@ -58,6 +64,9 @@ const getMinValue = (key: string) => {
   return parameterInfo[key]?.min
 }
 const getType = (key: string): UIType => {
+  if (parameterInfo[key]?.type === undefined) {
+    return UIType.none
+  }
   return parameterInfo[key]?.type
 }
 </script>
@@ -79,6 +88,7 @@ const getType = (key: string): UIType => {
 .parameter-name {
   width: 100px;
   font-weight: bold;
+  justify-content: center;
   margin-right: 10px;
   text-align: center;
   border: 1px solid #555;
