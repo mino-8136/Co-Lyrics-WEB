@@ -2,6 +2,7 @@
   <v-container class="timeline-panel">
     <div class="header">
       <h3>Timeline: {{ objectStore.currentFrame }}</h3>
+      <input type="number" v-model="objectStore.currentFrame" /> 
     </div>
 
     <Timelinebar></Timelinebar>
