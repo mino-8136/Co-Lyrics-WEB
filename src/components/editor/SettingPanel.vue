@@ -5,6 +5,7 @@
       <div v-for="(value, param) in selectedObject" :key="param" class="parameter-row">
         <v-chip v-if="getType(param) != UIType.none" class="parameter-name" @click="animationDialog = true">{{
           getName(param) }}</v-chip>
+          
         <template v-if="getType(param) == UIType.slider">
           <div class="parameter-value">{{ value }}</div>
           <v-slider v-model="selectedObject[param]" :min="getMinValue(param) || 0" :max="getMaxValue(param) || 1000"
