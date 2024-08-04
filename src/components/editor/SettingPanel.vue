@@ -88,12 +88,13 @@ const selectedObject = computed(() => {
   return objectStore.objects.find((obj) => obj.selected)
 })
 
-// TODO: 雑な実装なのであとで直す
+// TODO: 雑な実装なのであとで直す。slider型のときだけ呼び出す関数
 function addKeyframe(index: string, idx: number) {
   // キーフレームが1つのときは、this.endに値を設定
   if (isKeyframeSettings(selectedObject.value?.[index as keyof typeof selectedObject.value])) {
-    (selectedObject.value as any)[index].value.push((selectedObject.value as any)[index].value[idx])
-    (selectedObject.value as any)[index].frame.push((selectedObject.value as any)[index].frame[idx] + 1)
+    ;(selectedObject.value as any)[index].value
+      .push((selectedObject.value as any)[index].value[idx])(selectedObject.value as any)
+      [index].frame.push((selectedObject.value as any)[index].frame[idx] + 1)
   }
 
   // キーフレームが2つのときは、this.startとthis.endの間に値を設定
