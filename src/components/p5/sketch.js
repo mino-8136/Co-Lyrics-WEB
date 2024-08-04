@@ -30,17 +30,18 @@ export function sketch(p) {
   // レンダリングを担当する関数
   p.renderTextObject = (object) => {
     p.push()
-    p.textSize(object.size)
+    p.textSize(object.size.value[0])
     p.fill(object.color)
-    p.translate(object.X, object.Y)
-    p.rotate(object.angle)
-    p.scale(object.scale/100)
+    p.translate(object.X.value[0], object.Y.value[0])
+    p.rotate(object.angle.value[0])
+    p.scale(object.scale.value[0]/100)
     p.text(object.text, 0, 0)
     p.pop()
   }
 
   // 外部に公開するための関数
   p.addRenderObjects = (objects) => {
+    console.log(objects)
     renderObjects = objects
   }
 }
