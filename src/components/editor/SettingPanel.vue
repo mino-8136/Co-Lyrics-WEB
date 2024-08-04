@@ -2,7 +2,7 @@
   <v-container class="setting-panel">
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-      <div v-for="(value, index) in selectedObject" :key="index">
+      <div v-for="(element, index) in selectedObject" :key="index">
         <div v-if="getType(index) != UIType.none" class="parameter-row">
           <v-chip class="parameter-name" @click="animationDialog = true">{{
             getName(index)
@@ -10,13 +10,33 @@
 
           <!-- 数値型の場合 -->
           <template v-if="getType(index) == UIType.slider">
+            <v-row v-if="isKeyframeSettings(element)">
+              <v-col v-for="(val, idx) in element.value" :key="idx" cols="12">
+                <v-slider
+                  v-model="(element as KeyframeSettings).value[idx]"
+                  :min="getMinValue(index) || 0"
+                  :max="getMaxValue(index) || 1000"
+                  step="1"
+                  append-icon="mdi-plus"
+                  @click:append="animationDialog = true"
+                  hide-details
+                >
+                  <template v-slot:prepend>
+                    <input
+                      class="parameter-value"
+                      v-model.number="(element as KeyframeSettings).value[idx]"
+                    />
+                  </template>
+                </v-slider>
+              </v-col>
+            </v-row>
             <v-slider
+              v-else
               v-model="selectedObject[index]"
               :min="getMinValue(index) || 0"
               :max="getMaxValue(index) || 1000"
               step="1"
-              append-icon="mdi-plus"
-              @click:append="animationDialog = true"
+              append-icon="mdi-"
               hide-details
             >
               <template v-slot:prepend>
@@ -63,7 +83,7 @@ const selectedObject = computed(() => {
   return objectStore.objects.find((obj) => obj.selected)
 })
 
-// 
+//
 function addKeyframe() {
   // キーフレームが1つのときは、this.endに値を設定
   // キーフレームが2つのときは、this.startとthis.endの間に値を設定
@@ -75,9 +95,9 @@ function addAnimation(arg1, arg2) {
 
 ///////////////////////////////////////////
 
-// KeyframeSettings 型の判定
+// KeyframeSettings 型か number 型かを判定する関数
 const isKeyframeSettings = (value: any): value is KeyframeSettings => {
-  return value && Array.isArray(value.value) && Array.isArray(value.time)
+  return typeof value === 'object' && value !== null && 'value' in value
 }
 
 // パラメータを取得する関数
