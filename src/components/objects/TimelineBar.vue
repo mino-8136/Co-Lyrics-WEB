@@ -4,7 +4,7 @@
       type="range"
       style="width: 100%"
       min="0"
-      max="441"
+      max="2000"
       step="1"
       v-model="objectStore.currentFrame"
     />
@@ -24,7 +24,7 @@ const ticks = ref(20)
 
 <style>
 :root {
-  --ruler-unit: 2px;
+  --ruler-unit: 3px;
   --ruler-num-fz: 10px;
   --ruler-num-c: #888;
 
@@ -45,9 +45,7 @@ input[type='range'] {
   outline: none;
   background: transparent;
   cursor: pointer;
-  width: 100%;
   position: relative;
-  z-index: 2;
 }
 
 input[type='range']::-webkit-slider-runnable-track {
@@ -57,11 +55,11 @@ input[type='range']::-webkit-slider-runnable-track {
   background-size:
     calc(var(--ruler-unit) * var(--ruler1-space)) var(--ruler1-h),
     calc(var(--ruler-unit) * var(--ruler2-space)) var(--ruler2-h);
-  height: 40px; /* Adjust the height as needed */
+  width: 6000px;
+  height: 40px;
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
   z-index: 1;
 }
 

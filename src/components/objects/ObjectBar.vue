@@ -18,6 +18,7 @@ import { BaseObject } from './objectInfo'
 const props = defineProps<{
   object: BaseObject
 }>()
+const scaler = ref(3)
 
 const baseObject = ref(props.object)
 const tempStart = ref(baseObject.value.start)
@@ -31,8 +32,8 @@ const lastMouseX = ref(0)
 const side = ref('')
 
 const objectStyle = computed(() => ({
-  left: `${tempStart.value}px`,
-  width: `${tempEnd.value - tempStart.value}px`,
+  left: `${Math.floor(tempStart.value) * scaler.value}px`,
+  width: `${(tempEnd.value - Math.floor(tempStart.value)) * scaler.value}px`,
   position: 'absolute',
   cursor: isMoving.value ? 'grabbing' : 'grab'
 }))
@@ -44,17 +45,19 @@ const startMove = (event: MouseEvent) => {
 
 const move = (event: MouseEvent) => {
   if (isMoving.value) {
-    const dx = event.clientX - lastMouseX.value
+    const dx = (event.clientX - lastMouseX.value) / scaler.value
     lastMouseX.value = event.clientX
-    tempStart.value += dx
-    tempEnd.value += dx
+    if (tempStart.value + dx >= 0) {
+      tempStart.value += dx
+      tempEnd.value += dx
+    }
   }
 }
 
 const stopMove = () => {
   if (isMoving.value) {
-    baseObject.value.start = tempStart.value
-    baseObject.value.end = tempEnd.value
+    baseObject.value.start = Math.floor(tempStart.value)
+    baseObject.value.end = Math.floor(tempEnd.value)
   }
   isMoving.value = false
 }
@@ -68,20 +71,22 @@ const startResize = (sideValue: string, event: MouseEvent) => {
 
 const resize = (event: MouseEvent) => {
   if (isResizing.value) {
-    const dx = event.clientX - lastMouseX.value
+    const dx = (event.clientX - lastMouseX.value) / scaler.value
     lastMouseX.value = event.clientX
     if (side.value === 'right') {
       tempEnd.value += dx
     } else {
-      tempStart.value += dx
+      if (tempStart.value + dx >= 0) {
+        tempStart.value += dx
+      }
     }
   }
 }
 
 const stopResize = () => {
   if (isResizing.value) {
-    baseObject.value.start = tempStart.value
-    baseObject.value.end = tempEnd.value
+    baseObject.value.start = Math.floor(tempStart.value)
+    baseObject.value.end = Math.floor(tempEnd.value)
   }
   isResizing.value = false
 }
@@ -90,9 +95,7 @@ window.addEventListener('mouseup', stopResize)
 window.addEventListener('mousemove', resize)
 window.addEventListener('mouseup', stopMove)
 window.addEventListener('mousemove', move)
-
 </script>
-
 
 <style scoped>
 .object {
