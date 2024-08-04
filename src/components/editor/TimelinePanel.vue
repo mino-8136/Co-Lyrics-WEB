@@ -4,25 +4,28 @@
       <h3>Timeline: <input :value="objectStore.currentFrame"></h3>
     </div>
 
-    <Timelinebar></Timelinebar>
-
-    <v-virtual-scroll :items="layers" height="200" item-height="40">
-      <template v-slot="{ item, index }">
-        <div class="layer">
-          <div class="layerIndex">{{ item.name }} {{ index }}</div>
-          <div class="layerTimeline" @contextmenu.prevent="onTimelineContextMenu($event, index)">
-            <object-bar
-              v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
-              :key="object.id"
-              :object="object"
-              @contextmenu.prevent="onObjectContextMenu($event, object.id)"
-              @click="selectObject(object.id)"
-            ></object-bar>
-          </div>
-        </div>
-      </template>
-    </v-virtual-scroll>
-  </v-container>
+    <div class="timeline-container">
+      <div class="timeline">
+        <Timelinebar></Timelinebar>
+        <v-virtual-scroll :items="layers" height="200" item-height="40">
+          <template v-slot="{ item, index }">
+            <div class="layer">
+              <div class="layerIndex">{{ item.name }} {{ index }}</div>
+              <div class="layerTimeline" @contextmenu.prevent="onTimelineContextMenu($event, index)">
+                <object-bar
+                v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
+                :key="object.id"
+                :object="object"
+                @contextmenu.prevent="onObjectContextMenu($event, object.id)"
+                @click="selectObject(object.id)"
+                ></object-bar>
+              </div>
+            </div>
+          </template>
+        </v-virtual-scroll>
+      </div>
+    </div>
+    </v-container>
 </template>
 
 <script setup lang="ts">
@@ -129,6 +132,16 @@ function removeObject(index: number) {
 .timeline-panel {
   padding: 10px;
   border: 1px solid #ccc;
+}
+
+.timeline-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  height: 100%;
+}
+
+.timeline{
+  width: 2000px;
 }
 
 .layer {
