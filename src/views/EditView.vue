@@ -1,13 +1,9 @@
 <template>
   <menu-panel />
-  <v-row>
-    <v-col>
+  <div class="d-flex">
       <preview-panel />
-    </v-col>
-    <v-col>
       <setting-panel />
-    </v-col>
-  </v-row>
+  </div>
   <timeline-panel />
 </template>
 
