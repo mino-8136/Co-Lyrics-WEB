@@ -13,11 +13,16 @@
       </v-col>
     </v-row>
   </v-container>
+
+  <v-dialog v-model="playPanel">
+    <PlayMoviePanel />
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
 // TODO : ファイル内のsample.jsonを読み込む部分を、複数のファイルを読み込むように変更する(要サーバープログラム)
 import { onMounted, ref } from 'vue'
+import PlayMoviePanel from '../components/PlayMoviePanel.vue'
 
 interface MovieObject {
   id: number
@@ -26,6 +31,7 @@ interface MovieObject {
   date: string
 }
 const movies = ref<MovieObject[]>([])
+const playPanel = ref(false)
 
 // @/public/userdata/sample.jsonから、ムービーデータを取得してmoviesにセット
 onMounted(() => {
@@ -51,7 +57,7 @@ function getThumbnail(movie: MovieObject) {
 
 // サムネイルをクリックしたら、PlayMoviePanelを表示する
 function playMovie(movie: MovieObject) {
-  // TODO:ここにモーダルを読み出す処理を追加
+  playPanel.value = true
 }
 </script>
 
