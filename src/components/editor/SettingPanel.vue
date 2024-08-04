@@ -2,29 +2,41 @@
   <v-container class="setting-panel">
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-      <div v-for="(value, param) in selectedObject" :key="param" class="parameter-row">
-        <v-chip v-if="getType(param) != UIType.none" class="parameter-name" @click="animationDialog = true">{{
-          getName(param) }}</v-chip>
-          
-        <template v-if="getType(param) == UIType.slider">
-          <div class="parameter-value">{{ value }}</div>
-          <v-slider v-model="selectedObject[param]" :min="getMinValue(param) || 0" :max="getMaxValue(param) || 1000"
-            step="1" class="mx-6"></v-slider>
-          <v-btn icon="mdi-plus"></v-btn>
-        </template>
+      <div v-for="(value, param) in selectedObject" :key="param">
+        <div v-if="getType(param) != UIType.none" class="parameter-row">
+          <v-chip class="parameter-name" @click="animationDialog = true">{{
+            getName(param)
+          }}</v-chip>
 
-        <template v-if="getType(param) == UIType.text">
-          <textarea :id="param" v-model="selectedObject[param]" type="text" />
-        </template>
+          <!-- 数値型の場合 -->
+          <template v-if="getType(param) == UIType.slider">
+            <v-slider
+              v-model="selectedObject[param]"
+              :min="getMinValue(param) || 0"
+              :max="getMaxValue(param) || 1000"
+              step="1"
+              append-icon="mdi-plus"
+              @click:append="animationDialog = true"
+              hide-details
+            >
+              <template v-slot:prepend>
+                <input class="parameter-value" v-model.number="selectedObject[param]" />
+              </template>
+            </v-slider>
+          </template>
 
-        <template v-if="getType(param) == UIType.select">
-          <v-select v-model="selectedObject[param]" :items="fontList">
-          </v-select>
-        </template>
+          <template v-if="getType(param) == UIType.text">
+            <textarea :id="param" v-model="selectedObject[param]" type="text" />
+          </template>
 
-        <template v-if="getType(param) === UIType.color">
-          <input type="color" v-model="selectedObject[param]" />
-        </template>
+          <template v-if="getType(param) == UIType.select">
+            <v-select v-model="selectedObject[param]" :items="fontList"> </v-select>
+          </template>
+
+          <template v-if="getType(param) === UIType.color">
+            <input type="color" v-model="selectedObject[param]" />
+          </template>
+        </div>
       </div>
     </div>
 
@@ -39,7 +51,7 @@
 import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import { parameterInfo, UIType } from '../objects/parameterInfo'
-import AnimationPanel from './AnimationPanel.vue';
+import AnimationPanel from './AnimationPanel.vue'
 
 const objectStore = useObjectStore()
 const fontList = ['Arial', 'Verdana', 'Times New Roman', 'Courier New']
@@ -52,7 +64,6 @@ const selectedObject = computed(() => {
 
 function addAnimation(arg1, arg2) {
   // 指定したプロパティにアニメーションを追加
-
 }
 
 // パラメータを取得する関数
@@ -75,6 +86,7 @@ const getType = (key: string): UIType => {
 
 <style scoped>
 .setting-panel {
+  min-width: 300px;
   width: 100%;
   height: 500px;
   padding: 10px;
@@ -85,6 +97,7 @@ const getType = (key: string): UIType => {
 .parameter-row {
   display: flex;
   align-items: center;
+  margin-bottom: 12px;
 }
 
 .parameter-name {
@@ -97,8 +110,8 @@ const getType = (key: string): UIType => {
 }
 
 .parameter-value {
-  width: 30px;
-  margin-left: 10px;
+  width: 40px;
+  text-align: center;
   color: #555;
 }
 
