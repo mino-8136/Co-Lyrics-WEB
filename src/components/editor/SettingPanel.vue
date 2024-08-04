@@ -51,6 +51,7 @@
 import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import { parameterInfo, UIType } from '../objects/parameterInfo'
+import type { KeyframeSettings } from '../objects/objectInfo'
 import AnimationPanel from './AnimationPanel.vue'
 
 const objectStore = useObjectStore()
@@ -64,12 +65,19 @@ const selectedObject = computed(() => {
 
 // 
 function addKeyframe() {
-
+  // キーフレームが1つのときは、this.endに値を設定
+  // キーフレームが2つのときは、this.startとthis.endの間に値を設定
 }
-
 
 function addAnimation(arg1, arg2) {
   // 指定したプロパティにアニメーションを追加
+}
+
+///////////////////////////////////////////
+
+// KeyframeSettings 型の判定
+const isKeyframeSettings = (value: any): value is KeyframeSettings => {
+  return value && Array.isArray(value.value) && Array.isArray(value.time)
 }
 
 // パラメータを取得する関数
