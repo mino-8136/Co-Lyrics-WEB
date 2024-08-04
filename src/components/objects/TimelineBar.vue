@@ -1,23 +1,41 @@
 <template>
-  <div class="ruler" @mousedown="moveSeekbar">
+  <input type="range" style="width: 100%" min="0" max="3600" step="1" value="0" />
+
+  <div class="ruler">
     <ul class="ruler-x">
       <li v-for="n in ticks" :key="n"></li>
     </ul>
   </div>
-  <div class="seekbar" :style="{ left: seekbarPosition + 'px' }"></div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 const ticks = ref(20)
-const seekbarPosition = ref(0);
 
-const moveSeekbar = (event: MouseEvent) => {
-  seekbarPosition.value = event.clientX;
-};
 </script>
 
 <style scoped>
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  cursor: pointer;
+  width: 100%;
+  /* Track のスタイル */
+  background: #6d6d6d;
+  height: 8px;
+  border-radius: 8px;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 2px;
+  height: 200px;
+  background-color: #4cabe2;
+  z-index: 1;
+}
+
 .ruler {
   --ruler-unit: 2px;
   --ruler-num-fz: 10px;
@@ -66,13 +84,5 @@ const moveSeekbar = (event: MouseEvent) => {
   content: counter(frameCounter);
   line-height: 1;
   padding-inline-start: 1.75px;
-}
-
-.seekbar {
-  width: 2px;
-  height: 100%;
-  background: #626262;
-  position: absolute;
-  z-index: 1;
 }
 </style>
