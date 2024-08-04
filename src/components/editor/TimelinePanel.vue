@@ -1,7 +1,7 @@
 <template>
   <v-container class="timeline-panel">
     <div class="header">
-      <h3>Timeline: <input :value="objectStore.currentFrame"></h3>
+      <h3>Timeline: <input :value="objectStore.currentFrame" /></h3>
     </div>
 
     <div class="timeline-container">
@@ -11,13 +11,16 @@
           <template v-slot="{ item, index }">
             <div class="layer">
               <div class="layerIndex">{{ item.name }} {{ index }}</div>
-              <div class="layerTimeline" @contextmenu.prevent="onTimelineContextMenu($event, index)">
+              <div
+                class="layerTimeline"
+                @contextmenu.prevent="onTimelineContextMenu($event, index)"
+              >
                 <object-bar
-                v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
-                :key="object.id"
-                :object="object"
-                @contextmenu.prevent="onObjectContextMenu($event, object.id)"
-                @click="selectObject(object.id)"
+                  v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
+                  :key="object.id"
+                  :object="object"
+                  @contextmenu.prevent="onObjectContextMenu($event, object.id)"
+                  @click="selectObject(object.id)"
                 ></object-bar>
               </div>
             </div>
@@ -25,7 +28,7 @@
         </v-virtual-scroll>
       </div>
     </div>
-    </v-container>
+  </v-container>
 </template>
 
 <script setup lang="ts">
@@ -62,13 +65,12 @@ function onTimelineContextMenu(event: MouseEvent, index: number) {
           addObject(index, 'image')
         }
       },
-            {
+      {
         label: '基底オブジェクトを追加',
         onClick: () => {
           addObject(index, '')
         }
-      },
-
+      }
     ]
   })
   event.stopPropagation()
@@ -117,7 +119,7 @@ function addObject(layerIndex: number, type: string) {
     objectStore.addObject(new TextObject(settings))
   } else if (type === 'image') {
     // 画像オブジェクトを追加
-  } else{
+  } else {
     objectStore.addObject(new BaseObject(settings))
   }
   // console.log(objectStore.objects)
@@ -140,7 +142,7 @@ function removeObject(index: number) {
   height: 100%;
 }
 
-.timeline{
+.timeline {
   width: 2000px;
 }
 
