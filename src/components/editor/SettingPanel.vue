@@ -2,26 +2,31 @@
   <v-container class="setting-panel">
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-      <div v-for="(element, index) in selectedObject" :key="index">
-        <div v-if="getType(index) != UIType.none" class="parameter-row">
+      <div v-for="(element, param) in selectedObject" :key="param">
+        <div v-if="getType(param) != UIType.none" class="parameter-row">
           <v-chip class="parameter-name" @click="animationDialog = true">{{
-            getName(index)
+            getName(param)
           }}</v-chip>
 
           <!-- 数値型の場合 -->
-          <template v-if="getType(index) == UIType.slider">
+          <template v-if="getType(param) == UIType.slider">
             <v-row v-if="isKeyframeSettings(element)">
               <v-col v-for="(val, idx) in element.value" :key="idx" cols="12">
                 <v-slider
                   v-model="(element as KeyframeSettings).value[idx]"
-                  :min="getMinValue(index) || 0"
-                  :max="getMaxValue(index) || 1000"
+                  :min="getMinValue(param) || 0"
+                  :max="getMaxValue(param) || 1000"
                   step="1"
                   append-icon="mdi-plus"
-                  @click:append="animationDialog = true"
+                  @click:append="addKeyframe(param, idx)"
                   hide-details
                 >
                   <template v-slot:prepend>
+                    <input
+                      class="parameter-value"
+                      v-model.number="(element as KeyframeSettings).frame[idx]"
+                    />
+                    <p>→</p>
                     <input
                       class="parameter-value"
                       v-model.number="(element as KeyframeSettings).value[idx]"
@@ -32,29 +37,29 @@
             </v-row>
             <v-slider
               v-else
-              v-model="selectedObject[index]"
-              :min="getMinValue(index) || 0"
-              :max="getMaxValue(index) || 1000"
+              v-model="selectedObject[param]"
+              :min="getMinValue(param) || 0"
+              :max="getMaxValue(param) || 1000"
               step="1"
               append-icon="mdi-"
               hide-details
             >
               <template v-slot:prepend>
-                <input class="parameter-value" v-model.number="selectedObject[index]" />
+                <input class="parameter-value" v-model.number="selectedObject[param]" />
               </template>
             </v-slider>
           </template>
 
-          <template v-if="getType(index) == UIType.text">
-            <textarea :id="index" v-model="selectedObject[index]" type="text" />
+          <template v-if="getType(param) == UIType.text">
+            <textarea :id="param" v-model="selectedObject[param]" type="text" />
           </template>
 
-          <template v-if="getType(index) == UIType.select">
-            <v-select v-model="selectedObject[index]" :items="fontList"> </v-select>
+          <template v-if="getType(param) == UIType.select">
+            <v-select v-model="selectedObject[param]" :items="fontList"> </v-select>
           </template>
 
-          <template v-if="getType(index) === UIType.color">
-            <input type="color" v-model="selectedObject[index]" />
+          <template v-if="getType(param) === UIType.color">
+            <input type="color" v-model="selectedObject[param]" />
           </template>
         </div>
       </div>
@@ -83,9 +88,14 @@ const selectedObject = computed(() => {
   return objectStore.objects.find((obj) => obj.selected)
 })
 
-//
-function addKeyframe() {
+// TODO: 雑な実装なのであとで直す
+function addKeyframe(index: string, idx: number) {
   // キーフレームが1つのときは、this.endに値を設定
+  if (isKeyframeSettings(selectedObject.value?.[index])) {
+    selectedObject.value[index].value.push(selectedObject.value[index].value[idx])
+    selectedObject.value[index].frame.push(selectedObject.value[index].frame[idx] + 1)
+  }
+
   // キーフレームが2つのときは、this.startとthis.endの間に値を設定
 }
 
