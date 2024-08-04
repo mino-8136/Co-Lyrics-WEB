@@ -6,7 +6,7 @@
 // キーフレームの情報管理
 export interface KeyframeSettings {
   value: number[]
-  time: number[]
+  frame: number[]
 }
 
 export interface BaseSettings {
@@ -98,15 +98,15 @@ export class TextObject extends BaseObject implements TextSettings {
   constructor(settings: BaseSettings) {
     // 追加時は結局BaseSettingくらいの中身になる
     super(settings)
-    this.X = { value: [0, 100], time: [this.start, this.end] }
-    this.Y = { value: [0, 0], time: [this.start, this.end] }
-    this.scale = { value: [100, 100], time: [this.start, this.end] }
-    this.opacity = { value: [100, 100], time: [this.start, this.end] }
-    this.angle = { value: [0, 0], time: [this.start, this.end] }
+    this.X = { value: [0, 100], frame: [this.start, this.end] }
+    this.Y = { value: [0], frame: [this.start] }
+    this.scale = { value: [100], frame: [this.start] }
+    this.opacity = { value: [100], frame: [this.start] }
+    this.angle = { value: [0], frame: [this.start] }
     this.name = ''
     this.parameters = []
     this.type = 'text'
-    this.size = { value: [28, 28], time: [this.start, this.end] }
+    this.size = { value: [28], frame: [this.start] }
     this.individual_object = false
     this.align = 0
     this.spacing_x = 0
@@ -133,11 +133,11 @@ export class ImageObject extends BaseObject implements ImageSettings {
 
   constructor(settings: BaseSettings) {
     super(settings)
-    this.X = { value: [0, 100], time: [this.start, this.end] }
-    this.Y = { value: [0, 0], time: [this.start, this.end] }
-    this.scale = { value: [100, 100], time: [this.start, this.end] }
-    this.opacity = { value: [100, 100], time: [this.start, this.end] }
-    this.angle = { value: [0, 0], time: [this.start, this.end] }
+    this.X = { value: [0, 100], frame: [this.start, this.end] }
+    this.Y = { value: [0], frame: [this.start] }
+    this.scale = { value: [100], frame: [this.start] }
+    this.opacity = { value: [100], frame: [this.start] }
+    this.angle = { value: [0], frame: [this.start] }
     this.file = ''
     this.name = ''
     this.parameters = []
