@@ -15,14 +15,17 @@ const ticks = ref(20)
 </script>
 
 <style scoped>
-input[type='range'] {
+input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
   outline: none;
+  background: transparent;
   cursor: pointer;
   width: 100%;
-  /* Track のスタイル */
-  background: #6d6d6d;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background: #efafda;
   height: 8px;
   border-radius: 8px;
 }
