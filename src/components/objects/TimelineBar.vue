@@ -1,7 +1,13 @@
 <template>
-  <input type="range" style="width: 100%" min="0" max="3600" step="1" value="0" />
-
-  <div class="ruler">
+  <div class="slider-container">
+    <input
+      type="range"
+      style="width: 100%"
+      min="0"
+      max="441"
+      step="1"
+      v-model="objectStore.currentFrame"
+    />
     <ul class="ruler-x">
       <li v-for="n in ticks" :key="n"></li>
     </ul>
@@ -10,36 +16,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-const ticks = ref(20)
+import { useObjectStore } from '@/stores/objectStore'
+const objectStore = useObjectStore()
 
+const ticks = ref(20)
 </script>
 
-<style scoped>
-input[type="range"] {
-  -webkit-appearance: none;
-  appearance: none;
-  outline: none;
-  background: transparent;
-  cursor: pointer;
-  width: 100%;
-}
-
-input[type="range"]::-webkit-slider-runnable-track {
-  background: #efafda;
-  height: 8px;
-  border-radius: 8px;
-}
-
-input[type='range']::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 2px;
-  height: 200px;
-  background-color: #4cabe2;
-  z-index: 1;
-}
-
-.ruler {
+<style>
+:root {
   --ruler-unit: 2px;
   --ruler-num-fz: 10px;
   --ruler-num-c: #888;
@@ -53,13 +37,47 @@ input[type='range']::-webkit-slider-thumb {
   --ruler2-c: #bbb;
   --ruler2-h: 20px;
   --ruler2-space: 50;
+}
 
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
   background-image: linear-gradient(90deg, var(--ruler1-c) 0 var(--ruler1-bdw), transparent 0),
     linear-gradient(90deg, var(--ruler2-c) 0 var(--ruler2-bdw), transparent 0);
   background-repeat: repeat-x;
   background-size:
     calc(var(--ruler-unit) * var(--ruler1-space)) var(--ruler1-h),
     calc(var(--ruler-unit) * var(--ruler2-space)) var(--ruler2-h);
+  height: 40px; /* Adjust the height as needed */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 2px;
+  height: 300px; /* スマートに設定したい */
+  background-color: #4cabe2;
+  z-index: 3;
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: calc(var(--ruler2-h) * 2.5); /* これで合ってる? */
 }
 
 .ruler-x {

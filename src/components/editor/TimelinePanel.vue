@@ -1,8 +1,7 @@
 <template>
   <v-container class="timeline-panel">
     <div class="header">
-      <h3>Timeline: {{ objectStore.currentFrame }}</h3>
-      <input type="number" v-model="objectStore.currentFrame" /> 
+      <h3>Timeline: <input :value="objectStore.currentFrame"></h3>
     </div>
 
     <Timelinebar></Timelinebar>
