@@ -2,39 +2,39 @@
   <v-container class="setting-panel">
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-      <div v-for="(value, param) in selectedObject" :key="param">
-        <div v-if="getType(param) != UIType.none" class="parameter-row">
+      <div v-for="(value, index) in selectedObject" :key="index">
+        <div v-if="getType(index) != UIType.none" class="parameter-row">
           <v-chip class="parameter-name" @click="animationDialog = true">{{
-            getName(param)
+            getName(index)
           }}</v-chip>
 
           <!-- 数値型の場合 -->
-          <template v-if="getType(param) == UIType.slider">
+          <template v-if="getType(index) == UIType.slider">
             <v-slider
-              v-model="selectedObject[param]"
-              :min="getMinValue(param) || 0"
-              :max="getMaxValue(param) || 1000"
+              v-model="selectedObject[index]"
+              :min="getMinValue(index) || 0"
+              :max="getMaxValue(index) || 1000"
               step="1"
               append-icon="mdi-plus"
               @click:append="animationDialog = true"
               hide-details
             >
               <template v-slot:prepend>
-                <input class="parameter-value" v-model.number="selectedObject[param]" />
+                <input class="parameter-value" v-model.number="selectedObject[index]" />
               </template>
             </v-slider>
           </template>
 
-          <template v-if="getType(param) == UIType.text">
-            <textarea :id="param" v-model="selectedObject[param]" type="text" />
+          <template v-if="getType(index) == UIType.text">
+            <textarea :id="index" v-model="selectedObject[index]" type="text" />
           </template>
 
-          <template v-if="getType(param) == UIType.select">
-            <v-select v-model="selectedObject[param]" :items="fontList"> </v-select>
+          <template v-if="getType(index) == UIType.select">
+            <v-select v-model="selectedObject[index]" :items="fontList"> </v-select>
           </template>
 
-          <template v-if="getType(param) === UIType.color">
-            <input type="color" v-model="selectedObject[param]" />
+          <template v-if="getType(index) === UIType.color">
+            <input type="color" v-model="selectedObject[index]" />
           </template>
         </div>
       </div>
@@ -61,6 +61,12 @@ const animationDialog = ref(false)
 const selectedObject = computed(() => {
   return objectStore.objects.find((obj) => obj.selected)
 })
+
+// 
+function addKeyframe() {
+
+}
+
 
 function addAnimation(arg1, arg2) {
   // 指定したプロパティにアニメーションを追加
