@@ -1,6 +1,13 @@
 // [Aviutlからの変更点]
 // "settings"をuserdataに移設
 // "selected"を追加
+// 数値パラメータを配列に変更
+
+// キーフレームの情報管理
+export interface KeyframeSettings {
+  value: number[]
+  time: number[]
+}
 
 export interface BaseSettings {
   id: number
@@ -18,15 +25,14 @@ export interface AnimationSettings {
 }
 
 export interface StandardRenderSettings {
-  X: number
-  Y: number
-  //Z: number
-  scale: number
-  opacity: number
-  angle: number
+  X: KeyframeSettings
+  Y: KeyframeSettings
+  //Z: KeyframeSettings
+  scale: KeyframeSettings
+  opacity: KeyframeSettings
+  angle: KeyframeSettings
   //blend: number
 }
-
 
 export class BaseObject implements BaseSettings {
   id: number
@@ -51,7 +57,7 @@ export class BaseObject implements BaseSettings {
 export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   type: string
   //name: string
-  size: number
+  size: KeyframeSettings
   //display_speed: number
   individual_object: boolean
   //display_coordinates: boolean
@@ -72,15 +78,15 @@ export interface TextSettings extends BaseSettings, AnimationSettings, StandardR
 }
 
 export class TextObject extends BaseObject implements TextSettings {
-  X: number
-  Y: number
-  scale: number
-  opacity: number
-  angle: number
+  X: KeyframeSettings
+  Y: KeyframeSettings
+  scale: KeyframeSettings
+  opacity: KeyframeSettings
+  angle: KeyframeSettings
   name: string
   parameters: any
   type: string
-  size: number
+  size: KeyframeSettings
   individual_object: boolean
   align: number
   spacing_x: number
@@ -92,15 +98,15 @@ export class TextObject extends BaseObject implements TextSettings {
   constructor(settings: BaseSettings) {
     // 追加時は結局BaseSettingくらいの中身になる
     super(settings)
-    this.X = 0
-    this.Y = 0
-    this.scale = 100
-    this.opacity = 100
-    this.angle = 0
+    this.X = { value: [0, 100], time: [this.start, this.end] }
+    this.Y = { value: [0, 0], time: [this.start, this.end] }
+    this.scale = { value: [100, 100], time: [this.start, this.end] }
+    this.opacity = { value: [100, 100], time: [this.start, this.end] }
+    this.angle = { value: [0, 0], time: [this.start, this.end] }
     this.name = ''
     this.parameters = []
     this.type = 'text'
-    this.size = 28
+    this.size = { value: [28, 28], time: [this.start, this.end] }
     this.individual_object = false
     this.align = 0
     this.spacing_x = 0
@@ -116,24 +122,37 @@ export interface ImageSettings extends BaseSettings, AnimationSettings, Standard
 }
 
 export class ImageObject extends BaseObject implements ImageSettings {
-  X: number
-  Y: number
-  scale: number
-  opacity: number
-  angle: number
+  X: KeyframeSettings
+  Y: KeyframeSettings
+  scale: KeyframeSettings
+  opacity: KeyframeSettings
+  angle: KeyframeSettings
   file: string
   name: string
   parameters: any
 
   constructor(settings: BaseSettings) {
     super(settings)
-    this.X = 0
-    this.Y = 0
-    this.scale = 100
-    this.opacity = 100
-    this.angle = 0
+    this.X = { value: [0, 100], time: [this.start, this.end] }
+    this.Y = { value: [0, 0], time: [this.start, this.end] }
+    this.scale = { value: [100, 100], time: [this.start, this.end] }
+    this.opacity = { value: [100, 100], time: [this.start, this.end] }
+    this.angle = { value: [0, 0], time: [this.start, this.end] }
     this.file = ''
     this.name = ''
     this.parameters = []
+  }
+}
+
+export interface AudioSettings extends BaseSettings {
+  file: string
+}
+
+export class AudioObject extends BaseObject implements AudioSettings {
+  file: string
+
+  constructor(settings: BaseSettings) {
+    super(settings)
+    this.file = ''
   }
 }
