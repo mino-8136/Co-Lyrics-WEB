@@ -1,7 +1,7 @@
 <template>
   <div
     class="object"
-    :style="objectStyle"
+    :style="{ ...objectStyle, position: 'absolute' }"
     @mousedown="startMove"
     @mousemove="move"
     @mouseup="stopMove"
@@ -110,7 +110,7 @@ window.addEventListener('mousemove', move)
 .resize-handle {
   position: absolute;
   top: 0;
-  width: 10px;
+  width: 5px;
   height: 100%;
   background-color: gray;
   cursor: ew-resize;

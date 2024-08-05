@@ -154,6 +154,7 @@ function removeObject(index: number) {
   border: 1px solid black;
   width: 80px;
   padding: 8px;
+  user-select: none;
 }
 
 .layerTimeline {
