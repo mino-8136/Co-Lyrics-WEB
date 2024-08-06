@@ -34,10 +34,10 @@ export const useObjectStore = defineStore('objects', {
 export const useTimelineStore = defineStore('timeline', {
   state: () => ({
     width: 1280,
-    height: 1080,
-    rate: 30,
-    length: 60,
-    currentFrame: 0
+    height: 720,
+    framerate: 30,
+    totalFrame: 1800,
+    currentFrame: 0,
   }),
   actions: {
     setCurrentFrame(frame: number) {
