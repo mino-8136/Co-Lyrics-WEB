@@ -8,11 +8,12 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed, watch } from 'vue'
-import { useObjectStore } from '@/stores/objectStore'
+import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import p5 from 'p5'
 import { sketch } from '../p5/sketch'
 
 const objectStore = useObjectStore()
+const timelineStore = useTimelineStore()
 
 // マウント時に p5.canvas を生成
 const p = ref()
@@ -21,7 +22,7 @@ onMounted(() => {
 })
 
 watch(
-  () => objectStore.currentFrame,
+  () => timelineStore.currentFrame,
   () => {
     renderObjects()
   }
@@ -29,7 +30,7 @@ watch(
 
 // 現在レンダリングするオブジェクトの描画 p5.canvasに登録
 function renderObjects() {
-  p.value.addRenderObjects(objectStore.currentObjects)
+  p.value.addRenderObjects(objectStore.currentObjects(timelineStore.currentFrame))
 }
 </script>
 

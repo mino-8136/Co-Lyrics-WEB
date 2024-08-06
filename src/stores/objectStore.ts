@@ -3,14 +3,13 @@ import { BaseObject, TextObject } from '@/components/objects/objectInfo'
 
 export const useObjectStore = defineStore('objects', {
   state: () => ({
-    currentFrame: 0,
     counter: 0,
     objects: [] as (BaseObject | TextObject)[]
   }),
   getters: {
-    currentObjects: (state) => {
+    currentObjects: (state) => (frame: number) => {
       return state.objects.filter(
-        (object) => object.start <= state.currentFrame && object.end >= state.currentFrame
+        (object) => object.start <= frame && object.end >= frame
       )
     },
     selectedObject: (state) => {
@@ -32,8 +31,12 @@ export const useObjectStore = defineStore('objects', {
   }
 })
 
-export const useTimelineState = defineStore('timeline', {
+export const useTimelineStore = defineStore('timeline', {
   state: () => ({
+    width: 1280,
+    height: 1080,
+    rate: 30,
+    length: 60,
     currentFrame: 0
   }),
   actions: {
