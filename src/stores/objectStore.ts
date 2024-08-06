@@ -31,3 +31,17 @@ export const useObjectStore = defineStore('objects', {
     }
   }
 })
+
+export const useTimelineState = defineStore('timeline', {
+  state: () => ({
+    currentFrame: 0
+  }),
+  actions: {
+    setCurrentFrame(frame: number) {
+      this.currentFrame = frame
+    },
+    incrementFrame() {
+      this.currentFrame++
+    }
+  }
+})
