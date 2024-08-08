@@ -43,20 +43,20 @@ export function sketch(p) {
   // アニメーション位置を決める関数
   function AnimationPosition(param) {
     // Parameterが配列であるという前提で行く
-    const length = param.value.length
+    const length = param.length
     if (length === 1) {
       return param[0].value
     } else {
       return (
         param[0].value +
-        ((param[1].value - param[0].value) * (currentFrame - param[0].frame)) /
+        ((param[1].value - param[0].value) * (Math.min(param[1].frame, Math.max(param[0].frame, currentFrame)) - param[0].frame)) /
           (param[1].frame - param[0].frame)
       )
     }
   }
   // 外部に公開するための関数
   p.addRenderObjects = (objects) => {
-    console.log(objects)
+    //console.log(objects)
     renderObjects = objects
   }
 
