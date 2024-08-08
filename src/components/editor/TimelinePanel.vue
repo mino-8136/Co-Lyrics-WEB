@@ -1,7 +1,7 @@
 <template>
   <v-container class="timeline-panel">
     <div class="header">
-      <h3>Timeline: <input :value="objectStore.currentFrame" /></h3>
+      <h3>Timeline: <input :value="timelineStore.currentFrame" /></h3>
     </div>
 
     <div class="timeline-container">
@@ -33,13 +33,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useObjectStore } from '@/stores/objectStore'
+import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '../objects/ObjectBar.vue'
 import Timelinebar from '../objects/TimelineBar.vue'
 import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
 
 const objectStore = useObjectStore()
+const timelineStore = useTimelineStore()
+
 const layers = ref(
   Array.from({ length: 10 }, () => ({
     name: 'Layer'

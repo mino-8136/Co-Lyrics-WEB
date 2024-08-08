@@ -1,16 +1,15 @@
 import { defineStore } from 'pinia'
-import { BaseObject, TextObject } from '@/components/objects/objectInfo'
+import { BaseObject, TextObject, ImageObject, AudioObject } from '@/components/objects/objectInfo'
 
 export const useObjectStore = defineStore('objects', {
   state: () => ({
-    currentFrame: 0,
     counter: 0,
-    objects: [] as (BaseObject | TextObject)[]
+    objects: [] as (BaseObject | TextObject | ImageObject | AudioObject)[]
   }),
   getters: {
-    currentObjects: (state) => {
+    currentObjects: (state) => (frame: number) => {
       return state.objects.filter(
-        (object) => object.start <= state.currentFrame && object.end >= state.currentFrame
+        (object) => object.start <= frame && object.end >= frame
       )
     },
     selectedObject: (state) => {
@@ -19,7 +18,7 @@ export const useObjectStore = defineStore('objects', {
     }
   },
   actions: {
-    addObject(object: BaseObject | TextObject) {
+    addObject(object: BaseObject | TextObject | ImageObject | AudioObject) {
       this.objects.push(object)
       this.counter++
     },
@@ -32,9 +31,13 @@ export const useObjectStore = defineStore('objects', {
   }
 })
 
-export const useTimelineState = defineStore('timeline', {
+export const useTimelineStore = defineStore('timeline', {
   state: () => ({
-    currentFrame: 0
+    width: 1280,
+    height: 720,
+    framerate: 30,
+    totalFrame: 1800,
+    currentFrame: 0,
   }),
   actions: {
     setCurrentFrame(frame: number) {

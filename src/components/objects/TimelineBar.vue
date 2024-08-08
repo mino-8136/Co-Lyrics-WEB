@@ -6,7 +6,7 @@
       min="0"
       max="2000"
       step="1"
-      v-model="objectStore.currentFrame"
+      v-model="timelineStore.currentFrame"
     />
     <ul class="ruler-x">
       <li v-for="n in ticks" :key="n"></li>
@@ -16,8 +16,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useObjectStore } from '@/stores/objectStore'
-const objectStore = useObjectStore()
+import { useTimelineStore } from '@/stores/objectStore'
+const timelineStore = useTimelineStore()
 
 const ticks = ref(20)
 </script>
