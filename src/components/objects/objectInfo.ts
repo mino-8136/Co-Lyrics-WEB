@@ -5,8 +5,8 @@
 
 // キーフレームの情報管理
 export interface KeyframeSettings {
-  value: number[]
-  frame: number[]
+  value: number
+  frame: number
 }
 
 export interface BaseSettings {
@@ -25,12 +25,12 @@ export interface AnimationSettings {
 }
 
 export interface StandardRenderSettings {
-  X: KeyframeSettings
-  Y: KeyframeSettings
-  //Z: KeyframeSettings
-  scale: KeyframeSettings
-  opacity: KeyframeSettings
-  angle: KeyframeSettings
+  X: KeyframeSettings[]
+  Y: KeyframeSettings[]
+  //Z: KeyframeSettings[]
+  scale: KeyframeSettings[]
+  opacity: KeyframeSettings[]
+  angle: KeyframeSettings[]
   //blend: number
 }
 
@@ -57,7 +57,7 @@ export class BaseObject implements BaseSettings {
 export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   type: string
   //name: string
-  size: KeyframeSettings
+  size: KeyframeSettings[]
   //display_speed: number
   individual_object: boolean
   //display_coordinates: boolean
@@ -78,15 +78,15 @@ export interface TextSettings extends BaseSettings, AnimationSettings, StandardR
 }
 
 export class TextObject extends BaseObject implements TextSettings {
-  X: KeyframeSettings
-  Y: KeyframeSettings
-  scale: KeyframeSettings
-  opacity: KeyframeSettings
-  angle: KeyframeSettings
+  X: KeyframeSettings[]
+  Y: KeyframeSettings[]
+  scale: KeyframeSettings[]
+  opacity: KeyframeSettings[]
+  angle: KeyframeSettings[]
   name: string
   parameters: any
   type: string
-  size: KeyframeSettings
+  size: KeyframeSettings[]
   individual_object: boolean
   align: number
   spacing_x: number
@@ -98,15 +98,15 @@ export class TextObject extends BaseObject implements TextSettings {
   constructor(settings: BaseSettings) {
     // 追加時は結局BaseSettingくらいの中身になる
     super(settings)
-    this.X = { value: [0, 100], frame: [this.start, this.end] }
-    this.Y = { value: [0], frame: [this.start] }
-    this.scale = { value: [100], frame: [this.start] }
-    this.opacity = { value: [100], frame: [this.start] }
-    this.angle = { value: [0], frame: [this.start] }
+    this.X = [{ value: 0, frame: this.start }, { value: 100, frame: this.end }]
+    this.Y = [{ value: 0, frame: this.start }]
+    this.scale = [{ value: 100, frame: this.start }]
+    this.opacity = [{ value: 100, frame: this.start }]
+    this.angle = [{ value: 0, frame: this.start }]
     this.name = ''
     this.parameters = []
     this.type = 'text'
-    this.size = { value: [28], frame: [this.start] }
+    this.size = [{ value: 28, frame: this.start }]
     this.individual_object = false
     this.align = 0
     this.spacing_x = 0
@@ -122,22 +122,22 @@ export interface ImageSettings extends BaseSettings, AnimationSettings, Standard
 }
 
 export class ImageObject extends BaseObject implements ImageSettings {
-  X: KeyframeSettings
-  Y: KeyframeSettings
-  scale: KeyframeSettings
-  opacity: KeyframeSettings
-  angle: KeyframeSettings
+  X: KeyframeSettings[]
+  Y: KeyframeSettings[]
+  scale: KeyframeSettings[]
+  opacity: KeyframeSettings[]
+  angle: KeyframeSettings[]
   file: string
   name: string
   parameters: any
 
   constructor(settings: BaseSettings) {
     super(settings)
-    this.X = { value: [0, 100], frame: [this.start, this.end] }
-    this.Y = { value: [0], frame: [this.start] }
-    this.scale = { value: [100], frame: [this.start] }
-    this.opacity = { value: [100], frame: [this.start] }
-    this.angle = { value: [0], frame: [this.start] }
+    this.X = [{ value: 0, frame: this.start }, { value: 100, frame: this.end }]
+    this.Y = [{ value: 0, frame: this.start }]
+    this.scale = [{ value: 100, frame: this.start }]
+    this.opacity = [{ value: 100, frame: this.start }]
+    this.angle = [{ value: 0, frame: this.start }]
     this.file = ''
     this.name = ''
     this.parameters = []

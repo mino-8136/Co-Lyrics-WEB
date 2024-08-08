@@ -1,4 +1,5 @@
 let renderObjects = []
+let currentFrame = 0
 
 export function sketch(p) {
   p.setup = () => {
@@ -30,19 +31,37 @@ export function sketch(p) {
   // レンダリングを担当する関数
   p.renderTextObject = (object) => {
     p.push()
-    p.textSize(object.size.value[0])
+    p.textSize(object.size[0].value)
     p.fill(object.color)
-    p.translate(object.X.value[0], object.Y.value[0])
-    p.rotate(object.angle.value[0])
-    p.scale(object.scale.value[0]/100)
+    p.translate(AnimationPosition(object.X), AnimationPosition(object.Y))
+    p.rotate(object.angle[0].value)
+    p.scale(object.scale[0].value / 100)
     p.text(object.text, 0, 0)
     p.pop()
   }
 
+  // アニメーション位置を決める関数
+  function AnimationPosition(param) {
+    // Parameterが配列であるという前提で行く
+    const length = param.value.length
+    if (length === 1) {
+      return param[0].value
+    } else {
+      return (
+        param[0].value +
+        ((param[1].value - param[0].value) * (currentFrame - param[0].frame)) /
+          (param[1].frame - param[0].frame)
+      )
+    }
+  }
   // 外部に公開するための関数
   p.addRenderObjects = (objects) => {
     console.log(objects)
     renderObjects = objects
+  }
+
+  p.updateCurrentFrame = (frame) => {
+    currentFrame = frame
   }
 }
 
