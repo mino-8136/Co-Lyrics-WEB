@@ -46,7 +46,7 @@ export function sketch(p) {
   function AnimationPosition(param) {
     // Parameterが配列であるという前提で行く
     const lastSection = param.length - 1
-    const currentSection = getFrameSection(param)
+    const currentSection = getCurrentSection(param)
     const nextSection = currentSection + 1
 
     // 最初のキーフレームに到達していない場合、最初の値で止める
@@ -60,19 +60,36 @@ export function sketch(p) {
       return param[currentSection].value
     }
 
-    // それ以外の場合、仮に線形補間する
-    const currentValue =
-      param[currentSection].value +
-      ((param[nextSection].value - param[currentSection].value) *
-        (Math.min(param[nextSection].frame, Math.max(param[currentSection].frame, currentFrame)) -
-          param[currentSection].frame)) /
-        (param[nextSection].frame - param[currentSection].frame)
+    // それ以外の場合、値を補完して返す
+    const currentValue = getEaseValue(param, currentSection, nextSection, currentFrame)
     return currentValue
+  }
+
+  // アニメーションの値を補完する関数
+  function getEaseValue(param, currentSection, nextSection, currentFrame) {
+    const initialValue = param[currentSection].value
+    const deltaValue = param[nextSection].value - param[currentSection].value
+    const progress =
+      (gsap.utils.clamp(param[currentSection].frame, param[nextSection].frame, currentFrame) -
+        param[currentSection].frame) /
+      (param[nextSection].frame - param[currentSection].frame)
+    return (
+      initialValue + deltaValue * getAnimationStateAtTime(progress, param[currentSection].animation)
+    )
+  }
+
+  // keyframeに登録されたGSAPのアニメーションの実行結果を返す関数
+  function getAnimationStateAtTime(progress, easeType) {
+    if (easeType === 'none' || easeType == null) {
+      return progress
+    }
+    const easingFunction = gsap.parseEase(easeType)
+    return easingFunction(progress)
   }
 
   // どの区間のフレームを参照するかを求める(CurrentFrameを超えない最大のキーフレーム)
   // 最初のキーフレームに到達していない場合に-1を返す
-  function getFrameSection(param) {
+  function getCurrentSection(param) {
     let index = -1
     for (let i = 0; i < param.length; i++) {
       if (param[i].frame <= currentFrame) {

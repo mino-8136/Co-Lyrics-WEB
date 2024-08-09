@@ -4,9 +4,8 @@
     <v-row>
       <v-col v-for="effect in effects" :key="effect.id" class="d-flex" cols="4">
         <v-container>
-          <v-img :width="200" aspect-ratio="1" class="bg-grey-lighten-2" cover>
-          </v-img>
-          <v-btn >
+          <v-img :width="200" aspect-ratio="1" class="bg-grey-lighten-2" cover> </v-img>
+          <v-btn @click="emits.addAnimation()">
             {{ effect.name }}
           </v-btn>
         </v-container>
