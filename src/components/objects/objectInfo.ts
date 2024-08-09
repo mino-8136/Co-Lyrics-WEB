@@ -7,6 +7,7 @@
 export interface KeyframeSettings {
   value: number
   frame: number
+  animation?: string
 }
 
 export interface BaseSettings {
