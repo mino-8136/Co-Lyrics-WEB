@@ -43,17 +43,45 @@ export function sketch(p) {
   // アニメーション位置を決める関数
   function AnimationPosition(param) {
     // Parameterが配列であるという前提で行く
-    const length = param.length
-    if (length === 1) {
+    const lastSection = param.length - 1
+    const currentSection = getFrameSection(param)
+    const nextSection = currentSection + 1
+
+    // 最初のキーフレームに到達していない場合、最初の値で止める
+    if (currentSection === -1) {
       return param[0].value
-    } else {
-      return (
-        param[0].value +
-        ((param[1].value - param[0].value) * (Math.min(param[1].frame, Math.max(param[0].frame, currentFrame)) - param[0].frame)) /
-          (param[1].frame - param[0].frame)
-      )
     }
+
+    // 最後のキーフレームに到達していた場合、最後の値で止める
+    // console.log(param, "curr: ", currentSection, "last: " , lastSection)
+    if (currentSection == lastSection) {
+      return param[currentSection].value
+    }
+
+    // それ以外の場合、仮に線形補間する
+    const currentValue =
+      param[currentSection].value +
+      ((param[nextSection].value - param[currentSection].value) *
+        (Math.min(param[nextSection].frame, Math.max(param[currentSection].frame, currentFrame)) -
+          param[currentSection].frame)) /
+        (param[nextSection].frame - param[currentSection].frame)
+    return currentValue
   }
+
+  // どの区間のフレームを参照するかを求める(CurrentFrameを超えない最大のキーフレーム)
+  // 最初のキーフレームに到達していない場合に-1を返す
+  function getFrameSection(param) {
+    let index = -1
+    for (let i = 0; i < param.length; i++) {
+      if (param[i].frame <= currentFrame) {
+        index = i
+      } else {
+        break
+      }
+    }
+    return index
+  }
+
   // 外部に公開するための関数
   p.addRenderObjects = (objects) => {
     //console.log(objects)
