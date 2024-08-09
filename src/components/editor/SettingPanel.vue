@@ -17,8 +17,8 @@
                   :min="getMinValue(label) || 0"
                   :max="getMaxValue(label) || 1000"
                   step="1"
-                  append-icon="mdi-plus"  
-                  @click:append="addKeyframe(element, idx)"
+                  append-icon="mdi-plus"
+                  @click:append="addKeyframe(element, idx, )"
                   hide-details
                 >
                   <template v-slot:prepend>
@@ -65,7 +65,7 @@
       </div>
     </div>
 
-    <!-- アニメーション設定の「呼び出し-->
+    <!-- アニメーション設定の呼び出し -->
     <v-dialog v-model="animationDialog">
       <AnimationPanel :getParameter="ad" @callAddAnimaton="addAnimation" />
     </v-dialog>
@@ -100,13 +100,15 @@ function addKeyframe(element: KeyframeSettings[], idx: number) {
   })
 }
 
-function addAnimation(arg1, arg2) {
-  // 指定したプロパティにアニメーションを追加
+// 指定したプロパティにアニメーションを追加
+function addAnimation(element: KeyframeSettings, index: number, animation: string) {
+  element.animation = animation
 }
 
 ///////////////////////////////////////////
 
 // KeyframeSettings 型か number 型かを判定する関数
+// TODO:配列かどうかで判定しているので、もう少し詳細の判定が必要
 function isKeyframeSettings(element: any): element is KeyframeSettings {
   return Array.isArray(element)
 }

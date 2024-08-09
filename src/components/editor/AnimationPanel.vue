@@ -16,33 +16,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue'
 import { gsap } from 'gsap'
 
-// 仮のエフェクトリスト
+// 仮のイージングリスト
 const effects = ref([
-  { id: 1, name: 'フェードイン' },
-  { id: 2, name: 'ズーム' },
-  { id: 3, name: '回転' }
+  { id: 0, name: 'none' },
+  { id: 1, name: 'power1.in' },
+  { id: 2, name: 'power1.out' },
+  { id: 3, name: 'power1.inOut' }
 ])
 
 // 受け取ったパラメータの種類
 const props = defineProps({
-  getParameter : Object
+  getParameter: Object
 })
 const emits = defineEmits({
   addAnimation: String
 })
-
-// パラメータにGSAPを付与する関数
-function addTween(param: any){
-  gsap.fromTo(param,{
-    value: 0
-  },{
-    value: 100,
-    duration: 1,
-    ease: "power4.out"
-  }
-  )
-}
 </script>

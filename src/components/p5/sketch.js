@@ -1,3 +1,5 @@
+import { gsap } from 'gsap'
+
 let renderObjects = []
 let currentFrame = 0
 
