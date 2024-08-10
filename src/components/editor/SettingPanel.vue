@@ -4,7 +4,7 @@
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
       <div v-for="(element, label) in selectedObject" :key="label">
         <div v-if="getType(label) != UIType.none" class="parameter-row">
-          <v-chip class="parameter-name" @click="animationDialog = true">{{
+          <v-chip class="parameter-name" @click="openAnimationDialog()">{{
             getName(label)
           }}</v-chip>
 
@@ -18,7 +18,7 @@
                   :max="getMaxValue(label) || 1000"
                   step="1"
                   append-icon="mdi-plus"
-                  @click:append="addKeyframe(element, idx, )"
+                  @click:append="addKeyframe(element, idx)"
                   hide-details
                 >
                   <template v-slot:prepend>
@@ -67,7 +67,7 @@
 
     <!-- アニメーション設定の呼び出し -->
     <v-dialog v-model="animationDialog">
-      <AnimationPanel :getParameter="ad" @callAddAnimaton="addAnimation" />
+      <AnimationPanel @callAddAnimaton="addAnimation" />
     </v-dialog>
   </v-container>
 </template>
@@ -98,6 +98,10 @@ function addKeyframe(element: KeyframeSettings[], idx: number) {
     frame: newFrame,
     value: element[idx].value
   })
+}
+
+function openAnimationDialog() {
+  animationDialog.value = true
 }
 
 // 指定したプロパティにアニメーションを追加
