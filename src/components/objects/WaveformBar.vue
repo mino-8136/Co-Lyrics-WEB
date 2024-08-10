@@ -21,7 +21,6 @@ onMounted(() => {
 
     // イベントリスナーを追加
     wavesurfer.on('interaction', () => wavesurfer.playPause())
-
   }
 })
 

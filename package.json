@@ -1,6 +1,6 @@
 {
   "name": "co-lyrics-web",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -20,7 +20,8 @@
     "pinia": "^2.1.7",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
-    "vuetify": "^3.6.8"
+    "vuetify": "^3.6.8",
+    "wavesurfer.js": "^7.8.2"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.8.0",

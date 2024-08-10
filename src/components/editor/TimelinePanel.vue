@@ -7,6 +7,7 @@
     <div class="timeline-container">
       <div class="timeline">
         <Timelinebar></Timelinebar>
+        <Waveformbar></Waveformbar>
         <v-virtual-scroll :items="layers" height="200" item-height="40">
           <template v-slot="{ item, index }">
             <div class="layer">
@@ -37,11 +38,11 @@ import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '../objects/ObjectBar.vue'
 import Timelinebar from '../objects/TimelineBar.vue'
+import Waveformbar from '../objects/WaveformBar.vue'
 import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
-
 const layers = ref(
   Array.from({ length: 10 }, () => ({
     name: 'Layer'
