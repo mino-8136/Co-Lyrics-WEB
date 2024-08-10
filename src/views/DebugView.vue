@@ -22,8 +22,6 @@ onMounted(() => {
     // イベントリスナーを追加
     wavesurfer.on('interaction', () => wavesurfer.play());
 
-    // オーディオのロード
-    wavesurfer.load();
   }
 });
 
