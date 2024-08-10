@@ -2,34 +2,34 @@
   <v-container class="setting-panel">
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-      <div v-for="(element, param) in selectedObject" :key="param">
-        <div v-if="getType(param) != UIType.none" class="parameter-row">
-          <v-chip class="parameter-name" @click="animationDialog = true">{{
-            getName(param)
+      <div v-for="(element, label) in selectedObject" :key="label">
+        <div v-if="getType(label) != UIType.none" class="parameter-row">
+          <v-chip class="parameter-name" @click="openAnimationDialog()">{{
+            getName(label)
           }}</v-chip>
 
           <!-- 数値型の場合 -->
-          <template v-if="getType(param) == UIType.slider">
+          <template v-if="getType(label) == UIType.slider">
             <v-row v-if="isKeyframeSettings(element)">
-              <v-col v-for="(val, idx) in element.value" :key="idx" cols="12">
+              <v-col v-for="(val, idx) in element" :key="idx" cols="12">
                 <v-slider
-                  v-model="(element as KeyframeSettings).value[idx]"
-                  :min="getMinValue(param) || 0"
-                  :max="getMaxValue(param) || 1000"
+                  v-model="(element[idx] as unknown as KeyframeSettings).value"
+                  :min="getMinValue(label) || 0"
+                  :max="getMaxValue(label) || 1000"
                   step="1"
                   append-icon="mdi-plus"
-                  @click:append="addKeyframe(param, idx)"
+                  @click:append="addKeyframe(element, idx)"
                   hide-details
                 >
                   <template v-slot:prepend>
                     <input
                       class="parameter-value"
-                      v-model.number="(element as KeyframeSettings).frame[idx]"
+                      v-model.number="(element[idx] as unknown as KeyframeSettings).frame"
                     />
                     <p>→</p>
                     <input
                       class="parameter-value"
-                      v-model.number="(element as KeyframeSettings).value[idx]"
+                      v-model.number="(element[idx] as unknown as KeyframeSettings).value"
                     />
                   </template>
                 </v-slider>
@@ -37,37 +37,37 @@
             </v-row>
             <v-slider
               v-else
-              v-model="selectedObject[param]"
-              :min="getMinValue(param) || 0"
-              :max="getMaxValue(param) || 1000"
+              v-model="selectedObject[label]"
+              :min="getMinValue(label) || 0"
+              :max="getMaxValue(label) || 1000"
               step="1"
               append-icon="mdi-"
               hide-details
             >
               <template v-slot:prepend>
-                <input class="parameter-value" v-model.number="selectedObject[param]" />
+                <input class="parameter-value" v-model.number="selectedObject[label]" />
               </template>
             </v-slider>
           </template>
 
-          <template v-if="getType(param) == UIType.text">
-            <textarea :id="param" v-model="selectedObject[param]" type="text" />
+          <template v-if="getType(label) == UIType.text">
+            <textarea :id="label" v-model="selectedObject[label]" type="text" />
           </template>
 
-          <template v-if="getType(param) == UIType.select">
-            <v-select v-model="selectedObject[param]" :items="fontList"> </v-select>
+          <template v-if="getType(label) == UIType.select">
+            <v-select v-model="selectedObject[label]" :items="fontList"> </v-select>
           </template>
 
-          <template v-if="getType(param) === UIType.color">
-            <input type="color" v-model="selectedObject[param]" />
+          <template v-if="getType(label) === UIType.color">
+            <input type="color" v-model="selectedObject[label]" />
           </template>
         </div>
       </div>
     </div>
 
-    <!-- アニメーション設定の「呼び出し-->
+    <!-- アニメーション設定の呼び出し -->
     <v-dialog v-model="animationDialog">
-      <AnimationPanel :getParameter="ad" @callAddAnimaton="addAnimation" />
+      <AnimationPanel @callAddAnimaton="addAnimation" />
     </v-dialog>
   </v-container>
 </template>
@@ -88,29 +88,34 @@ const selectedObject = computed(() => {
   return objectStore.objects.find((obj) => obj.selected)
 })
 
-// TODO: 雑な実装なのであとで直す。slider型のときだけ呼び出す関数
-function addKeyframe(index: string, idx: number) {
-  // キーフレームが1つのときは、this.endに値を設定
-  if (isKeyframeSettings(selectedObject.value?.[index as keyof typeof selectedObject.value])) {
-    ;(selectedObject.value as any)[index].value
-      .push((selectedObject.value as any)[index].value[idx])(selectedObject.value as any)
-      [index].frame.push((selectedObject.value as any)[index].frame[idx] + 1)
-  }
-
-  // キーフレームが2つのときは、this.startとthis.endの間に値を設定
+// ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数
+function addKeyframe(element: KeyframeSettings[], idx: number) {
+  const newFrame =
+    element.length - 1 !== idx
+      ? Math.floor(element[idx].frame + element[idx + 1].frame / 2)
+      : element[idx].frame + 10
+  element.splice(idx + 1, 0, {
+    frame: newFrame,
+    value: element[idx].value
+  })
 }
 
-function addAnimation(arg1, arg2) {
-  // 指定したプロパティにアニメーションを追加
+function openAnimationDialog() {
+  animationDialog.value = true
+}
+
+// 指定したプロパティにアニメーションを追加
+function addAnimation(element: KeyframeSettings, index: number, animation: string) {
+  element.animation = animation
 }
 
 ///////////////////////////////////////////
 
 // KeyframeSettings 型か number 型かを判定する関数
-const isKeyframeSettings = (value: any): value is KeyframeSettings => {
-  return typeof value === 'object' && value !== null && 'value' in value
+// TODO:配列かどうかで判定しているので、もう少し詳細の判定が必要
+function isKeyframeSettings(element: any): element is KeyframeSettings {
+  return Array.isArray(element)
 }
-
 // パラメータを取得する関数
 const getName = (key: string) => {
   return parameterInfo[key]?.name ?? key

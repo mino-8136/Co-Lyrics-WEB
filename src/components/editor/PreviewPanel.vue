@@ -25,6 +25,7 @@ watch(
   () => timelineStore.currentFrame,
   () => {
     renderObjects()
+    p.value.updateCurrentFrame(timelineStore.currentFrame)
   }
 )
 
