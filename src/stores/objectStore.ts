@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { BaseObject, TextObject, ImageObject, AudioObject } from '@/components/objects/objectInfo'
+import { BaseObject, TextObject, ImageObject } from '@/components/objects/objectInfo'
 
 export const useObjectStore = defineStore('objects', {
   state: () => ({
     counter: 0,
-    objects: [] as (BaseObject | TextObject | ImageObject | AudioObject)[]
+    objects: [] as (BaseObject | TextObject | ImageObject)[]
   }),
   getters: {
     currentObjects: (state) => (frame: number) => {
@@ -18,7 +18,7 @@ export const useObjectStore = defineStore('objects', {
     }
   },
   actions: {
-    addObject(object: BaseObject | TextObject | ImageObject | AudioObject) {
+    addObject(object: BaseObject | TextObject | ImageObject) {
       this.objects.push(object)
       this.counter++
     },
