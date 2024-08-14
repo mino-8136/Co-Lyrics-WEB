@@ -61,6 +61,10 @@
           <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.color">
             <input type="color" v-model="selectedObject[label]" />
           </template>
+
+          <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.checkbox">
+            <v-checkbox v-model="selectedObject[label]" hide-details />
+          </template>
         </div>
       </div>
     </div>
@@ -76,7 +80,7 @@
 import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import * as ParameterInfo from '@/components/objects/parameterInfo'
-import  { type KeyframeSettings, isKeyframeSettings } from '@/components/objects/objectInfo'
+import { type KeyframeSettings, isKeyframeSettings } from '@/components/objects/objectInfo'
 import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 import { fontListData } from '@/assets/fonts/fonts'
 
@@ -109,7 +113,6 @@ function openAnimationDialog() {
 function addAnimation(element: KeyframeSettings, index: number, animation: string) {
   element.animation = animation
 }
-
 </script>
 
 <style scoped>

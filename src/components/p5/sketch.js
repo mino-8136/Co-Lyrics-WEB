@@ -35,6 +35,11 @@ export function sketch(p) {
     p.pop()
   }
 
+  // テキストを分解する関数
+  p.separateText = (text) => {
+    return 0
+  }
+
   // レンダリングを担当する関数
   p.renderTextObject = (object) => {
     p.push()
