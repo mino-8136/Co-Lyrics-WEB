@@ -10,6 +10,7 @@ export function sketch(p) {
 
     p.smooth()
     p.angleMode(p.DEGREES)
+    p.frameRate(30);
 
     p.background(0)
   }
