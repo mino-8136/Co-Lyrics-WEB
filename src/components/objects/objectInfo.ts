@@ -144,3 +144,16 @@ export class ImageObject extends BaseObject implements ImageSettings {
     this.parameters = []
   }
 }
+
+export interface AudioSettings extends BaseSettings {
+  file: string
+}
+
+export class AudioObject extends BaseObject implements AudioSettings {
+  file: string
+
+  constructor(settings: BaseSettings) {
+    super(settings)
+    this.file = ''
+  }
+}
