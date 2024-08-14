@@ -78,12 +78,11 @@ import { useObjectStore } from '@/stores/objectStore'
 import { parameterInfo, UIType } from '@/components/objects/parameterInfo'
 import type { KeyframeSettings } from '@/components/objects/objectInfo'
 import AnimationPanel from '@/components/editor/AnimationPanel.vue'
+import { fontListData } from '@/assets/fonts/fonts'
 
 const objectStore = useObjectStore()
-
-
-
 const animationDialog = ref(false)
+const fontList = fontListData
 
 // 選択されたオブジェクトの情報が自動的に表示される
 const selectedObject = computed(() => {

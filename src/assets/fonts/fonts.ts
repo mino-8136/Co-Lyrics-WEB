@@ -1,4 +1,4 @@
-export const fontList = [
+export const fontListData = [
     '851チカラヅヨク',
     'homura',
     '瀬戸フォントSP_sjis版',
