@@ -2,15 +2,19 @@ import { gsap } from 'gsap'
 
 let renderObjects = []
 let currentFrame = 0
+let fonts = null
 
 export function sketch(p) {
+  p.preload = () => {
+    fonts = p.loadFont('src/assets/fonts/SourceHanSansJP/SourceHanSansJP-Medium.otf')
+  }
   p.setup = () => {
     const canvas = p.createCanvas(400, 400)
     canvas.parent('canvas')
 
     p.smooth()
     p.angleMode(p.DEGREES)
-    p.frameRate(30);
+    p.frameRate(30)
 
     p.background(0)
   }
@@ -31,9 +35,15 @@ export function sketch(p) {
     p.pop()
   }
 
+  // テキストを分解する関数
+  p.separateText = (text) => {
+    return 0
+  }
+
   // レンダリングを担当する関数
   p.renderTextObject = (object) => {
     p.push()
+    p.textFont(fonts)
     p.textSize(object.size[0].value)
     p.fill(object.color)
     p.translate(AnimationPosition(object.X), AnimationPosition(object.Y))

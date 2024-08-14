@@ -10,6 +10,12 @@ export interface KeyframeSettings {
   animation?: string
 }
 
+// KeyframeSettings 型か number 型かを判定する関数
+// TODO:配列かどうかで判定しているので、もう少し詳細の判定が必要
+export function isKeyframeSettings(element: any): element is KeyframeSettings {
+  return Array.isArray(element)
+}
+
 export interface BaseSettings {
   id: number
   start: number
