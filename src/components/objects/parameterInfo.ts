@@ -29,3 +29,20 @@ export const parameterInfo: {
   font: { name: 'フォント', type: UIType.select },
   text: { name: 'テキスト', type: UIType.text }
 }
+
+// パラメータを取得する関数
+export const getName = (key: string) => {
+  return parameterInfo[key]?.name ?? key
+}
+export const getMaxValue = (key: string) => {
+  return parameterInfo[key]?.max
+}
+export const getMinValue = (key: string) => {
+  return parameterInfo[key]?.min
+}
+export const getType = (key: string): UIType => {
+  if (parameterInfo[key]?.type === undefined) {
+    return UIType.none
+  }
+  return parameterInfo[key]?.type
+}
