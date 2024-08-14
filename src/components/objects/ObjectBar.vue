@@ -8,8 +8,8 @@
   >
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
+    <div class="keyframe"></div>
   </div>
-  <div class="keyframe"></div>
 </template>
 
 <script setup lang="ts">
@@ -38,6 +38,14 @@ const objectStyle = computed(() => ({
   position: 'absolute',
   cursor: isMoving.value ? 'grabbing' : 'grab'
 }))
+
+
+// キーフレームの設定
+const displayKeyframe = () =>{
+  // object.valueの中のパラメータをすべて巡回する
+
+  // そのパラメータの中の
+}
 
 //////////////////////////
 // オブジェクト操作の関数 //
