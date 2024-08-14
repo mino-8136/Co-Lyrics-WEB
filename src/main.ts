@@ -1,4 +1,4 @@
-import './assets/main.css'
+import './assets/css/main.css'
 
 // Vue
 import { createApp } from 'vue'
