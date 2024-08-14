@@ -75,9 +75,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
-import { parameterInfo, UIType } from '../objects/parameterInfo'
-import type { KeyframeSettings } from '../objects/objectInfo'
-import AnimationPanel from './AnimationPanel.vue'
+import { parameterInfo, UIType } from '@/components/objects/parameterInfo'
+import type { KeyframeSettings } from '@/components/objects/objectInfo'
+import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 
 const objectStore = useObjectStore()
 const fontList = ['Arial', 'Verdana', 'Times New Roman', 'Courier New']

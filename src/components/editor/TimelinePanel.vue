@@ -36,9 +36,9 @@
 import { ref } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
-import ObjectBar from '../objects/ObjectBar.vue'
-import Timelinebar from '../objects/TimelineBar.vue'
-import Waveformbar from '../objects/WaveformBar.vue'
+import ObjectBar from '@/components/objects/ObjectBar.vue'
+import Timelinebar from '@/components/objects/TimelineBar.vue'
+import Waveformbar from '@/components/objects/WaveformBar.vue'
 import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
 
 const objectStore = useObjectStore()
