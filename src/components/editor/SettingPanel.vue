@@ -80,7 +80,9 @@ import type { KeyframeSettings } from '@/components/objects/objectInfo'
 import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 
 const objectStore = useObjectStore()
-const fontList = ['Arial', 'Verdana', 'Times New Roman', 'Courier New']
+
+
+
 const animationDialog = ref(false)
 
 // 選択されたオブジェクトの情報が自動的に表示される
