@@ -1,7 +1,10 @@
 <template>
   <v-container class="timeline-panel">
-    <div class="header">
-      <h3>Timeline: <input :value="timelineStore.currentFrame + 'f ' + frameToTime(timelineStore.currentFrame) " /></h3>
+    <div class="header d-flex">
+      <p>Timeline:</p>
+      <input :value="timelineStore.currentFrame" />
+      <p>{{ frameToTime(timelineStore.currentFrame) }}</p>
+      <input type="range" min="10" max="1000" value="100" />
     </div>
 
     <div class="timeline-container">
@@ -132,7 +135,7 @@ function removeObject(index: number) {
   objectStore.removeObject(index)
 }
 
-function frameToTime(frame: number):string {
+function frameToTime(frame: number): string {
   const frameRate = 30
   let minutes = Math.floor(frame / frameRate / 60)
   let seconds = Math.floor(frame / frameRate) % 60
