@@ -12,10 +12,8 @@
       v-for="(keyframe, index) in keyFrameList"
       :key="index"
       class="keyframe"
-      :style="{ left: `${keyframe.frame * 3}px` }"
-    >
-      <div class="keyframe"></div>
-    </div>
+      :style="{ left: `${keyframe.frame * 3 - 5}px` }"
+    ></div>
   </div>
 </template>
 
@@ -57,7 +55,6 @@ const keyFrameList = computed(() => {
     }
     return acc
   }, keyFrameList)
-  console.log(keyFrameList)
   return keyFrameList
 })
 
@@ -126,6 +123,9 @@ window.addEventListener('mousemove', move)
 
 <style scoped>
 .object {
+  --barWidth: 5px;
+  --keysize: 10px;
+
   position: relative;
   background-color: lightgray;
   width: 150px;
@@ -137,7 +137,7 @@ window.addEventListener('mousemove', move)
 .resize-handle {
   position: absolute;
   top: 0;
-  width: 5px;
+  width: calc(var(--barWidth));
   height: 100%;
   background-color: gray;
   cursor: ew-resize;
@@ -152,12 +152,13 @@ window.addEventListener('mousemove', move)
 }
 
 .keyframe {
-  position: absolute;
   background-color: lightgray;
   border: 1px solid black;
+  position: absolute;
+  width: var(--keysize);
+  height: var(--keysize);
+  top: calc(50% - var(--keysize) / 2);
   transform: rotate(45deg);
-  width: 10px;
-  height: 10px;
   cursor: move;
 }
 </style>
