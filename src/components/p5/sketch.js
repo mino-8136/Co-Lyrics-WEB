@@ -46,33 +46,35 @@ export function sketch(p) {
     p.textFont(fonts)
     p.textSize(object.size[0].value)
     p.fill(object.color)
-    p.translate(AnimationPosition(object.X), AnimationPosition(object.Y))
+    p.translate(AnimationPosition(object.X, object.start), AnimationPosition(object.Y, object.start))
     p.rotate(object.angle[0].value)
     p.scale(object.scale[0].value / 100)
     p.text(object.text, 0, 0)
     p.pop()
   }
 
+  ////////////////////////////////
+
   // アニメーション位置を決める関数
-  function AnimationPosition(param) {
+  function AnimationPosition(param, initFrame) {
     // Parameterが配列であるという前提で行く
     const lastSection = param.length - 1
-    const currentSection = getCurrentSection(param)
+    const currentSection = getCurrentSection(param, initFrame)
     const nextSection = currentSection + 1
 
-    // 最初のキーフレームに到達していない場合、最初の値で止める
+    // 最初の相対キーフレームに到達していない場合、最初の値で止める
     if (currentSection === -1) {
       return param[0].value
     }
 
-    // 最後のキーフレームに到達していた場合、最後の値で止める
+    // 最後の相対キーフレームに到達していた場合、最後の値で止める
     // console.log(param, "curr: ", currentSection, "last: " , lastSection)
     if (currentSection == lastSection) {
       return param[currentSection].value
     }
 
     // それ以外の場合、値を補完して返す
-    const currentValue = getEaseValue(param, currentSection, nextSection, currentFrame)
+    const currentValue = getEaseValue(param, currentSection, nextSection, currentFrame-initFrame)
     return currentValue
   }
 
@@ -100,10 +102,10 @@ export function sketch(p) {
 
   // どの区間のフレームを参照するかを求める(CurrentFrameを超えない最大のキーフレーム)
   // 最初のキーフレームに到達していない場合に-1を返す
-  function getCurrentSection(param) {
+  function getCurrentSection(param, initFrame) {
     let index = -1
     for (let i = 0; i < param.length; i++) {
-      if (param[i].frame <= currentFrame) {
+      if (initFrame+param[i].frame <= currentFrame) {
         index = i
       } else {
         break
@@ -112,7 +114,9 @@ export function sketch(p) {
     return index
   }
 
-  // 外部に公開するための関数
+  ////////////////////////////
+  // 外部に公開するための関数 //
+  ////////////////////////////
   p.addRenderObjects = (objects) => {
     //console.log(objects)
     renderObjects = objects
