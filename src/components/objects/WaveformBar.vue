@@ -16,13 +16,15 @@ onMounted(() => {
       container: waveform.value,
       waveColor: '#4F4A85',
       progressColor: '#383351',
+      url: '/src/assets/music/demo.mp3',
       height: 40,
+      minPxPerSec: 90, // ここを1フレームあたりの幅に合わせる
+      dragToSeek: true,
       normalize: true,
-      url: '/src/assets/music/demo.mp3'
     })
 
     // イベントリスナーを追加
-    wavesurfer.on('interaction', () => wavesurfer.playPause())
+    wavesurfer.on('click', () => wavesurfer.playPause())
   }
 })
 
