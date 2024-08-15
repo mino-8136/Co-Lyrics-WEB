@@ -71,7 +71,7 @@
 
     <!-- アニメーション設定の呼び出し -->
     <v-dialog v-model="animationDialog">
-      <AnimationPanel @callAddAnimaton="addAnimation" />
+      <EasingPanel @callAddAnimaton="addAnimation" />
     </v-dialog>
   </v-container>
 </template>
@@ -81,7 +81,7 @@ import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import * as ParameterInfo from '@/components/objects/parameterInfo'
 import { type KeyframeSettings, isKeyframeSettings } from '@/components/objects/objectInfo'
-import AnimationPanel from '@/components/editor/AnimationPanel.vue'
+import EasingPanel from '@/components/editor/EasingPanel.vue'
 import { fontListData } from '@/assets/fonts/fonts'
 
 const objectStore = useObjectStore()
