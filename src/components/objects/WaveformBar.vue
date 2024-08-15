@@ -1,5 +1,5 @@
 <template>
-  <div ref="waveform"></div>
+  <div ref="waveform" class="waveform"></div>
 </template>
 
 <script setup>
@@ -13,12 +13,6 @@ const timelineStore = useTimelineStore()
 const waveform = ref(null) // DOM要素への参照を作成
 let wavesurfer = null // wavesurferのインスタンスを保持する変数
 
-// 指定したフレームに応じて音の位置を変更する関数
-function updateCurrentFrame(currentFrame) {
-  if (wavesurfer) {
-    wavesurfer.seekTo(currentFrame / frameRate / wavesurfer.getDuration())
-  }
-}
 
 onMounted(() => {
   if (waveform.value) {
@@ -53,7 +47,12 @@ onMounted(() => {
     })
 
     // イベントリスナーを追加
-    wavesurfer.on('click', () => wavesurfer.playPause())
+    wavesurfer.on('click', () => {
+      wavesurfer.playPause()
+    })
+    wavesurfer.on('dragstart', () => {
+      wavesurfer.pause()
+    })
     wavesurfer.on('audioprocess', (currentTime) => {
       timelineStore.currentFrame = Math.round(currentTime * timelineStore.framerate)
     })
@@ -83,5 +82,9 @@ onUnmounted(() => {
 <style scoped>
 div {
   background-color: aliceblue;
+}
+
+.waveform ::part(cursor) {
+  border: 1px solid #4cabe2;
 }
 </style>
