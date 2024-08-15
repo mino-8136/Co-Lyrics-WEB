@@ -16,6 +16,8 @@ onMounted(() => {
       container: waveform.value,
       waveColor: '#4F4A85',
       progressColor: '#383351',
+      height: 40,
+      normalize: true,
       url: '/src/assets/music/demo.mp3'
     })
 

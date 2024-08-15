@@ -1,7 +1,7 @@
 <template>
   <v-container class="timeline-panel">
     <div class="header">
-      <h3>Timeline: <input :value="timelineStore.currentFrame" /></h3>
+      <h3>Timeline: <input :value="timelineStore.currentFrame + 'f ' + frameToTime(timelineStore.currentFrame) " /></h3>
     </div>
 
     <div class="timeline-container">
@@ -130,6 +130,13 @@ function addObject(layerIndex: number, type: string) {
 
 function removeObject(index: number) {
   objectStore.removeObject(index)
+}
+
+function frameToTime(frame: number):string {
+  const frameRate = 30
+  let minutes = Math.floor(frame / frameRate / 60)
+  let seconds = Math.floor(frame / frameRate) % 60
+  return '(' + minutes + '分' + seconds + '秒' + ')'
 }
 </script>
 

@@ -36,7 +36,7 @@ export function sketch(p) {
   }
 
   // テキストを分解する関数
-  p.separateText = (text) => {
+  p.splitText = (text) => {
     return 0
   }
 
