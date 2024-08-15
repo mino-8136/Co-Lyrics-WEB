@@ -7,8 +7,18 @@ import { onMounted, onUnmounted, ref } from 'vue'
 import WaveSurfer from 'wavesurfer.js'
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 
+import { useTimelineStore } from '@/stores/objectStore'
+const timelineStore = useTimelineStore()
+
 const waveform = ref(null) // DOM要素への参照を作成
 let wavesurfer = null // wavesurferのインスタンスを保持する変数
+
+// 指定したフレームに応じて音の位置を変更する関数
+function updateCurrentFrame(currentFrame) {
+  if (wavesurfer) {
+    wavesurfer.seekTo(currentFrame / frameRate / wavesurfer.getDuration())
+  }
+}
 
 onMounted(() => {
   if (waveform.value) {
@@ -18,7 +28,7 @@ onMounted(() => {
       timeInterval: 0.1,
       primaryLabelInterval: 1,
       formatTimeCallback: (seconds) => {
-        return Math.round(seconds * 30) + 'f'
+        return Math.round(seconds * timelineStore.framerate) + 'f'
       },
       style: {
         fontSize: '10px',
@@ -34,13 +44,32 @@ onMounted(() => {
       url: '/src/assets/music/demo.mp3',
       height: 40,
       minPxPerSec: 90, // ここを1フレームあたりの幅に合わせる
+      autoplay: false,
+      autoScroll: true,
       dragToSeek: true,
+      fillParent: false,
       normalize: true,
       plugins: [bottomTimeline]
     })
 
     // イベントリスナーを追加
     wavesurfer.on('click', () => wavesurfer.playPause())
+    wavesurfer.on('audioprocess', (currentTime) => {
+      timelineStore.currentFrame = Math.round(currentTime * timelineStore.framerate)
+    })
+    wavesurfer.on('interaction', (newTime) => {
+      timelineStore.currentFrame = Math.round(newTime * timelineStore.framerate)
+    })
+
+    // スケーラーの追加
+    wavesurfer.once('decode', () => {
+      const slider = document.querySelector('input[type="range"]')
+
+      slider.addEventListener('input', (e) => {
+        const minPxPerSec = e.target.valueAsNumber
+        wavesurfer.zoom(minPxPerSec)
+      })
+    })
   }
 })
 
