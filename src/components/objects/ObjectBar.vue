@@ -8,16 +8,24 @@
   >
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
-    <div class="keyframe"></div>
+    <div
+      v-for="(keyframe, index) in keyFrameList"
+      :key="index"
+      class="keyframe"
+      :style="{ left: `${keyframe.frame * 3}px` }"
+    >
+      <div class="keyframe"></div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { BaseObject } from './objectInfo'
+import { BaseObject, TextObject, ImageObject } from './objectInfo'
+import { type KeyframeSettings } from './objectInfo'
 
 const props = defineProps<{
-  object: BaseObject
+  object: BaseObject | TextObject | ImageObject
 }>()
 const scaler = ref(3)
 
@@ -39,13 +47,19 @@ const objectStyle = computed(() => ({
   cursor: isMoving.value ? 'grabbing' : 'grab'
 }))
 
-
 // キーフレームの設定
-const displayKeyframe = () =>{
-  // object.valueの中のパラメータをすべて巡回する
-
-  // そのパラメータの中の
-}
+const keyFrameList = computed(() => {
+  let keyFrameList: KeyframeSettings[] = []
+  Object.entries(props.object).reduce((acc, [key, value]) => {
+    // KeyframeSettingsの配列であるかを判定
+    if (Array.isArray(value) && value.length > 1) {
+      acc.push(...value)
+    }
+    return acc
+  }, keyFrameList)
+  console.log(keyFrameList)
+  return keyFrameList
+})
 
 //////////////////////////
 // オブジェクト操作の関数 //
@@ -137,7 +151,7 @@ window.addEventListener('mousemove', move)
   right: 0;
 }
 
-.keyframe{
+.keyframe {
   position: absolute;
   background-color: lightgray;
   border: 1px solid black;
