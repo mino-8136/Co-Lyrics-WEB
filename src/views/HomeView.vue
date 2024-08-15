@@ -22,7 +22,7 @@
 <script setup lang="ts">
 // TODO : ファイル内のsample.jsonを読み込む部分を、複数のファイルを読み込むように変更する(要サーバープログラム)
 import { onMounted, ref } from 'vue'
-import PlayMoviePanel from '../components/PlayMoviePanel.vue'
+import PlayMoviePanel from '@/components/PlayMoviePanel.vue'
 
 interface MovieObject {
   id: number

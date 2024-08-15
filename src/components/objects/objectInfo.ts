@@ -10,6 +10,12 @@ export interface KeyframeSettings {
   animation?: string
 }
 
+// KeyframeSettings 型か number 型かを判定する関数
+// TODO:配列かどうかで判定しているので、もう少し詳細の判定が必要
+export function isKeyframeSettings(element: any): element is KeyframeSettings {
+  return Array.isArray(element)
+}
+
 export interface BaseSettings {
   id: number
   start: number
@@ -113,7 +119,7 @@ export class TextObject extends BaseObject implements TextSettings {
     this.spacing_x = 0
     this.spacing_y = 0
     this.color = '#ffffff'
-    this.font = 'ＭＳ ゴシック'
+    this.font = 'SourceHanSansJP'
     this.text = 'サンプルテキスト'
   }
 }
@@ -142,18 +148,5 @@ export class ImageObject extends BaseObject implements ImageSettings {
     this.file = ''
     this.name = ''
     this.parameters = []
-  }
-}
-
-export interface AudioSettings extends BaseSettings {
-  file: string
-}
-
-export class AudioObject extends BaseObject implements AudioSettings {
-  file: string
-
-  constructor(settings: BaseSettings) {
-    super(settings)
-    this.file = ''
   }
 }

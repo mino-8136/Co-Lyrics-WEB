@@ -1,7 +1,10 @@
 <template>
   <v-container class="timeline-panel">
-    <div class="header">
-      <h3>Timeline: <input :value="timelineStore.currentFrame" /></h3>
+    <div class="header d-flex">
+      <p>Timeline:</p>
+      <input :value="timelineStore.currentFrame" />
+      <p>{{ frameToTime(timelineStore.currentFrame) }}</p>
+      <input type="range" min="10" max="1000" value="100" />
     </div>
 
     <div class="timeline-container">
@@ -36,9 +39,9 @@
 import { ref } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
-import ObjectBar from '../objects/ObjectBar.vue'
-import Timelinebar from '../objects/TimelineBar.vue'
-import Waveformbar from '../objects/WaveformBar.vue'
+import ObjectBar from '@/components/objects/ObjectBar.vue'
+import Timelinebar from '@/components/objects/TimelineBar.vue'
+import Waveformbar from '@/components/objects/WaveformBar.vue'
 import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
 
 const objectStore = useObjectStore()
@@ -130,6 +133,13 @@ function addObject(layerIndex: number, type: string) {
 
 function removeObject(index: number) {
   objectStore.removeObject(index)
+}
+
+function frameToTime(frame: number): string {
+  const frameRate = 30
+  let minutes = Math.floor(frame / frameRate / 60)
+  let seconds = Math.floor(frame / frameRate) % 60
+  return '(' + minutes + '分' + seconds + '秒' + ')'
 }
 </script>
 

@@ -39,7 +39,13 @@ const ticks = ref(20)
   --ruler2-space: 50;
 }
 
-input[type='range'] {
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: calc(var(--ruler2-h) * 2.5); /* これで合ってる? */
+}
+
+.slider-container input[type='range'] {
   -webkit-appearance: none;
   appearance: none;
   outline: none;
@@ -48,7 +54,7 @@ input[type='range'] {
   position: relative;
 }
 
-input[type='range']::-webkit-slider-runnable-track {
+.slider-container input[type='range']::-webkit-slider-runnable-track {
   background-image: linear-gradient(90deg, var(--ruler1-c) 0 var(--ruler1-bdw), transparent 0),
     linear-gradient(90deg, var(--ruler2-c) 0 var(--ruler2-bdw), transparent 0);
   background-repeat: repeat-x;
@@ -63,22 +69,17 @@ input[type='range']::-webkit-slider-runnable-track {
   z-index: 1;
 }
 
-input[type='range']::-webkit-slider-thumb {
+.slider-container input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 2px;
   height: 300px; /* スマートに設定したい */
   background-color: #4cabe2;
   z-index: 3;
+  pointer-events: none;
 }
 
-.slider-container {
-  position: relative;
-  width: 100%;
-  height: calc(var(--ruler2-h) * 2.5); /* これで合ってる? */
-}
-
-.ruler-x {
+.slider-container .ruler-x {
   width: 100%;
   padding: 0;
   margin: 0;
@@ -93,13 +94,13 @@ input[type='range']::-webkit-slider-thumb {
   counter-reset: frameCounter calc(var(--ruler2-space) * -1);
 }
 
-.ruler-x li {
+.slider-container .ruler-x li {
   align-self: flex-end;
   counter-increment: frameCounter var(--ruler2-space);
   flex: 0 0 calc(var(--ruler-unit) * var(--ruler2-space));
 }
 
-.ruler-x li::after {
+.slider-container .ruler-x li::after {
   content: counter(frameCounter);
   line-height: 1;
   padding-inline-start: 1.75px;

@@ -3,19 +3,19 @@
     <div v-if="selectedObject">
       <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
       <div v-for="(element, label) in selectedObject" :key="label">
-        <div v-if="getType(label) != UIType.none" class="parameter-row">
+        <div v-if="ParameterInfo.getType(label) != ParameterInfo.UIType.none" class="parameter-row">
           <v-chip class="parameter-name" @click="openAnimationDialog()">{{
-            getName(label)
+            ParameterInfo.getName(label)
           }}</v-chip>
 
           <!-- 数値型の場合 -->
-          <template v-if="getType(label) == UIType.slider">
+          <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
             <v-row v-if="isKeyframeSettings(element)">
               <v-col v-for="(val, idx) in element" :key="idx" cols="12">
                 <v-slider
                   v-model="(element[idx] as unknown as KeyframeSettings).value"
-                  :min="getMinValue(label) || 0"
-                  :max="getMaxValue(label) || 1000"
+                  :min="ParameterInfo.getMinValue(label) || 0"
+                  :max="ParameterInfo.getMaxValue(label) || 1000"
                   step="1"
                   append-icon="mdi-plus"
                   @click:append="addKeyframe(element, idx)"
@@ -38,8 +38,8 @@
             <v-slider
               v-else
               v-model="selectedObject[label]"
-              :min="getMinValue(label) || 0"
-              :max="getMaxValue(label) || 1000"
+              :min="ParameterInfo.getMinValue(label) || 0"
+              :max="ParameterInfo.getMaxValue(label) || 1000"
               step="1"
               append-icon="mdi-"
               hide-details
@@ -50,16 +50,20 @@
             </v-slider>
           </template>
 
-          <template v-if="getType(label) == UIType.text">
+          <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.text">
             <textarea :id="label" v-model="selectedObject[label]" type="text" />
           </template>
 
-          <template v-if="getType(label) == UIType.select">
+          <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.select">
             <v-select v-model="selectedObject[label]" :items="fontList"> </v-select>
           </template>
 
-          <template v-if="getType(label) === UIType.color">
+          <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.color">
             <input type="color" v-model="selectedObject[label]" />
+          </template>
+
+          <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.checkbox">
+            <v-checkbox v-model="selectedObject[label]" hide-details />
           </template>
         </div>
       </div>
@@ -67,7 +71,7 @@
 
     <!-- アニメーション設定の呼び出し -->
     <v-dialog v-model="animationDialog">
-      <AnimationPanel @callAddAnimaton="addAnimation" />
+      <EasingPanel @callAddAnimaton="addAnimation" />
     </v-dialog>
   </v-container>
 </template>
@@ -75,13 +79,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
-import { parameterInfo, UIType } from '../objects/parameterInfo'
-import type { KeyframeSettings } from '../objects/objectInfo'
-import AnimationPanel from './AnimationPanel.vue'
+import * as ParameterInfo from '@/components/objects/parameterInfo'
+import { type KeyframeSettings, isKeyframeSettings } from '@/components/objects/objectInfo'
+import EasingPanel from '@/components/editor/EasingPanel.vue'
+import { fontListData } from '@/assets/fonts/fonts'
 
 const objectStore = useObjectStore()
-const fontList = ['Arial', 'Verdana', 'Times New Roman', 'Courier New']
 const animationDialog = ref(false)
+const fontList = fontListData.map((font) => font.name)
 
 // 選択されたオブジェクトの情報が自動的に表示される
 const selectedObject = computed(() => {
@@ -107,30 +112,6 @@ function openAnimationDialog() {
 // 指定したプロパティにアニメーションを追加
 function addAnimation(element: KeyframeSettings, index: number, animation: string) {
   element.animation = animation
-}
-
-///////////////////////////////////////////
-
-// KeyframeSettings 型か number 型かを判定する関数
-// TODO:配列かどうかで判定しているので、もう少し詳細の判定が必要
-function isKeyframeSettings(element: any): element is KeyframeSettings {
-  return Array.isArray(element)
-}
-// パラメータを取得する関数
-const getName = (key: string) => {
-  return parameterInfo[key]?.name ?? key
-}
-const getMaxValue = (key: string) => {
-  return parameterInfo[key]?.max
-}
-const getMinValue = (key: string) => {
-  return parameterInfo[key]?.min
-}
-const getType = (key: string): UIType => {
-  if (parameterInfo[key]?.type === undefined) {
-    return UIType.none
-  }
-  return parameterInfo[key]?.type
 }
 </script>
 
