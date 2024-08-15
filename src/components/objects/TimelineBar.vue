@@ -45,7 +45,6 @@ const ticks = ref(20)
   height: calc(var(--ruler2-h) * 2.5); /* これで合ってる? */
 }
 
-
 .slider-container input[type='range'] {
   -webkit-appearance: none;
   appearance: none;
@@ -77,6 +76,7 @@ const ticks = ref(20)
   height: 300px; /* スマートに設定したい */
   background-color: #4cabe2;
   z-index: 3;
+  pointer-events: none;
 }
 
 .slider-container .ruler-x {
