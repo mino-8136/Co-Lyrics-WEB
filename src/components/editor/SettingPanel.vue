@@ -86,7 +86,7 @@ import { fontListData } from '@/assets/fonts/fonts'
 
 const objectStore = useObjectStore()
 const animationDialog = ref(false)
-const fontList = fontListData
+const fontList = fontListData.map((font) => font.name)
 
 // 選択されたオブジェクトの情報が自動的に表示される
 const selectedObject = computed(() => {
