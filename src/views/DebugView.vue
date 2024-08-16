@@ -1,13 +1,13 @@
 <template>
   <v-container class="setting-panel">
-    <v-tabs v-model="tab">
-      <v-tab value="basic">基本設定</v-tab>
-      <v-tab value="animation">アニメーション</v-tab>
-    </v-tabs>
+    <div v-if="selectedObject">
+      <v-tabs v-model="tab">
+        <v-tab value="basic">基本設定</v-tab>
+        <v-tab value="animation">アニメーション</v-tab>
+      </v-tabs>
 
-    <v-tabs-window v-model="tab">
-      <v-tabs-window-item value="basic">
-        <div v-if="selectedObject">
+      <v-tabs-window v-model="tab">
+        <v-tabs-window-item value="basic">
           <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
           <div v-for="(element, label) in selectedObject" :key="label">
             <div
@@ -77,12 +77,20 @@
               </template>
             </div>
           </div>
-        </div>
-      </v-tabs-window-item>
-      <v-tabs-window-item value="animation">
-        <h3>aiotna</h3>
-      </v-tabs-window-item>
-    </v-tabs-window>
+        </v-tabs-window-item>
+        <v-tabs-window-item value="animation">
+          <p>{{ selectedObject.anim_name }}</p>
+
+          <p v-for="(parameter,index) in selectedObject.anim_parameters" :key="index">
+            {{ selectedObject.anim_parameters }}
+          </p>
+          <v-btn>
+            <v-icon>mdi-plus</v-icon>
+            アニメーション追加
+          </v-btn>
+        </v-tabs-window-item>
+      </v-tabs-window>
+    </div>
 
     <!-- アニメーション設定の呼び出し -->
     <v-dialog v-model="animationDialog">

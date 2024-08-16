@@ -28,7 +28,10 @@ export const parameterInfo: {
   spacing_y: { name: '垂直間隔', type: UIType.none, min: 0, max: 100 },
   color: { name: '色', type: UIType.color, min: 0, max: 0xffffff },
   font: { name: 'フォント', type: UIType.select },
-  text: { name: 'テキスト', type: UIType.text }
+  text: { name: 'テキスト', type: UIType.text },
+  ////////////////////////////////////////////////
+  anim_name: { name: 'アニメーション', type: UIType.select },
+  anim_parameters: { name: 'アニメーションパラメータ', type: UIType.none },
 }
 
 // パラメータを取得する関数

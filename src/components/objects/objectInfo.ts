@@ -27,8 +27,8 @@ export interface BaseSettings {
 }
 
 export interface AnimationSettings {
-  name: string
-  parameters: {}
+  anim_name: string
+  anim_parameters: {}
 }
 
 export interface StandardRenderSettings {
@@ -90,8 +90,8 @@ export class TextObject extends BaseObject implements TextSettings {
   scale: KeyframeSettings[]
   opacity: KeyframeSettings[]
   angle: KeyframeSettings[]
-  name: string
-  parameters: any
+  anim_name: string
+  anim_parameters: any
   type: string
   size: KeyframeSettings[]
   individual_object: boolean
@@ -105,13 +105,16 @@ export class TextObject extends BaseObject implements TextSettings {
   constructor(settings: BaseSettings) {
     // 追加時は結局BaseSettingくらいの中身になる
     super(settings)
-    this.X = [{ value: 0, frame: this.start }, { value: 100, frame: this.end }]
+    this.X = [
+      { value: 0, frame: this.start },
+      { value: 100, frame: this.end }
+    ]
     this.Y = [{ value: 0, frame: this.start }]
     this.scale = [{ value: 100, frame: this.start }]
     this.opacity = [{ value: 100, frame: this.start }]
     this.angle = [{ value: 0, frame: this.start }]
-    this.name = ''
-    this.parameters = []
+    this.anim_name = 'サンプル'
+    this.anim_parameters = []
     this.type = 'text'
     this.size = [{ value: 28, frame: this.start }]
     this.individual_object = false
@@ -135,18 +138,21 @@ export class ImageObject extends BaseObject implements ImageSettings {
   opacity: KeyframeSettings[]
   angle: KeyframeSettings[]
   file: string
-  name: string
-  parameters: any
+  anim_name: string
+  anim_parameters: any
 
   constructor(settings: BaseSettings) {
     super(settings)
-    this.X = [{ value: 0, frame: this.start }, { value: 100, frame: this.end }]
+    this.X = [
+      { value: 0, frame: this.start },
+      { value: 100, frame: this.end }
+    ]
     this.Y = [{ value: 0, frame: this.start }]
     this.scale = [{ value: 100, frame: this.start }]
     this.opacity = [{ value: 100, frame: this.start }]
     this.angle = [{ value: 0, frame: this.start }]
     this.file = ''
-    this.name = ''
-    this.parameters = []
+    this.anim_name = ''
+    this.anim_parameters = []
   }
 }
