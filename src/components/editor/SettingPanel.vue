@@ -1,72 +1,95 @@
 <template>
   <v-container class="setting-panel">
     <div v-if="selectedObject">
-      <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-      <div v-for="(element, label) in selectedObject" :key="label">
-        <div v-if="ParameterInfo.getType(label) != ParameterInfo.UIType.none" class="parameter-row">
-          <v-chip class="parameter-name" @click="openAnimationDialog()">{{
-            ParameterInfo.getName(label)
-          }}</v-chip>
+      <v-tabs v-model="tab">
+        <v-tab value="basic">基本設定</v-tab>
+        <v-tab value="animation">アニメーション</v-tab>
+      </v-tabs>
 
-          <!-- 数値型の場合 -->
-          <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
-            <v-row v-if="isKeyframeSettings(element)">
-              <v-col v-for="(val, idx) in element" :key="idx" cols="12">
+      <v-tabs-window v-model="tab">
+        <v-tabs-window-item value="basic">
+          <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
+          <div v-for="(element, label) in selectedObject" :key="label">
+            <div
+              v-if="ParameterInfo.getType(label) != ParameterInfo.UIType.none"
+              class="parameter-row"
+            >
+              <v-chip class="parameter-name" @click="openAnimationDialog()">{{
+                ParameterInfo.getName(label)
+              }}</v-chip>
+
+              <!-- 数値型の場合 -->
+              <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
+                <v-row v-if="isKeyframeSettings(element)">
+                  <v-col v-for="(val, idx) in element" :key="idx" cols="12">
+                    <v-slider
+                      v-model="(element[idx] as unknown as KeyframeSettings).value"
+                      :min="ParameterInfo.getMinValue(label) || 0"
+                      :max="ParameterInfo.getMaxValue(label) || 1000"
+                      step="1"
+                      append-icon="mdi-plus"
+                      @click:append="addKeyframe(element, idx)"
+                      hide-details
+                    >
+                      <template v-slot:prepend>
+                        <input
+                          class="parameter-value"
+                          v-model.number="(element[idx] as unknown as KeyframeSettings).frame"
+                        />
+                        <p>→</p>
+                        <input
+                          class="parameter-value"
+                          v-model.number="(element[idx] as unknown as KeyframeSettings).value"
+                        />
+                      </template>
+                    </v-slider>
+                  </v-col>
+                </v-row>
                 <v-slider
-                  v-model="(element[idx] as unknown as KeyframeSettings).value"
+                  v-else
+                  v-model="selectedObject[label]"
                   :min="ParameterInfo.getMinValue(label) || 0"
                   :max="ParameterInfo.getMaxValue(label) || 1000"
                   step="1"
-                  append-icon="mdi-plus"
-                  @click:append="addKeyframe(element, idx)"
+                  append-icon="mdi-"
                   hide-details
                 >
                   <template v-slot:prepend>
-                    <input
-                      class="parameter-value"
-                      v-model.number="(element[idx] as unknown as KeyframeSettings).frame"
-                    />
-                    <p>→</p>
-                    <input
-                      class="parameter-value"
-                      v-model.number="(element[idx] as unknown as KeyframeSettings).value"
-                    />
+                    <input class="parameter-value" v-model.number="selectedObject[label]" />
                   </template>
                 </v-slider>
-              </v-col>
-            </v-row>
-            <v-slider
-              v-else
-              v-model="selectedObject[label]"
-              :min="ParameterInfo.getMinValue(label) || 0"
-              :max="ParameterInfo.getMaxValue(label) || 1000"
-              step="1"
-              append-icon="mdi-"
-              hide-details
-            >
-              <template v-slot:prepend>
-                <input class="parameter-value" v-model.number="selectedObject[label]" />
               </template>
-            </v-slider>
-          </template>
 
-          <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.text">
-            <textarea :id="label" v-model="selectedObject[label]" type="text" />
-          </template>
+              <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.text">
+                <textarea :id="label" v-model="selectedObject[label]" type="text" />
+              </template>
 
-          <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.select">
-            <v-select v-model="selectedObject[label]" :items="fontList"> </v-select>
-          </template>
+              <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.select">
+                <v-select v-model="selectedObject[label]" :items="fontList"> </v-select>
+              </template>
 
-          <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.color">
-            <input type="color" v-model="selectedObject[label]" />
-          </template>
+              <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.color">
+                <input type="color" v-model="selectedObject[label]" />
+              </template>
 
-          <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.checkbox">
-            <v-checkbox v-model="selectedObject[label]" hide-details />
-          </template>
-        </div>
-      </div>
+              <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.checkbox">
+                <v-checkbox v-model="selectedObject[label]" hide-details />
+              </template>
+            </div>
+          </div>
+        </v-tabs-window-item>
+        <v-tabs-window-item value="animation">
+          <p>{{ selectedObject.anim_name }}</p>
+
+          <p v-for="(parameter,index) in selectedObject.anim_parameters" :key="index">
+            {{ selectedObject.anim_parameters }}
+          </p>
+          <v-btn>
+            <v-icon>mdi-plus</v-icon>
+            アニメーション追加
+          </v-btn>
+        </v-tabs-window-item>
+      </v-tabs-window>
     </div>
 
     <!-- アニメーション設定の呼び出し -->
@@ -87,6 +110,7 @@ import { fontListData } from '@/assets/fonts/fonts'
 const objectStore = useObjectStore()
 const animationDialog = ref(false)
 const fontList = fontListData.map((font) => font.name)
+const tab = ref('basic')
 
 // 選択されたオブジェクトの情報が自動的に表示される
 const selectedObject = computed(() => {
