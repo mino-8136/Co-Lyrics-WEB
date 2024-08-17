@@ -10,7 +10,7 @@
 import { onMounted, ref, computed, watch } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import p5 from 'p5'
-import { sketch } from '../p5/sketch'
+import { sketch } from '../p5/sketch.ts'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()

@@ -12,7 +12,7 @@
 import { onMounted, ref } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import p5 from 'p5'
-import { sketch } from '@/components/p5/sketch'
+import { sketch } from '@/components/p5/sketch.ts'
 
 const objectStore = useObjectStore()
 const currentTime = ref(0)

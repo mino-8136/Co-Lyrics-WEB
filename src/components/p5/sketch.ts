@@ -1,10 +1,12 @@
 import { gsap } from 'gsap'
+import type p5 from 'p5'
+import type { TextObject } from '@/components/objects/objectInfo'
 
-let renderObjects = []
+let renderObjects: TextObject[] = []
 let currentFrame = 0
-let fonts = null
+let fonts: p5.Font
 
-export function sketch(p) {
+export function sketch(p: p5) {
   p.preload = () => {
     fonts = p.loadFont('src/assets/fonts/SourceHanSansJP/SourceHanSansJP-Medium.otf')
   }
@@ -46,7 +48,10 @@ export function sketch(p) {
     p.textFont(fonts)
     p.textSize(object.size[0].value)
     p.fill(object.color)
-    p.translate(AnimationPosition(object.X, object.start), AnimationPosition(object.Y, object.start))
+    p.translate(
+      AnimationPosition(object.X, object.start),
+      AnimationPosition(object.Y, object.start)
+    )
     p.rotate(object.angle[0].value)
     p.scale(object.scale[0].value / 100)
     p.text(object.text, 0, 0)
@@ -74,7 +79,7 @@ export function sketch(p) {
     }
 
     // それ以外の場合、値を補完して返す
-    const currentValue = getEaseValue(param, currentSection, nextSection, currentFrame-initFrame)
+    const currentValue = getEaseValue(param, currentSection, nextSection, currentFrame - initFrame)
     return currentValue
   }
 
@@ -105,7 +110,7 @@ export function sketch(p) {
   function getCurrentSection(param, initFrame) {
     let index = -1
     for (let i = 0; i < param.length; i++) {
-      if (initFrame+param[i].frame <= currentFrame) {
+      if (initFrame + param[i].frame <= currentFrame) {
         index = i
       } else {
         break
@@ -117,12 +122,12 @@ export function sketch(p) {
   ////////////////////////////
   // 外部に公開するための関数 //
   ////////////////////////////
-  p.addRenderObjects = (objects) => {
+  p.addRenderObjects = (objects: TextObject) => {
     //console.log(objects)
     renderObjects = objects
   }
 
-  p.updateCurrentFrame = (frame) => {
+  p.updateCurrentFrame = (frame:number) => {
     currentFrame = frame
   }
 }
