@@ -8,9 +8,7 @@ export const useObjectStore = defineStore('objects', {
   }),
   getters: {
     currentObjects: (state) => (frame: number) => {
-      return state.objects.filter(
-        (object) => object.start <= frame && object.end >= frame
-      )
+      return state.objects.filter((object) => object.start <= frame && object.end >= frame)
     },
     selectedObject: (state) => {
       const selectedObjects = state.objects.filter((object) => object.selected)
@@ -38,6 +36,7 @@ export const useTimelineStore = defineStore('timeline', {
     framerate: 30,
     totalFrame: 1800,
     currentFrame: 0,
+    canvasScale: 1
   }),
   actions: {
     setCurrentFrame(frame: number) {
@@ -45,6 +44,9 @@ export const useTimelineStore = defineStore('timeline', {
     },
     incrementFrame() {
       this.currentFrame++
-    }
+    },
+    updateCanvasScale(receivedWidth: number) {
+      this.canvasScale = receivedWidth / this.width
+    },
   }
 })
