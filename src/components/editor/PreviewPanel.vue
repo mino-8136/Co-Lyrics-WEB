@@ -22,7 +22,7 @@ onMounted(() => {
   // canvasのsizeを取得し、スケールを計算
   if (canvasContainer.value) {
     const { width, height } = canvasContainer.value.getBoundingClientRect()
-    timelineStore.canvasScale = width / timelineStore.width
+    timelineStore.canvasScale = calculateCanvasScale(width, height)
   }
 
   let sketch = defineSketch(timelineStore)
@@ -44,9 +44,17 @@ watch(
 function updateCanvasSize() {
   if (canvasContainer.value && p.value) {
     const { width, height } = canvasContainer.value.getBoundingClientRect()
-    timelineStore.canvasScale = width / timelineStore.width
+    timelineStore.canvasScale = calculateCanvasScale(width, height)
     p.value.updateCanvasScale()
   }
+}
+
+function calculateCanvasScale(width, height) {
+  console.log(width, height)
+  if ((width / 16) * 9 > height) {
+    return height / timelineStore.height
+  }
+  return width / timelineStore.width
 }
 
 // 現在レンダリングするオブジェクトの描画 p5.canvasに登録
@@ -65,5 +73,10 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 500px;
   border: 1px solid #ccc;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%; /* 親要素の高さに合わせる */
 }
 </style>
