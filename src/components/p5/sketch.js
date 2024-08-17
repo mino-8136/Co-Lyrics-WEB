@@ -9,7 +9,7 @@ export function sketch(p) {
     fonts = p.loadFont('src/assets/fonts/SourceHanSansJP/SourceHanSansJP-Medium.otf')
   }
   p.setup = () => {
-    const canvas = p.createCanvas(400, 400)
+    const canvas = p.createCanvas(1280, 720)
     canvas.parent('canvas')
 
     p.smooth()
