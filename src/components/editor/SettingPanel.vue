@@ -3,6 +3,7 @@
     <div v-if="selectedObject">
       <v-tabs v-model="tab">
         <v-tab value="basic">基本設定</v-tab>
+        <v-tab value="stylize">スタイル</v-tab>
         <v-tab value="animation">アニメーション</v-tab>
       </v-tabs>
 
@@ -78,10 +79,13 @@
             </div>
           </div>
         </v-tabs-window-item>
+        <v-tabs-window-item value="stylize">
+          <p>機能追加予定</p>
+        </v-tabs-window-item>
         <v-tabs-window-item value="animation">
           <p>{{ selectedObject.anim_name }}</p>
 
-          <p v-for="(parameter,index) in selectedObject.anim_parameters" :key="index">
+          <p v-for="(parameter, index) in selectedObject.anim_parameters" :key="index">
             {{ selectedObject.anim_parameters }}
           </p>
           <v-btn>

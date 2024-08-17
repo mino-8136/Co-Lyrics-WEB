@@ -1,7 +1,11 @@
 <template>
   <v-container class="preview-panel">
     <!-- ここでp5.jsのCanvasを表示 -->
-    <div id="canvas" ref="canvasContainer" :style="{ height: 500-informationHeight + 'px' }"></div>
+    <div
+      id="canvas"
+      ref="canvasContainer"
+      :style="{ height: 500 - informationHeight + 'px' }"
+    ></div>
     <div id="information">
       <v-btn @click="renderObjects" icon="mdi-play"></v-btn>
     </div>
@@ -16,7 +20,7 @@ import { defineSketch } from '@/components/p5/sketch.ts'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
-const informationHeight = 80;
+const informationHeight = 80
 
 // マウント時に p5.canvas を生成
 const p = ref()

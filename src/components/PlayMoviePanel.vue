@@ -14,7 +14,6 @@ import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import p5 from 'p5'
 import { defineSketch } from '@/components/p5/sketch.ts'
 
-
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
 const currentTime = ref(0)
@@ -31,11 +30,9 @@ function renderObjects() {
   p.value.addRenderObjects(objectStore.objects)
 }
 
-
 ////////////////////////////
 // ゲームプレイに関わる処理 //
 ////////////////////////////
-
 
 // タイミングオブジェクト描画処理
 
@@ -43,8 +40,6 @@ function renderObjects() {
 // function judgeTiming()
 
 // スペースキーが押された場合の処理
-
-
 </script>
 
 <style scoped>

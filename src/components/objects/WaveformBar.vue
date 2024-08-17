@@ -13,7 +13,6 @@ const timelineStore = useTimelineStore()
 const waveform = ref(null) // DOM要素への参照を作成
 let wavesurfer = null // wavesurferのインスタンスを保持する変数
 
-
 onMounted(() => {
   if (waveform.value) {
     // タイムラインプラグインの設定

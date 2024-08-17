@@ -47,6 +47,6 @@ export const useTimelineStore = defineStore('timeline', {
     },
     updateCanvasScale(receivedWidth: number) {
       this.canvasScale = receivedWidth / this.width
-    },
+    }
   }
 })

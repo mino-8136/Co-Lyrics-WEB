@@ -1,8 +1,8 @@
 <template>
   <menu-panel />
   <div class="d-flex">
-      <preview-panel />
-      <setting-panel />
+    <preview-panel />
+    <setting-panel />
   </div>
   <timeline-panel />
 </template>

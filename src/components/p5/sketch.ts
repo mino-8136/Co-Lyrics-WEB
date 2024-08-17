@@ -12,8 +12,10 @@ export function defineSketch(project) {
       fonts = p.loadFont('src/assets/fonts/SourceHanSansJP/SourceHanSansJP-Medium.otf')
     }
     p.setup = () => {
-      
-      const canvas = p.createCanvas(project.width * project.canvasScale, project.width / 16 * 9 * project.canvasScale)
+      const canvas = p.createCanvas(
+        project.width * project.canvasScale,
+        (project.width / 16) * 9 * project.canvasScale
+      )
       canvas.parent('canvas')
 
       p.smooth()

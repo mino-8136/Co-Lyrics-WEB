@@ -31,7 +31,7 @@ export const parameterInfo: {
   text: { name: 'テキスト', type: UIType.text },
   ////////////////////////////////////////////////
   anim_name: { name: 'アニメーション', type: UIType.none },
-  anim_parameters: { name: 'アニメーションパラメータ', type: UIType.none },
+  anim_parameters: { name: 'アニメーションパラメータ', type: UIType.none }
 }
 
 // パラメータを取得する関数
