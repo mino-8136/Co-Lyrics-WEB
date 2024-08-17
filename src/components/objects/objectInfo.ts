@@ -119,8 +119,8 @@ export class TextObject extends BaseObject implements TextSettings {
     this.size = [{ value: 28, frame: this.start }]
     this.individual_object = false
     this.align = 0
-    this.spacing_x = 0
-    this.spacing_y = 0
+    this.spacing_x = 20
+    this.spacing_y = 20
     this.color = '#ffffff'
     this.font = 'SourceHanSansJP'
     this.text = 'サンプルテキスト'

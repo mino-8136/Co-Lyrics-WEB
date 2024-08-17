@@ -1,6 +1,7 @@
 import { gsap } from 'gsap'
 import type p5 from 'p5'
 import type { TextObject } from '@/components/objects/objectInfo'
+import type { KeyframeSettings } from '@/components/objects/objectInfo'
 
 let renderObjects: TextObject[] = []
 let currentFrame = 0
@@ -38,8 +39,26 @@ export function defineSketch(project) {
       p.scale(project.canvasScale)
       renderObjects.forEach((object) => {
         p.renderTextObject(object)
+        p.getText(object)
       })
       p.pop()
+    }
+
+    //////////////////////
+    // テキスト周りの関数 //
+    //////////////////////
+
+    // テキストオブジェクトからテキストを取り出す関数
+    p.getText = (object: TextObject) => {
+      const currentSection = getCurrentSection(object.X, object.start)
+      for (let i = 0; i < object.text.length; i++) {
+        p.text(
+          object.text[i],
+          object.X[currentSection].value + object.spacing_x * i,
+          object.Y[0].value + object.spacing_y,
+          object.size[0].value
+        )
+      }
     }
 
     // テキストを分解する関数
@@ -48,14 +67,14 @@ export function defineSketch(project) {
     }
 
     // レンダリングを担当する関数
-    p.renderTextObject = (object) => {
+    p.renderTextObject = (object: TextObject) => {
       p.push()
       p.textFont(fonts)
       p.textSize(object.size[0].value)
       p.fill(object.color)
       p.translate(
-        AnimationPosition(object.X, object.start),
-        AnimationPosition(object.Y, object.start)
+        lerpValue(object.X, object.start),
+        lerpValue(object.Y, object.start)
       )
       p.rotate(object.angle[0].value)
       p.scale(object.scale[0].value / 100)
@@ -66,10 +85,10 @@ export function defineSketch(project) {
     ////////////////////////////////
 
     // アニメーション位置を決める関数
-    function AnimationPosition(param, initFrame) {
+    function lerpValue(param: KeyframeSettings[], objectStartFrame: number) {
       // Parameterが配列であるという前提で行く
       const lastSection = param.length - 1
-      const currentSection = getCurrentSection(param, initFrame)
+      const currentSection = getCurrentSection(param, objectStartFrame)
       const nextSection = currentSection + 1
 
       // 最初の相対キーフレームに到達していない場合、最初の値で止める
@@ -88,13 +107,18 @@ export function defineSketch(project) {
         param,
         currentSection,
         nextSection,
-        currentFrame - initFrame
+        currentFrame - objectStartFrame
       )
       return currentValue
     }
 
     // アニメーションの値を補完する関数
-    function getEaseValue(param, currentSection, nextSection, currentFrame) {
+    function getEaseValue(
+      param: KeyframeSettings[],
+      currentSection: number,
+      nextSection: number,
+      currentFrame: number
+    ) {
       const initialValue = param[currentSection].value
       const deltaValue = param[nextSection].value - param[currentSection].value
       const progress =
@@ -118,10 +142,10 @@ export function defineSketch(project) {
 
     // どの区間のフレームを参照するかを求める(CurrentFrameを超えない最大のキーフレーム)
     // 最初のキーフレームに到達していない場合に-1を返す
-    function getCurrentSection(param, initFrame) {
+    function getCurrentSection(param: KeyframeSettings[], objectStartFrame: number) {
       let index = -1
       for (let i = 0; i < param.length; i++) {
-        if (initFrame + param[i].frame <= currentFrame) {
+        if (objectStartFrame + param[i].frame <= currentFrame) {
           index = i
         } else {
           break
