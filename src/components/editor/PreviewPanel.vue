@@ -1,24 +1,35 @@
 <template>
   <v-container class="preview-panel">
     <!-- ここでp5.jsのCanvasを表示 -->
-    <div id="canvas"></div>
+    <div id="canvas" ref="canvasContainer"></div>
     <v-btn @click="renderObjects" icon="mdi-play"></v-btn>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, ref, onBeforeUnmount, watch } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import p5 from 'p5'
-import { sketch } from '../p5/sketch.ts'
+import { defineSketch } from '@/components/p5/sketch.ts'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
 
 // マウント時に p5.canvas を生成
 const p = ref()
+const canvasContainer = ref<HTMLDivElement | null>(null)
 onMounted(() => {
+  // canvasのsizeを取得し、スケールを計算
+  if (canvasContainer.value) {
+    const { width, height } = canvasContainer.value.getBoundingClientRect()
+    timelineStore.canvasScale = width / timelineStore.width
+  }
+
+  let sketch = defineSketch(timelineStore)
   p.value = new p5(sketch)
+
+  // ウィンドウのリサイズイベントを監視
+  window.addEventListener('resize', updateCanvasSize)
 })
 
 watch(
@@ -29,10 +40,23 @@ watch(
   }
 )
 
+// canvasの大きさを取得してp5.jsに伝達
+function updateCanvasSize() {
+  if (canvasContainer.value && p.value) {
+    const { width, height } = canvasContainer.value.getBoundingClientRect()
+    timelineStore.canvasScale = width / timelineStore.width
+    p.value.updateCanvasScale()
+  }
+}
+
 // 現在レンダリングするオブジェクトの描画 p5.canvasに登録
 function renderObjects() {
   p.value.addRenderObjects(objectStore.currentObjects(timelineStore.currentFrame))
 }
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateCanvasSize)
+})
 </script>
 
 <style scoped>

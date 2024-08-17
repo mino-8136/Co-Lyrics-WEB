@@ -10,16 +10,19 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useObjectStore } from '@/stores/objectStore'
+import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import p5 from 'p5'
-import { sketch } from '@/components/p5/sketch.ts'
+import { defineSketch } from '@/components/p5/sketch.ts'
+
 
 const objectStore = useObjectStore()
+const timelineStore = useTimelineStore()
 const currentTime = ref(0)
 
 // マウント時に p5.canvas を生成
 const p = ref()
 onMounted(() => {
+  let sketch = defineSketch(timelineStore)
   p.value = new p5(sketch)
 })
 
