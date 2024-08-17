@@ -82,6 +82,7 @@ export interface TextSettings extends BaseSettings, AnimationSettings, StandardR
   //color2: '000000'
   font: string
   text: string
+  char_cache: string[] // 効率的な描画のために分解したテキストを保持する(p5.jsで利用)
 }
 
 export class TextObject extends BaseObject implements TextSettings {
@@ -101,6 +102,7 @@ export class TextObject extends BaseObject implements TextSettings {
   color: string
   font: string
   text: string
+  char_cache: any // 本当はp5jsのcharacterObjects型
 
   constructor(settings: BaseSettings) {
     // 追加時は結局BaseSettingくらいの中身になる
@@ -124,6 +126,7 @@ export class TextObject extends BaseObject implements TextSettings {
     this.color = '#ffffff'
     this.font = 'SourceHanSansJP'
     this.text = 'サンプルテキスト'
+    this.char_cache = []
   }
 }
 

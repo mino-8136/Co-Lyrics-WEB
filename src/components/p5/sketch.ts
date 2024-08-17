@@ -1,7 +1,6 @@
 import { gsap } from 'gsap'
 import type p5 from 'p5'
-import type { TextObject } from '@/components/objects/objectInfo'
-import type { KeyframeSettings } from '@/components/objects/objectInfo'
+import type { TextObject, KeyframeSettings } from '@/components/objects/objectInfo'
 
 let renderObjects: TextObject[] = []
 let currentFrame = 0
@@ -37,45 +36,64 @@ export function defineSketch(project) {
       p.push()
       p.translate(p.width / 2, p.height / 2)
       p.scale(project.canvasScale)
+
       renderObjects.forEach((object) => {
+        // individual_objectがtrueかつ、char_cacheが未定義の場合、分解してキャッシュする
+        if (object.individual_object && object.char_cache.length == 0) {
+          object.char_cache = p.addCharCache(object)
+        }
+
+        // テキストオブジェクトの描画
         p.renderTextObject(object)
-        p.getText(object)
       })
+
       p.pop()
     }
 
     //////////////////////
     // テキスト周りの関数 //
     //////////////////////
+    class characterObjects {
+      id: number
+      parent: TextObject
+      char: string
+      deltaX: number
+      deltaY: number
+      deltaScale: number
+      deltaOpacity: number
+      deltaAngle: number
 
-    // テキストオブジェクトからテキストを取り出す関数
-    p.getText = (object: TextObject) => {
-      const currentSection = getCurrentSection(object.X, object.start)
-      for (let i = 0; i < object.text.length; i++) {
-        p.text(
-          object.text[i],
-          object.X[currentSection].value + object.spacing_x * i,
-          object.Y[0].value + object.spacing_y,
-          object.size[0].value
-        )
+      constructor(index: number, parent: TextObject) {
+        ;(this.id = index),
+          (this.parent = parent),
+          (this.char = parent.text[index]),
+          (this.deltaX = parent.spacing_x * index),
+          (this.deltaY = parent.spacing_y * index),
+          (this.deltaScale = 0),
+          (this.deltaOpacity = 0),
+          (this.deltaAngle = 0)
       }
     }
 
-    // テキストを分解する関数
-    p.splitText = (text) => {
-      return 0
+    // テキストオブジェクトからcharacterオブジェクトを生成する関数
+    p.addCharCache = (object: TextObject) => {
+      const char_cache = [] // キャッシュの初期化
+      for (let i = 0; i < object.text.length; i++) {
+        const charObject = new characterObjects(i, object)
+        char_cache.push(charObject)
+      }
+      return char_cache
     }
 
+
     // レンダリングを担当する関数
+    // TODO: object.individual_objectがtrueの場合, object.charaterを使うようにする
     p.renderTextObject = (object: TextObject) => {
       p.push()
       p.textFont(fonts)
       p.textSize(object.size[0].value)
       p.fill(object.color)
-      p.translate(
-        lerpValue(object.X, object.start),
-        lerpValue(object.Y, object.start)
-      )
+      p.translate(lerpValue(object.X, object.start), lerpValue(object.Y, object.start))
       p.rotate(object.angle[0].value)
       p.scale(object.scale[0].value / 100)
       p.text(object.text, 0, 0)
@@ -157,9 +175,9 @@ export function defineSketch(project) {
     ////////////////////////////
     // 外部に公開するための関数 //
     ////////////////////////////
-    p.addRenderObjects = (objects: TextObject) => {
+    p.addRenderObjects = (currentObjects: TextObject) => {
       //console.log(objects)
-      renderObjects = objects
+      renderObjects = currentObjects
     }
 
     p.updateCurrentFrame = (frame: number) => {
