@@ -40,11 +40,15 @@ export function defineSketch(project) {
       renderObjects.forEach((object) => {
         // individual_objectがtrueかつ、char_cacheが未定義の場合、分解してキャッシュする
         if (object.individual_object && object.char_cache.length == 0) {
-          object.char_cache = p.addCharCache(object)
+          object.char_cache = addCharCache(object)
         }
 
         // テキストオブジェクトの描画
-        p.renderTextObject(object)
+        if (object.individual_object) {
+          renderIndividualText(object)
+        } else {
+          renderTextObject(object)
+        }
       })
 
       p.pop()
@@ -53,51 +57,70 @@ export function defineSketch(project) {
     //////////////////////
     // テキスト周りの関数 //
     //////////////////////
-    class characterObjects {
-      id: number
+    class CharacterObject {
+      index: number
       parent: TextObject
       char: string
-      deltaX: number
-      deltaY: number
-      deltaScale: number
-      deltaOpacity: number
-      deltaAngle: number
+      animX: number
+      animY: number
+      animScale: number
+      animOpacity: number
+      animAngle: number
 
       constructor(index: number, parent: TextObject) {
-        ;(this.id = index),
+        ;(this.index = index),
           (this.parent = parent),
           (this.char = parent.text[index]),
-          (this.deltaX = parent.spacing_x * index),
-          (this.deltaY = parent.spacing_y * index),
-          (this.deltaScale = 0),
-          (this.deltaOpacity = 0),
-          (this.deltaAngle = 0)
+          (this.animX = 0),
+          (this.animY = 0),
+          (this.animScale = 0),
+          (this.animOpacity = 0),
+          (this.animAngle = 0)
       }
     }
 
     // テキストオブジェクトからcharacterオブジェクトを生成する関数
-    p.addCharCache = (object: TextObject) => {
+    const addCharCache = (object: TextObject) => {
       const char_cache = [] // キャッシュの初期化
       for (let i = 0; i < object.text.length; i++) {
-        const charObject = new characterObjects(i, object)
+        const charObject = new CharacterObject(i, object)
         char_cache.push(charObject)
       }
       return char_cache
     }
 
-
     // レンダリングを担当する関数
     // TODO: object.individual_objectがtrueの場合, object.charaterを使うようにする
-    p.renderTextObject = (object: TextObject) => {
+    const renderTextObject = (object: TextObject) => {
       p.push()
       p.textFont(fonts)
-      p.textSize(object.size[0].value)
+      p.textSize(object.textSize[0].value)
       p.fill(object.color)
       p.translate(lerpValue(object.X, object.start), lerpValue(object.Y, object.start))
       p.rotate(object.angle[0].value)
       p.scale(object.scale[0].value / 100)
       p.text(object.text, 0, 0)
       p.pop()
+    }
+
+    const renderIndividualText = (object: TextObject) => {
+      p.push()
+      p.textFont(fonts)
+      p.textSize(object.textSize[0].value)
+      p.fill(object.color)
+      object.char_cache.forEach((charObject: CharacterObject) => {
+        p.push()
+        p.translate(
+          lerpValue(object.X, object.start) +
+            object.spacing_x * charObject.index +
+            charObject.animX,
+          lerpValue(object.Y, object.start) + object.spacing_y * charObject.index + charObject.animY
+        )
+        p.rotate(object.angle[0].value + charObject.animAngle)
+        p.scale((object.scale[0].value + charObject.animScale) / 100)
+        p.text(charObject.char, 0, 0)
+        p.pop()
+      })
     }
 
     ////////////////////////////////

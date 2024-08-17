@@ -64,7 +64,7 @@ export class BaseObject implements BaseSettings {
 export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   type: string
   //name: string
-  size: KeyframeSettings[]
+  textSize: KeyframeSettings[]
   //display_speed: number
   individual_object: boolean
   //display_coordinates: boolean
@@ -94,7 +94,7 @@ export class TextObject extends BaseObject implements TextSettings {
   anim_name: string
   anim_parameters: any
   type: string
-  size: KeyframeSettings[]
+  textSize: KeyframeSettings[]
   individual_object: boolean
   align: number
   spacing_x: number
@@ -118,11 +118,11 @@ export class TextObject extends BaseObject implements TextSettings {
     this.anim_name = 'サンプル'
     this.anim_parameters = []
     this.type = 'text'
-    this.size = [{ value: 28, frame: this.start }]
+    this.textSize = [{ value: 28, frame: this.start }]
     this.individual_object = false
     this.align = 0
     this.spacing_x = 20
-    this.spacing_y = 20
+    this.spacing_y = 0
     this.color = '#ffffff'
     this.font = 'SourceHanSansJP'
     this.text = 'サンプルテキスト'
