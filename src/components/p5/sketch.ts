@@ -1,6 +1,7 @@
 import { gsap } from 'gsap'
 import type p5 from 'p5'
 import type { TextObject, KeyframeSettings } from '@/components/objects/objectInfo'
+import { CharacterObject } from '@/components/objects/objectInfo'
 
 let renderObjects: TextObject[] = []
 let currentFrame = 0
@@ -57,27 +58,7 @@ export function defineSketch(project) {
     //////////////////////
     // テキスト周りの関数 //
     //////////////////////
-    class CharacterObject {
-      index: number
-      parent: TextObject
-      char: string
-      animX: number
-      animY: number
-      animScale: number
-      animOpacity: number
-      animAngle: number
 
-      constructor(index: number, parent: TextObject) {
-        ;(this.index = index),
-          (this.parent = parent),
-          (this.char = parent.text[index]),
-          (this.animX = 0),
-          (this.animY = 0),
-          (this.animScale = 0),
-          (this.animOpacity = 0),
-          (this.animAngle = 0)
-      }
-    }
 
     // テキストオブジェクトからcharacterオブジェクトを生成する関数
     const addCharCache = (object: TextObject) => {

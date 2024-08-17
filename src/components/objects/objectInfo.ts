@@ -130,6 +130,28 @@ export class TextObject extends BaseObject implements TextSettings {
   }
 }
 
+export class CharacterObject {
+  index: number
+  parent: TextObject
+  char: string
+  animX: number
+  animY: number
+  animScale: number
+  animOpacity: number
+  animAngle: number
+
+  constructor(index: number, parent: TextObject) {
+    ;(this.index = index),
+      (this.parent = parent),
+      (this.char = parent.text[index]),
+      (this.animX = 0),
+      (this.animY = 0),
+      (this.animScale = 0),
+      (this.animOpacity = 0),
+      (this.animAngle = 0)
+  }
+}
+
 export interface ImageSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   file: string
 }
