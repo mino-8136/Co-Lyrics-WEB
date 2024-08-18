@@ -70,7 +70,16 @@
               </template>
 
               <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.color">
-                <v-color-picker v-model="selectedObject[label]" />
+                <div class="text-center">
+                  <v-menu v-model="colorMenu" :close-on-content-click="false" location="end">
+                    <template v-slot:activator="{ props }">
+                      <v-btn :color="selectedObject[label]" v-bind="props" width="100px">
+                        {{ selectedObject[label] }}
+                      </v-btn>
+                    </template>
+                    <v-color-picker v-model="selectedObject[label]" :modes="['hexa']" flat />
+                  </v-menu>
+                </div>
               </template>
 
               <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.checkbox">
@@ -109,12 +118,16 @@ import { useObjectStore } from '@/stores/objectStore'
 import * as ParameterInfo from '@/components/objects/parameterInfo'
 import { type KeyframeSettings, isKeyframeSettings } from '@/components/objects/objectInfo'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
+// import ColorPanel from '@/components/objects/ColorPanel.vue'
 import { fontListData } from '@/assets/fonts/fonts'
 
 const objectStore = useObjectStore()
 const animationDialog = ref(false)
 const fontList = fontListData.map((font) => font.name)
+
 const tab = ref('basic')
+
+const colorMenu = ref(false)
 
 // 選択されたオブジェクトの情報が自動的に表示される
 const selectedObject = computed(() => {
