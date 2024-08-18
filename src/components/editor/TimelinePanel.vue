@@ -84,13 +84,8 @@ function onTimelineContextMenu(event: MouseEvent, index: number) {
 
 // オブジェクトクリックで選択
 function selectObject(objectId: number) {
-  // すべてのオブジェクトの選択を解除
-  objectStore.objects.forEach((obj) => {
-    obj.selected = false
-  })
-
   // クリックしたオブジェクトを選択
-  objectStore.objects[objectId].selected = true
+  objectStore.selectedObjectId = objectId
 }
 
 // オブジェクトを右クリックした場合のメニュー
@@ -117,8 +112,7 @@ function addObject(layerIndex: number, type: string) {
     id: objectStore.counter,
     start: 0,
     end: 100,
-    layer: layerIndex,
-    selected: false
+    layer: layerIndex
   }
 
   if (type === 'text') {

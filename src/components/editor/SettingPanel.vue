@@ -118,7 +118,7 @@ const tab = ref('basic')
 
 // 選択されたオブジェクトの情報が自動的に表示される
 const selectedObject = computed(() => {
-  return objectStore.objects.find((obj) => obj.selected)
+  return objectStore.objects.find((obj) => obj.id === objectStore.selectedObjectId)
 })
 
 // ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数

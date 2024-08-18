@@ -1,6 +1,5 @@
 // [Aviutlからの変更点]
 // "settings"をuserdataに移設
-// "selected"を追加
 // 数値パラメータを配列に変更
 
 // キーフレームの情報管理
@@ -23,7 +22,6 @@ export interface BaseSettings {
   layer: number
   //overlay: number
   //camera: number
-  selected: boolean
 }
 
 export interface AnimationSettings {
