@@ -70,7 +70,7 @@
               </template>
 
               <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.color">
-                <input type="color" v-model="selectedObject[label]" />
+                <v-color-picker v-model="selectedObject[label]" />
               </template>
 
               <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.checkbox">
