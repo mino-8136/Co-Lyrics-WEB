@@ -71,7 +71,6 @@ export function defineSketch(project) {
     }
 
     // レンダリングを担当する関数
-    // TODO: object.individual_objectがtrueの場合, object.charaterを使うようにする
     const renderTextObject = (object: TextObject) => {
       p.push()
       p.textFont(fonts)
