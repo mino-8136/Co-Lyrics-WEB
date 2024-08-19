@@ -3,6 +3,7 @@
   <v-container class="timeline-panel">
     <div class="header d-flex">
       <input :value="timelineStore.currentFrame" style="width: 60px" />
+
       <input type="range" min="30" max="500" v-model="timelineSpan" />
     </div>
 
@@ -46,7 +47,7 @@ import PreviewPanel from '@/components/editor/PreviewPanel.vue'
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
 const layers = ref(
-  Array.from({ length: 10 }, () => ({
+  Array.from({ length: 1 }, () => ({
     name: 'Layer'
   }))
 )
