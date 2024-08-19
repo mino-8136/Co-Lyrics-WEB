@@ -15,9 +15,8 @@
               v-if="ParameterInfo.getType(label) != ParameterInfo.UIType.none"
               class="parameter-row"
             >
-              <v-chip class="parameter-name" @click="openEasingDialog(param)">{{
-                ParameterInfo.getName(label)
-              }}</v-chip>
+              <!-- パラメータ名の表示 -->
+              <v-chip class="parameter-name">{{ ParameterInfo.getName(label) }} </v-chip>
 
               <!-- 数値型の場合 -->
               <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
@@ -33,6 +32,11 @@
                       hide-details
                     >
                       <template v-slot:prepend>
+                        <!-- イージング設定 -->
+                        <v-chip @click="openEasingDialog(keyframe, label)"
+                          ><v-icon> mdi-pen </v-icon></v-chip
+                        >
+                        <!-- キーフレームのフレーム数と値 -->
                         <input
                           class="parameter-value"
                           v-model.number="(keyframe as unknown as KeyframeSettings).frame"
@@ -108,7 +112,11 @@
 
     <!-- イージング設定の呼び出し -->
     <v-dialog v-model="easingPanel">
-      <EasingPanel @callAddEasing="addEasing" />
+      <EasingPanel
+        :getParam="currentParam"
+        @callAddEasing="addEasing"
+        v-model:panel="easingPanel"
+      />
     </v-dialog>
 
     <!-- アニメーション設定の呼び出し -->
@@ -154,14 +162,19 @@ function addKeyframe(element: KeyframeSettings[], idx: number) {
 // イージング設定に関する記述 //
 //////////////////////////////
 const easingPanel = ref(false)
-const currentParam = ref()
-function openEasingDialog(param: string) {
-  currentParam.value = param
+const currentParam = ref({
+  label: '',
+  param: '' as unknown as KeyframeSettings
+})
+function openEasingDialog(param: KeyframeSettings, label: string) {
+  currentParam.value.param = param
+  currentParam.value.label = label
   easingPanel.value = true
 }
 
-function addEasing(element: KeyframeSettings, index: number, easing: string) {
-  element.animation = easing
+function addEasing(easing: string) {
+  console.log(currentParam.value)
+  currentParam.value.param.animation = easing
 }
 
 //////////////////////////////////
@@ -175,6 +188,7 @@ function openAnimationDialog() {
 // 指定したプロパティの移動タイプを追加
 function addAnimation(element: KeyframeSettings, index: number, animation: string) {
   element.animation = animation
+  console.log(element)
 }
 </script>
 

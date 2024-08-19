@@ -1,11 +1,11 @@
 <template>
   <v-card>
-    <v-card-title> 移動タイプを選択 </v-card-title>
+    <v-card-title> {{props.getParam.label}}の移動タイプを選択 </v-card-title>
     <v-row>
       <v-col v-for="effect in effects" :key="effect.id" class="d-flex" cols="4">
         <v-container>
           <v-img :width="200" aspect-ratio="1" class="bg-grey-lighten-2" cover> </v-img>
-          <v-btn @click="emits('addEasing', effect.name)">
+          <v-btn @click="emits('callAddEasing', effect.name), panel=false">
             {{ effect.name }}
           </v-btn>
         </v-container>
@@ -15,16 +15,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits } from 'vue'
-import { gsap } from 'gsap'
+import { ref, defineEmits, defineModel } from 'vue'
 
 // 受け取ったパラメータの種類
 const props = defineProps({
-  getElement: Object
+  getParam: Object
 })
 const emits = defineEmits({
-  addEasing: String
+  callAddEasing: String,
 })
+
+const panel = defineModel('panel')
 
 // 仮のイージングリスト
 const effects = ref([
