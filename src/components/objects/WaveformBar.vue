@@ -1,5 +1,6 @@
 <template>
   <div ref="waveform" class="waveform"></div>
+  <div class="scrollable"><p class="scrollchild">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p></div>
 </template>
 
 <script setup>
@@ -53,8 +54,10 @@ onMounted(() => {
       wavesurfer.pause()
     })
     wavesurfer.on('audioprocess', (currentTime) => {
-      timelineStore.currentFrame = Math.round(currentTime * timelineStore.framerate)
-    })
+  timelineStore.currentFrame = Math.round(currentTime * timelineStore.framerate);
+  const scrollPosition = currentTime * 100; // currentTimeに基づいてスクロール位置を計算
+  setScrollPosition(scrollPosition);
+});
     wavesurfer.on('interaction', (newTime) => {
       timelineStore.currentFrame = Math.round(newTime * timelineStore.framerate)
     })
@@ -71,6 +74,14 @@ onMounted(() => {
   }
 })
 
+// スクロールバーの位置を操作する関数
+const setScrollPosition = (position) => {
+  const scrollableElement = document.querySelector('.scrollable');
+  if (scrollableElement) {
+    scrollableElement.scrollLeft = position; // 水平方向のスクロール位置を設定
+  }
+}
+
 onUnmounted(() => {
   if (wavesurfer) {
     wavesurfer.destroy()
@@ -85,5 +96,13 @@ div {
 
 .waveform ::part(cursor) {
   border: 1px solid #4cabe2;
+}
+
+.scrollable {
+  overflow-x: scroll;
+}
+.scrollchild {
+  width: 4000px;
+  background-color: red;
 }
 </style>

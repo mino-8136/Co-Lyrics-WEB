@@ -32,7 +32,6 @@ import { ref } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ObjectNote from '@/components/objects/ObjectNote.vue'
 import Waveformbar from '@/components/objects/WaveformBar.vue'
-import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
 import PreviewPanel from '@/components/editor/PreviewPanel.vue'
 
 const objectStore = useObjectStore()
@@ -70,7 +69,7 @@ function frameToTime(frame: number): string {
 }
 
 .timeline {
-  width: 2000px;
+  width: 100%;
 }
 
 .layer {
@@ -82,6 +81,6 @@ function frameToTime(frame: number): string {
   border: 1px solid black;
   background: linear-gradient(90deg, #ccc 1px, transparent 1px);
   background-size: 10px;
-  width: 90%;
+  width: 100%;
 }
 </style>
