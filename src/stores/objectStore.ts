@@ -4,8 +4,8 @@ import { BaseObject, TextObject, ImageObject } from '@/components/objects/object
 export const useObjectStore = defineStore('objects', {
   state: () => ({
     counter: 0,
-    objects: [] as (BaseObject | TextObject | ImageObject)[],
-    selectedObjectId: 0,
+    objects: [] as (TextObject | ImageObject | BaseObject)[],
+    selectedObjectId: 0
   }),
   getters: {
     currentObjects: (state) => (frame: number) => {
@@ -13,7 +13,7 @@ export const useObjectStore = defineStore('objects', {
     }
   },
   actions: {
-    addObject(object: BaseObject | TextObject | ImageObject) {
+    addObject(object: TextObject | ImageObject | BaseObject) {
       this.objects.push(object)
       this.counter++
     },
