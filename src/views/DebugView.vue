@@ -12,7 +12,7 @@
         @callGetWaveformWidth="setWaveformWidth"
         @callSetScrollPosition="setScrollPosition"
       ></Waveformbar>
-      <div class="timeline" style="overflow-y: auto; height: 200px">
+      <div class="timeline" style="overflow-y: scroll; height: 200px">
         <div
           class="seekbar"
           :style="{ left: (timelineStore.currentFrame * timelineSpan) / 30 + 'px' }"
