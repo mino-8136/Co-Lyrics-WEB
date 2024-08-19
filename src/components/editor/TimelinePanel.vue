@@ -155,6 +155,7 @@ function frameToTime(frame: number): string {
 
 .layer {
   display: flex;
+  height: 40px;
 }
 
 .layerIndex {
