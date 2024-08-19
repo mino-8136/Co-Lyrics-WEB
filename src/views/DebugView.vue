@@ -2,7 +2,8 @@
   <PreviewPanel />
   <v-container class="timeline-panel">
     <div class="header d-flex">
-      <input type="range" min="10" max="1000" v-model="timelineSpan" />
+      <input :value="timelineStore.currentFrame" style="width: 60px" />
+      <input type="range" min="30" max="500" v-model="timelineSpan" />
     </div>
 
     <div class="timeline-container">
@@ -12,12 +13,16 @@
       ></Waveformbar>
       <div class="timeline" style="overflow-y: auto; height: 200px">
         <div
+          class="seekbar"
+          :style="{ left: (timelineStore.currentFrame * timelineSpan) / 30 + 'px' }"
+        ></div>
+        <div
           class="layer"
           v-for="(layer, index) in layers"
           :key="index"
           :style="{ width: waveformWidth }"
         >
-          <div class="layerTimeline" :style="{backgroundSize: timelineSpan/3 + 'px'}">
+          <div class="layerTimeline" :style="{ backgroundSize: timelineSpan / 30 + 'px' }">
             <object-note
               v-for="object in objectStore.objects"
               :key="object.id"
@@ -47,7 +52,7 @@ const layers = ref(
 )
 
 const waveformWidth = ref(90)
-const timelineSpan = ref(9)
+const timelineSpan = ref(90)
 
 // オブジェクトクリックで選択
 function selectObject(objectId: number) {
@@ -86,15 +91,16 @@ function frameToTime(frame: number): string {
 }
 
 .timeline {
+  position: relative; /* 親要素を相対位置に設定 */
   overflow-x: hidden;
   overflow-y: hidden;
   width: 100%;
 }
 
 .layer {
-  width: 200px;
   display: flex;
   height: 40px;
+  width: 100%; /* layerの幅を親に合わせる */
 }
 
 .layerTimeline {
@@ -102,6 +108,16 @@ function frameToTime(frame: number): string {
   border: 1px solid black;
   background: linear-gradient(90deg, #ccc 1px, transparent 1px);
   background-size: 9px;
-  width: 100%;
+  width: 100%; /* widthを100%に設定して親要素に合わせる */
+}
+
+.seekbar {
+  position: absolute; /* 絶対位置を指定 */
+  top: 0;
+  width: 2px;
+  height: 100%; /* 親要素の高さに合わせる */
+  background-color: #4cabe2;
+  z-index: 10; /* z-indexを高く設定して最前面に */
+  pointer-events: none; /* クリックイベントを無視 */
 }
 </style>
