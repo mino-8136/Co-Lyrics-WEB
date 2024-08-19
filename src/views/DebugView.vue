@@ -2,7 +2,7 @@
   <PreviewPanel />
   <v-container class="timeline-panel">
     <div class="header d-flex">
-      <input type="range" min="10" max="1000" value="100" />
+      <input type="range" min="10" max="1000" v-model="timelineSpan" />
     </div>
 
     <div class="timeline-container">
@@ -17,7 +17,7 @@
           :key="index"
           :style="{ width: waveformWidth }"
         >
-          <div class="layerTimeline">
+          <div class="layerTimeline" :style="{backgroundSize: timelineSpan/3 + 'px'}">
             <object-note
               v-for="object in objectStore.objects"
               :key="object.id"
@@ -47,6 +47,7 @@ const layers = ref(
 )
 
 const waveformWidth = ref(90)
+const timelineSpan = ref(9)
 
 // オブジェクトクリックで選択
 function selectObject(objectId: number) {
@@ -59,7 +60,7 @@ function setWaveformWidth(width: number) {
 }
 
 function setScrollPosition(position: number) {
-  console.log("ccc", position)
+  console.log('ccc', position)
   const scrollable = document.querySelector('.timeline')
   if (scrollable) {
     scrollable.scrollLeft = position
@@ -91,15 +92,16 @@ function frameToTime(frame: number): string {
 }
 
 .layer {
-  width: 20000px;
+  width: 200px;
   display: flex;
   height: 40px;
 }
 
 .layerTimeline {
+  position: relative;
   border: 1px solid black;
   background: linear-gradient(90deg, #ccc 1px, transparent 1px);
-  background-size: 10px;
+  background-size: 9px;
   width: 100%;
 }
 </style>
