@@ -59,7 +59,6 @@ export function defineSketch(project) {
     // テキストレンダリングの関数 //
     //////////////////////////////
 
-
     // テキストオブジェクトからcharacterオブジェクトを生成する関数
     const addCharCache = (object: TextObject) => {
       const char_cache = [] // キャッシュの初期化
@@ -77,17 +76,15 @@ export function defineSketch(project) {
         Y: 0,
         scale: 1,
         opacity: 1,
-        angle: 0,
+        angle: 0
       }
       // まずは単エフェクトの場合を考える
       // 適用するエフェクトをanimations.tsから取得する
       const effectName = object.anim_name
-    
+
       // animations.tsから見つけたエフェクトの関数を呼び出す
-      
 
       // 計算結果をtotalEffectに加算する
-
 
       // 返す
       return totalEffect
@@ -98,7 +95,6 @@ export function defineSketch(project) {
       p.push()
       // スタイライズエフェクトの処理
 
-
       // 見た目の設定
       // TODO: 縁取りの場合はstrokeWeightを設定する
       p.textFont(fonts)
@@ -107,11 +103,10 @@ export function defineSketch(project) {
 
       // エフェクトの処理
 
-
       // トランスフォーム実行
       p.translate(lerpValue(object.X, object.start), lerpValue(object.Y, object.start))
-      p.rotate(object.angle[0].value)
-      p.scale(object.scale[0].value / 100)
+      p.rotate(lerpValue(object.angle, object.start))
+      p.scale(lerpValue(convertToPercentage(object.scale), object.start))
       p.text(object.text, 0, 0)
       p.pop()
     }
@@ -129,8 +124,10 @@ export function defineSketch(project) {
             charObject.animX,
           lerpValue(object.Y, object.start) + object.spacing_y * charObject.index + charObject.animY
         )
-        p.rotate(object.angle[0].value + charObject.animAngle)
-        p.scale((object.scale[0].value + charObject.animScale) / 100)
+        p.rotate(lerpValue(object.angle, object.start) + charObject.animAngle)
+        p.scale(
+          lerpValue(convertToPercentage(object.scale), object.start) + charObject.animScale / 100
+        )
         p.text(charObject.char, 0, 0)
         p.pop()
       })
@@ -139,6 +136,15 @@ export function defineSketch(project) {
     ////////////////////////////
     // キーフレームのための関数 //
     ////////////////////////////
+
+    // 受け取ったobjectのパラメータをすべて百分率にして返す関数
+    const convertToPercentage = (param: KeyframeSettings[]) => {
+      const convertedParam = JSON.parse(JSON.stringify(param))
+      convertedParam.forEach((keyframe: { value: number }) => {
+        keyframe.value = keyframe.value / 100
+      })
+      return convertedParam
+    }
 
     // キーフレーム間の値を補完する関数1
     function lerpValue(param: KeyframeSettings[], objectStartFrame: number) {
