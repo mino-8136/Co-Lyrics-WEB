@@ -2,8 +2,8 @@
   <PreviewPanel />
   <v-container class="timeline-panel">
     <div class="header d-flex">
+      <p>Frame:</p>
       <input :value="timelineStore.currentFrame" style="width: 60px" />
-
       <input type="range" min="30" max="500" v-model="timelineSpan" />
     </div>
 
