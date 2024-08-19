@@ -15,7 +15,7 @@
               v-if="ParameterInfo.getType(label) != ParameterInfo.UIType.none"
               class="parameter-row"
             >
-              <v-chip class="parameter-name" @click="openAnimationDialog()">{{
+              <v-chip class="parameter-name" @click="openEasingDialog(param)">{{
                 ParameterInfo.getName(label)
               }}</v-chip>
 
@@ -88,16 +88,17 @@
             </div>
           </div>
         </v-tabs-window-item>
+
         <v-tabs-window-item value="stylize">
           <p>機能追加予定</p>
         </v-tabs-window-item>
+
         <v-tabs-window-item value="animation">
           <p>{{ selectedObject.anim_name }}</p>
-
           <p v-for="(parameter, index) in selectedObject.anim_parameters" :key="index">
             {{ selectedObject.anim_parameters }}
           </p>
-          <v-btn>
+          <v-btn @click="openAnimationDialog()">
             <v-icon>mdi-plus</v-icon>
             アニメーション追加
           </v-btn>
@@ -122,6 +123,7 @@ import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import * as ParameterInfo from '@/components/objects/parameterInfo'
 import { type KeyframeSettings, isKeyframeSettings } from '@/components/objects/objectInfo'
+import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
 // import ColorPanel from '@/components/objects/ColorPanel.vue'
 import { fontListData } from '@/assets/fonts/fonts'
@@ -132,7 +134,7 @@ const tab = ref('basic')
 const colorMenu = ref(false)
 
 // 選択されたオブジェクトの情報が自動的に表示される
-const selectedObject = computed(() => {
+const selectedObject: Record<string, any> = computed(() => {
   return objectStore.objects.find((obj) => obj.id === objectStore.selectedObjectId)
 })
 
@@ -153,7 +155,7 @@ function addKeyframe(element: KeyframeSettings[], idx: number) {
 //////////////////////////////
 const easingPanel = ref(false)
 const currentParam = ref()
-function openEasingDialog(param: KeyframeSettings) {
+function openEasingDialog(param: string) {
   currentParam.value = param
   easingPanel.value = true
 }
@@ -174,7 +176,6 @@ function openAnimationDialog() {
 function addAnimation(element: KeyframeSettings, index: number, animation: string) {
   element.animation = animation
 }
-
 </script>
 
 <style scoped>
