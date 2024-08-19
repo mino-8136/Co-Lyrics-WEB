@@ -8,9 +8,9 @@
     </div>
 
     <div class="timeline-container">
+      <Timelinebar></Timelinebar>
+      <Waveformbar></Waveformbar>
       <div class="timeline">
-        <Timelinebar></Timelinebar>
-        <Waveformbar></Waveformbar>
         <v-virtual-scroll :items="layers" height="200" item-height="40">
           <template v-slot="{ item, index }">
             <div class="layer">

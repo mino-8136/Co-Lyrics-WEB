@@ -6,22 +6,26 @@
     </div>
 
     <div class="timeline-container">
-      <div class="timeline">
-        <Waveformbar></Waveformbar>
-        <v-virtual-scroll :items="layers" height="200" item-height="40">
-          <template v-slot="{ item, index }">
-            <div class="layer">
-              <div class="layerTimeline">
-                <object-note
-                  v-for="object in objectStore.objects"
-                  :key="object.id"
-                  :object="object"
-                  @click="selectObject(object.id)"
-                ></object-note>
-              </div>
-            </div>
-          </template>
-        </v-virtual-scroll>
+      <Waveformbar
+        @callGetWaveformWidth="setWaveformWidth"
+        @callSetScrollPosition="setScrollPosition"
+      ></Waveformbar>
+      <div class="timeline" style="overflow-y: auto; height: 200px">
+        <div
+          class="layer"
+          v-for="(layer, index) in layers"
+          :key="index"
+          :style="{ width: waveformWidth }"
+        >
+          <div class="layerTimeline">
+            <object-note
+              v-for="object in objectStore.objects"
+              :key="object.id"
+              :object="object"
+              @click="selectObject(object.id)"
+            ></object-note>
+          </div>
+        </div>
       </div>
     </div>
   </v-container>
@@ -37,15 +41,29 @@ import PreviewPanel from '@/components/editor/PreviewPanel.vue'
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
 const layers = ref(
-  Array.from({ length: 1 }, () => ({
+  Array.from({ length: 10 }, () => ({
     name: 'Layer'
   }))
 )
+
+const waveformWidth = ref(90)
 
 // オブジェクトクリックで選択
 function selectObject(objectId: number) {
   // クリックしたオブジェクトを選択
   objectStore.selectedObjectId = objectId
+}
+
+function setWaveformWidth(width: number) {
+  waveformWidth.value = width
+}
+
+function setScrollPosition(position: number) {
+  console.log("ccc", position)
+  const scrollable = document.querySelector('.timeline')
+  if (scrollable) {
+    scrollable.scrollLeft = position
+  }
 }
 
 function frameToTime(frame: number): string {
@@ -63,16 +81,17 @@ function frameToTime(frame: number): string {
 }
 
 .timeline-container {
-  overflow-x: auto;
-  overflow-y: hidden;
   height: 100%;
 }
 
 .timeline {
+  overflow-x: hidden;
+  overflow-y: hidden;
   width: 100%;
 }
 
 .layer {
+  width: 20000px;
   display: flex;
   height: 40px;
 }

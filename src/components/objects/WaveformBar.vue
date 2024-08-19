@@ -1,8 +1,5 @@
 <template>
   <div ref="waveform" class="waveform"></div>
-  <div class="scrollable">
-    <p class="scrollchild" :style="{ width: waveformWidth }">aaaaaaaaaaaaaaaaaa</p>
-  </div>
 </template>
 
 <script setup>
@@ -14,9 +11,9 @@ import { useTimelineStore } from '@/stores/objectStore'
 const timelineStore = useTimelineStore()
 
 const waveform = ref(null) // DOM要素への参照を作成
-const waveformWidth = ref(100)
-
 let wavesurfer = null // wavesurferのインスタンスを保持する変数
+
+const emits = defineEmits(['callGetWaveformWidth', 'callSetScrollPosition'])
 
 onMounted(() => {
   if (waveform.value) {
@@ -58,22 +55,21 @@ onMounted(() => {
     wavesurfer.on('dragstart', () => {
       wavesurfer.pause()
     })
-    wavesurfer.on('audioprocess', (currentTime) => {
-      timelineStore.currentFrame = Math.round(currentTime * timelineStore.framerate)
-      const scrollPosition = currentTime * 100 // currentTimeに基づいてスクロール位置を計算
-      setScrollPosition(scrollPosition)
-    })
     wavesurfer.on('interaction', (newTime) => {
       timelineStore.currentFrame = Math.round(newTime * timelineStore.framerate)
     })
+    wavesurfer.on('audioprocess', (currentTime) => {
+      timelineStore.currentFrame = Math.round(currentTime * timelineStore.framerate)
+    })
     wavesurfer.on('scroll', (scroll) => {
       const scrollPosition = scroll * wavesurfer.options.minPxPerSec // スクロール位置を計算
-      setScrollPosition(scrollPosition)
+      console.log('aaa', scrollPosition, scroll)
+      emits('callSetScrollPosition', scrollPosition)
     })
 
     // 再生直前の処理はここに追加
     wavesurfer.on('ready', () => {
-      waveformWidth.value = wavesurfer.getWrapper().style.width
+      emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
     })
 
     // スケーラーの追加
@@ -83,19 +79,11 @@ onMounted(() => {
       slider.addEventListener('input', (e) => {
         const minPxPerSec = e.target.valueAsNumber
         wavesurfer.zoom(minPxPerSec)
-        waveformWidth.value = wavesurfer.getWrapper().style.width
+        emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
       })
     })
   }
 })
-
-// スクロールバーの位置を操作する関数
-const setScrollPosition = (position) => {
-  const scrollableElement = document.querySelector('.scrollable')
-  if (scrollableElement) {
-    scrollableElement.scrollLeft = position // 水平方向のスクロール位置を設定
-  }
-}
 
 onUnmounted(() => {
   if (wavesurfer) {
@@ -107,6 +95,7 @@ onUnmounted(() => {
 <style scoped>
 div {
   background-color: aliceblue;
+  overflow-y: scroll;
 }
 
 .waveform ::part(cursor) {
