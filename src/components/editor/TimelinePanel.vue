@@ -1,35 +1,41 @@
 <template>
   <v-container class="timeline-panel">
     <div class="header d-flex">
-      <p>Timeline:</p>
-      <input :value="timelineStore.currentFrame" />
-      <p>{{ frameToTime(timelineStore.currentFrame) }}</p>
-      <input type="range" min="10" max="1000" value="100" />
+      <p>Frame:</p>
+      <input :value="timelineStore.currentFrame" style="width: 60px" />
+      <input type="range" min="30" max="500" v-model="timelineSpan" />
     </div>
 
     <div class="timeline-container">
-      <Timelinebar></Timelinebar>
-      <Waveformbar></Waveformbar>
-      <div class="timeline">
-        <v-virtual-scroll :items="layers" height="200" item-height="40">
-          <template v-slot="{ item, index }">
-            <div class="layer">
-              <div class="layerIndex">{{ item.name }} {{ index }}</div>
-              <div
-                class="layerTimeline"
-                @contextmenu.prevent="onTimelineContextMenu($event, index)"
-              >
-                <object-bar
-                  v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
-                  :key="object.id"
-                  :object="object"
-                  @contextmenu.prevent="onObjectContextMenu($event, object.id)"
-                  @click="selectObject(object.id)"
-                ></object-bar>
-              </div>
-            </div>
-          </template>
-        </v-virtual-scroll>
+      <Waveformbar
+        @callGetWaveformWidth="setWaveformWidth"
+        @callSetScrollPosition="setScrollPosition"
+      ></Waveformbar>
+      <div class="timeline" style="overflow-y: auto; height: 200px">
+        <div
+          class="seekbar"
+          :style="{ left: (timelineStore.currentFrame * timelineSpan) / 30 + 'px' }"
+        ></div>
+        <div
+          class="layer"
+          v-for="(layer, index) in layers"
+          :key="index"
+          :style="{ width: waveformWidth }"
+        >
+          <div
+            class="layerTimeline"
+            :style="{ backgroundSize: timelineSpan / 30 + 'px' }"
+            @contextmenu.prevent="onTimelineContextMenu($event, index)"
+          >
+            <object-bar
+              v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
+              :key="object.id"
+              :object="object"
+              @contextmenu.prevent="onObjectContextMenu($event, object.id)"
+              @click="selectObject(object.id)"
+            ></object-bar>
+          </div>
+        </div>
       </div>
     </div>
   </v-container>
@@ -40,7 +46,6 @@ import { ref } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '@/components/objects/ObjectBar.vue'
-import Timelinebar from '@/components/objects/TimelineBar.vue'
 import Waveformbar from '@/components/objects/WaveformBar.vue'
 import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
 
@@ -51,6 +56,8 @@ const layers = ref(
     name: 'Layer'
   }))
 )
+const waveformWidth = ref(90)
+const timelineSpan = ref(90)
 
 // タイムラインメニュー
 function onTimelineContextMenu(event: MouseEvent, index: number) {
@@ -129,6 +136,22 @@ function removeObject(index: number) {
   objectStore.removeObject(index)
 }
 
+////////////////////////////
+// タイムライン操作用の関数 //
+////////////////////////////
+
+function setWaveformWidth(width: number) {
+  waveformWidth.value = width
+}
+
+function setScrollPosition(position: number) {
+  console.log('ccc', position)
+  const scrollable = document.querySelector('.timeline')
+  if (scrollable) {
+    scrollable.scrollLeft = position
+  }
+}
+
 function frameToTime(frame: number): string {
   const frameRate = 30
   let minutes = Math.floor(frame / frameRate / 60)
@@ -144,31 +167,37 @@ function frameToTime(frame: number): string {
 }
 
 .timeline-container {
-  overflow-x: auto;
-  overflow-y: hidden;
   height: 100%;
 }
 
 .timeline {
-  width: 2000px;
+  position: relative; /* 親要素を相対位置に設定 */
+  overflow-x: hidden;
+  overflow-y: hidden;
+  width: 100%;
 }
 
 .layer {
   display: flex;
   height: 40px;
-}
-
-.layerIndex {
-  border: 1px solid black;
-  width: 80px;
-  padding: 8px;
-  user-select: none;
+  width: 100%; /* layerの幅を親に合わせる */
 }
 
 .layerTimeline {
+  position: relative;
   border: 1px solid black;
   background: linear-gradient(90deg, #ccc 1px, transparent 1px);
-  background-size: 10px;
-  width: 90%;
+  background-size: 9px;
+  width: 100%; /* widthを100%に設定して親要素に合わせる */
+}
+
+.seekbar {
+  position: absolute; /* 絶対位置を指定 */
+  top: 0;
+  width: 2px;
+  height: 100%; /* 親要素の高さに合わせる */
+  background-color: #4cabe2;
+  z-index: 10; /* z-indexを高く設定して最前面に */
+  pointer-events: none; /* クリックイベントを無視 */
 }
 </style>
