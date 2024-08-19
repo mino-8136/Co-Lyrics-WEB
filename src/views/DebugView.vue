@@ -28,7 +28,6 @@
               v-for="object in objectStore.objects"
               :key="object.id"
               :object="object"
-              @click="selectObject(object.id)"
             ></object-note>
           </div>
         </div>
@@ -38,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onUnmounted, ref } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ObjectNote from '@/components/objects/ObjectNote.vue'
 import Waveformbar from '@/components/objects/WaveformBar.vue'
@@ -51,15 +50,8 @@ const layers = ref(
     name: 'Layer'
   }))
 )
-
 const waveformWidth = ref(90)
 const timelineSpan = ref(90)
-
-// オブジェクトクリックで選択
-function selectObject(objectId: number) {
-  // クリックしたオブジェクトを選択
-  objectStore.selectedObjectId = objectId
-}
 
 function setWaveformWidth(width: number) {
   waveformWidth.value = width
@@ -79,6 +71,42 @@ function frameToTime(frame: number): string {
   let seconds = Math.floor(frame / frameRate) % 60
   return '(' + minutes + '分' + seconds + '秒' + ')'
 }
+
+///////////////////
+// 判定などの処理 //
+///////////////////
+
+// ゲーム開始前の処理
+const startGame = () => {
+  // 
+}
+
+// スペースキーが押されたときの処理
+window.addEventListener('keydown', (event) => {
+  if (event.key === ' ') {
+    // object.startがcurrentFrame+-15f以内かつ最も近いオブジェクトを取得 (TODO: オブジェクトをstartでソートすると早い)
+    const currentFrame = timelineStore.currentFrame
+    const nearestObject = objectStore.objects.reduce((prev, current) => {
+      const prevDiff = Math.abs(prev.start - currentFrame)
+      const currentDiff = Math.abs(current.start - currentFrame)
+      return prevDiff < currentDiff ? prev : current
+    })
+
+    // 最も近いオブジェクトについて、正解かどうかを判定
+    
+  }
+})
+
+
+
+
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', () => {})
+})
+
+
+
 </script>
 
 <style scoped>

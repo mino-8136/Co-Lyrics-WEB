@@ -1,5 +1,10 @@
 <template>
-  <div class="object" :style="{ ...objectStyle, position: 'absolute' }" @mousedown="noteClick"></div>
+  <div
+    class="object"
+    :class="{ correct: isCorrect }"
+    :style="{ ...objectStyle, position: 'absolute' }"
+    @mousedown="noteClick"
+  ></div>
 </template>
 
 <script setup lang="ts">
@@ -19,13 +24,14 @@ const objectStyle = computed(() => ({
   left: `${Math.floor(tempStart.value) * scaler.value - 10}px`,
   position: 'absolute'
 }))
+const isCorrect = ref(false)
 
 //////////////////////////
 // オブジェクト操作の関数 //
 //////////////////////////
 
 const noteClick = (event: MouseEvent) => {
-  console.log('click')
+  isCorrect.value = true
 }
 </script>
 
@@ -43,6 +49,22 @@ const noteClick = (event: MouseEvent) => {
   height: 20px;
   left: 20px;
   cursor: move;
+}
+
+@keyframes grow {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.2);
+  }
+}
+
+/* 新しいIDが付与されたときに適用されるスタイル */
+.correct {
+  background-color: rgb(87, 255, 191);
+  animation: grow 0.3s cubic-bezier(1, 0, 0, 1);
+  transition: cubic-bezier(1, 0, 0, 1);
 }
 
 .keyframe {
