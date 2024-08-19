@@ -46,7 +46,6 @@ export class BaseObject implements BaseSettings {
   layer: number
   //overlay: number
   //camera: number
-  selected: boolean
 
   constructor(settings: BaseSettings) {
     this.id = settings.id
@@ -55,7 +54,6 @@ export class BaseObject implements BaseSettings {
     this.layer = settings.layer
     //this.overlay = settings.overlay
     //this.camera = settings.camera
-    this.selected = false
   }
 }
 
