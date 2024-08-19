@@ -1,180 +1,152 @@
 <template>
-  <v-container class="setting-panel">
-    <div v-if="selectedObject">
-      <v-tabs v-model="tab">
-        <v-tab value="basic">基本設定</v-tab>
-        <v-tab value="animation">アニメーション</v-tab>
-      </v-tabs>
-
-      <v-tabs-window v-model="tab">
-        <v-tabs-window-item value="basic">
-          <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-          <div v-for="(element, label) in selectedObject" :key="label">
-            <div
-              v-if="ParameterInfo.getType(label) != ParameterInfo.UIType.none"
-              class="parameter-row"
-            >
-              <v-chip class="parameter-name" @click="openAnimationDialog()">{{
-                ParameterInfo.getName(label)
-              }}</v-chip>
-
-              <!-- 数値型の場合 -->
-              <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
-                <v-row v-if="isKeyframeSettings(element)">
-                  <v-col v-for="(val, idx) in element" :key="idx" cols="12">
-                    <v-slider
-                      v-model="(element[idx] as unknown as KeyframeSettings).value"
-                      :min="ParameterInfo.getMinValue(label) || 0"
-                      :max="ParameterInfo.getMaxValue(label) || 1000"
-                      step="1"
-                      append-icon="mdi-plus"
-                      @click:append="addKeyframe(element, idx)"
-                      hide-details
-                    >
-                      <template v-slot:prepend>
-                        <input
-                          class="parameter-value"
-                          v-model.number="(element[idx] as unknown as KeyframeSettings).frame"
-                        />
-                        <p>→</p>
-                        <input
-                          class="parameter-value"
-                          v-model.number="(element[idx] as unknown as KeyframeSettings).value"
-                        />
-                      </template>
-                    </v-slider>
-                  </v-col>
-                </v-row>
-                <v-slider
-                  v-else
-                  v-model="selectedObject[label]"
-                  :min="ParameterInfo.getMinValue(label) || 0"
-                  :max="ParameterInfo.getMaxValue(label) || 1000"
-                  step="1"
-                  append-icon="mdi-"
-                  hide-details
-                >
-                  <template v-slot:prepend>
-                    <input class="parameter-value" v-model.number="selectedObject[label]" />
-                  </template>
-                </v-slider>
-              </template>
-
-              <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.text">
-                <textarea :id="label" v-model="selectedObject[label]" type="text" />
-              </template>
-
-              <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.select">
-                <v-select v-model="selectedObject[label]" :items="fontList"> </v-select>
-              </template>
-
-              <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.color">
-                <input type="color" v-model="selectedObject[label]" />
-              </template>
-
-              <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.checkbox">
-                <v-checkbox v-model="selectedObject[label]" hide-details />
-              </template>
-            </div>
-          </div>
-        </v-tabs-window-item>
-        <v-tabs-window-item value="animation">
-          <p>{{ selectedObject.anim_name }}</p>
-
-          <p v-for="(parameter,index) in selectedObject.anim_parameters" :key="index">
-            {{ selectedObject.anim_parameters }}
-          </p>
-          <v-btn>
-            <v-icon>mdi-plus</v-icon>
-            アニメーション追加
-          </v-btn>
-        </v-tabs-window-item>
-      </v-tabs-window>
+  <PreviewPanel />
+  <v-container class="timeline-panel">
+    <div class="header d-flex">
+      <p>Frame:</p>
+      <input :value="timelineStore.currentFrame" style="width: 60px" />
+      <input type="range" min="30" max="500" v-model="timelineSpan" />
     </div>
 
-    <!-- アニメーション設定の呼び出し -->
-    <v-dialog v-model="animationDialog">
-      <EasingPanel @callAddAnimaton="addAnimation" />
-    </v-dialog>
+    <div class="timeline-container">
+      <Waveformbar
+        @callGetWaveformWidth="setWaveformWidth"
+        @callSetScrollPosition="setScrollPosition"
+      ></Waveformbar>
+      <div class="timeline" style="overflow-y: scroll; height: 200px">
+        <div
+          class="seekbar"
+          :style="{ left: (timelineStore.currentFrame * timelineSpan) / 30 + 'px' }"
+        ></div>
+        <div
+          class="layer"
+          v-for="(layer, index) in layers"
+          :key="index"
+          :style="{ width: waveformWidth }"
+        >
+          <div class="layerTimeline" :style="{ backgroundSize: timelineSpan / 30 + 'px' }">
+            <object-note
+              v-for="object in objectStore.objects"
+              :key="object.id"
+              :object="object"
+            ></object-note>
+          </div>
+        </div>
+      </div>
+    </div>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useObjectStore } from '@/stores/objectStore'
-import * as ParameterInfo from '@/components/objects/parameterInfo'
-import { type KeyframeSettings, isKeyframeSettings } from '@/components/objects/objectInfo'
-import EasingPanel from '@/components/editor/EasingPanel.vue'
-import { fontListData } from '@/assets/fonts/fonts'
+import { onUnmounted, ref } from 'vue'
+import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
+import ObjectNote from '@/components/objects/ObjectNote.vue'
+import Waveformbar from '@/components/objects/WaveformBar.vue'
+import PreviewPanel from '@/components/editor/PreviewPanel.vue'
 
 const objectStore = useObjectStore()
-const animationDialog = ref(false)
-const fontList = fontListData.map((font) => font.name)
-const tab = ref('basic')
+const timelineStore = useTimelineStore()
+const layers = ref(
+  Array.from({ length: 1 }, () => ({
+    name: 'Layer'
+  }))
+)
+const waveformWidth = ref(90)
+const timelineSpan = ref(90)
 
-// 選択されたオブジェクトの情報が自動的に表示される
-const selectedObject = computed(() => {
-  return objectStore.objects.find((obj) => obj.selected)
+function setWaveformWidth(width: number) {
+  waveformWidth.value = width
+}
+
+function setScrollPosition(position: number) {
+  console.log('ccc', position)
+  const scrollable = document.querySelector('.timeline')
+  if (scrollable) {
+    scrollable.scrollLeft = position
+  }
+}
+
+function frameToTime(frame: number): string {
+  const frameRate = 30
+  let minutes = Math.floor(frame / frameRate / 60)
+  let seconds = Math.floor(frame / frameRate) % 60
+  return '(' + minutes + '分' + seconds + '秒' + ')'
+}
+
+///////////////////
+// 判定などの処理 //
+///////////////////
+
+// ゲーム開始前の処理
+const startGame = () => {
+  // 
+}
+
+// スペースキーが押されたときの処理
+window.addEventListener('keydown', (event) => {
+  if (event.key === ' ') {
+    // object.startがcurrentFrame+-15f以内かつ最も近いオブジェクトを取得 (TODO: オブジェクトをstartでソートすると早い)
+    const currentFrame = timelineStore.currentFrame
+    const nearestObject = objectStore.objects.reduce((prev, current) => {
+      const prevDiff = Math.abs(prev.start - currentFrame)
+      const currentDiff = Math.abs(current.start - currentFrame)
+      return prevDiff < currentDiff ? prev : current
+    })
+
+    // 最も近いオブジェクトについて、正解かどうかを判定
+    
+  }
 })
 
-// ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数
-function addKeyframe(element: KeyframeSettings[], idx: number) {
-  const newFrame =
-    element.length - 1 !== idx
-      ? Math.floor(element[idx].frame + element[idx + 1].frame / 2)
-      : element[idx].frame + 10
-  element.splice(idx + 1, 0, {
-    frame: newFrame,
-    value: element[idx].value
-  })
-}
 
-function openAnimationDialog() {
-  animationDialog.value = true
-}
 
-// 指定したプロパティにアニメーションを追加
-function addAnimation(element: KeyframeSettings, index: number, animation: string) {
-  element.animation = animation
-}
+
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', () => {})
+})
+
+
+
 </script>
 
 <style scoped>
-.setting-panel {
-  min-width: 300px;
-  width: 100%;
-  height: 500px;
+.timeline-panel {
   padding: 10px;
   border: 1px solid #ccc;
-  overflow-y: auto;
 }
 
-.parameter-row {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
+.timeline-container {
+  height: 100%;
 }
 
-.parameter-name {
-  width: 100px;
-  font-weight: bold;
-  justify-content: center;
-  margin-right: 10px;
-  text-align: center;
-  border: 1px solid #555;
-}
-
-.parameter-value {
-  width: 40px;
-  text-align: center;
-  color: #555;
-}
-
-textarea {
+.timeline {
+  position: relative; /* 親要素を相対位置に設定 */
+  overflow-x: hidden;
+  overflow-y: hidden;
   width: 100%;
-  height: 120px;
-  padding: 8px 12px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
+}
+
+.layer {
+  display: flex;
+  height: 40px;
+  width: 100%; /* layerの幅を親に合わせる */
+}
+
+.layerTimeline {
+  position: relative;
+  border: 1px solid black;
+  background: linear-gradient(90deg, #ccc 1px, transparent 1px);
+  background-size: 9px;
+  width: 100%; /* widthを100%に設定して親要素に合わせる */
+}
+
+.seekbar {
+  position: absolute; /* 絶対位置を指定 */
+  top: 0;
+  width: 2px;
+  height: 100%; /* 親要素の高さに合わせる */
+  background-color: #4cabe2;
+  z-index: 10; /* z-indexを高く設定して最前面に */
+  pointer-events: none; /* クリックイベントを無視 */
 }
 </style>

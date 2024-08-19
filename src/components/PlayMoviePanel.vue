@@ -10,16 +10,18 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useObjectStore } from '@/stores/objectStore'
+import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import p5 from 'p5'
-import { sketch } from '@/components/p5/sketch'
+import { defineSketch } from '@/components/p5/sketch.ts'
 
 const objectStore = useObjectStore()
+const timelineStore = useTimelineStore()
 const currentTime = ref(0)
 
 // マウント時に p5.canvas を生成
 const p = ref()
 onMounted(() => {
+  let sketch = defineSketch(timelineStore)
   p.value = new p5(sketch)
 })
 
@@ -28,11 +30,9 @@ function renderObjects() {
   p.value.addRenderObjects(objectStore.objects)
 }
 
-
 ////////////////////////////
 // ゲームプレイに関わる処理 //
 ////////////////////////////
-
 
 // タイミングオブジェクト描画処理
 
@@ -40,8 +40,6 @@ function renderObjects() {
 // function judgeTiming()
 
 // スペースキーが押された場合の処理
-
-
 </script>
 
 <style scoped>

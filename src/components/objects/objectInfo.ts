@@ -1,6 +1,5 @@
 // [Aviutlからの変更点]
 // "settings"をuserdataに移設
-// "selected"を追加
 // 数値パラメータを配列に変更
 
 // キーフレームの情報管理
@@ -23,7 +22,6 @@ export interface BaseSettings {
   layer: number
   //overlay: number
   //camera: number
-  selected: boolean
 }
 
 export interface AnimationSettings {
@@ -48,7 +46,6 @@ export class BaseObject implements BaseSettings {
   layer: number
   //overlay: number
   //camera: number
-  selected: boolean
 
   constructor(settings: BaseSettings) {
     this.id = settings.id
@@ -57,14 +54,13 @@ export class BaseObject implements BaseSettings {
     this.layer = settings.layer
     //this.overlay = settings.overlay
     //this.camera = settings.camera
-    this.selected = false
   }
 }
 
 export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   type: string
   //name: string
-  size: KeyframeSettings[]
+  textSize: KeyframeSettings[]
   //display_speed: number
   individual_object: boolean
   //display_coordinates: boolean
@@ -82,6 +78,7 @@ export interface TextSettings extends BaseSettings, AnimationSettings, StandardR
   //color2: '000000'
   font: string
   text: string
+  char_cache: string[] // 効率的な描画のために分解したテキストを保持する(p5.jsで利用)
 }
 
 export class TextObject extends BaseObject implements TextSettings {
@@ -93,7 +90,7 @@ export class TextObject extends BaseObject implements TextSettings {
   anim_name: string
   anim_parameters: any
   type: string
-  size: KeyframeSettings[]
+  textSize: KeyframeSettings[]
   individual_object: boolean
   align: number
   spacing_x: number
@@ -101,6 +98,7 @@ export class TextObject extends BaseObject implements TextSettings {
   color: string
   font: string
   text: string
+  char_cache: any // 本当はp5jsのcharacterObjects型
 
   constructor(settings: BaseSettings) {
     // 追加時は結局BaseSettingくらいの中身になる
@@ -116,14 +114,37 @@ export class TextObject extends BaseObject implements TextSettings {
     this.anim_name = 'サンプル'
     this.anim_parameters = []
     this.type = 'text'
-    this.size = [{ value: 28, frame: this.start }]
+    this.textSize = [{ value: 28, frame: this.start }]
     this.individual_object = false
     this.align = 0
-    this.spacing_x = 0
+    this.spacing_x = 20
     this.spacing_y = 0
     this.color = '#ffffff'
     this.font = 'SourceHanSansJP'
     this.text = 'サンプルテキスト'
+    this.char_cache = []
+  }
+}
+
+export class CharacterObject {
+  index: number
+  parent: TextObject
+  char: string
+  animX: number
+  animY: number
+  animScale: number
+  animOpacity: number
+  animAngle: number
+
+  constructor(index: number, parent: TextObject) {
+    ;(this.index = index),
+      (this.parent = parent),
+      (this.char = parent.text[index]),
+      (this.animX = 0),
+      (this.animY = 0),
+      (this.animScale = 0),
+      (this.animOpacity = 0),
+      (this.animAngle = 0)
   }
 }
 

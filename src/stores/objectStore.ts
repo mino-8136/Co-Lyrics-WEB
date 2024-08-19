@@ -4,21 +4,16 @@ import { BaseObject, TextObject, ImageObject } from '@/components/objects/object
 export const useObjectStore = defineStore('objects', {
   state: () => ({
     counter: 0,
-    objects: [] as (BaseObject | TextObject | ImageObject)[]
+    objects: [] as (TextObject | ImageObject | BaseObject)[],
+    selectedObjectId: 0
   }),
   getters: {
     currentObjects: (state) => (frame: number) => {
-      return state.objects.filter(
-        (object) => object.start <= frame && object.end >= frame
-      )
-    },
-    selectedObject: (state) => {
-      const selectedObjects = state.objects.filter((object) => object.selected)
-      return selectedObjects.length > 0 ? selectedObjects[0] : null
+      return state.objects.filter((object) => object.start <= frame && object.end >= frame)
     }
   },
   actions: {
-    addObject(object: BaseObject | TextObject | ImageObject) {
+    addObject(object: TextObject | ImageObject | BaseObject) {
       this.objects.push(object)
       this.counter++
     },
@@ -38,6 +33,7 @@ export const useTimelineStore = defineStore('timeline', {
     framerate: 30,
     totalFrame: 1800,
     currentFrame: 0,
+    canvasScale: 1
   }),
   actions: {
     setCurrentFrame(frame: number) {
@@ -45,6 +41,9 @@ export const useTimelineStore = defineStore('timeline', {
     },
     incrementFrame() {
       this.currentFrame++
+    },
+    updateCanvasScale(receivedWidth: number) {
+      this.canvasScale = receivedWidth / this.width
     }
   }
 })

@@ -30,8 +30,8 @@ export const parameterInfo: {
   font: { name: 'フォント', type: UIType.select },
   text: { name: 'テキスト', type: UIType.text },
   ////////////////////////////////////////////////
-  anim_name: { name: 'アニメーション', type: UIType.select },
-  anim_parameters: { name: 'アニメーションパラメータ', type: UIType.none },
+  anim_name: { name: 'アニメーション', type: UIType.none },
+  anim_parameters: { name: 'アニメーションパラメータ', type: UIType.none }
 }
 
 // パラメータを取得する関数

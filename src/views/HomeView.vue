@@ -65,5 +65,4 @@ function playMovie(movie: MovieObject) {
 .thumbnail {
   height: 100px;
 }
-
 </style>

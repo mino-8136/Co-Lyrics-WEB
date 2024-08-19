@@ -13,6 +13,7 @@ const timelineStore = useTimelineStore()
 const waveform = ref(null) // DOM要素への参照を作成
 let wavesurfer = null // wavesurferのインスタンスを保持する変数
 
+const emits = defineEmits(['callGetWaveformWidth', 'callSetScrollPosition'])
 
 onMounted(() => {
   if (waveform.value) {
@@ -43,6 +44,7 @@ onMounted(() => {
       dragToSeek: true,
       fillParent: false,
       normalize: true,
+      hideScrollbar: false,
       plugins: [bottomTimeline]
     })
 
@@ -53,11 +55,21 @@ onMounted(() => {
     wavesurfer.on('dragstart', () => {
       wavesurfer.pause()
     })
+    wavesurfer.on('interaction', (newTime) => {
+      timelineStore.currentFrame = Math.round(newTime * timelineStore.framerate)
+    })
     wavesurfer.on('audioprocess', (currentTime) => {
       timelineStore.currentFrame = Math.round(currentTime * timelineStore.framerate)
     })
-    wavesurfer.on('interaction', (newTime) => {
-      timelineStore.currentFrame = Math.round(newTime * timelineStore.framerate)
+    wavesurfer.on('scroll', (scroll) => {
+      const scrollPosition = scroll * wavesurfer.options.minPxPerSec // スクロール位置を計算
+      console.log('aaa', scrollPosition, scroll)
+      emits('callSetScrollPosition', scrollPosition)
+    })
+
+    // 再生直前の処理はここに追加
+    wavesurfer.on('ready', () => {
+      emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
     })
 
     // スケーラーの追加
@@ -67,6 +79,7 @@ onMounted(() => {
       slider.addEventListener('input', (e) => {
         const minPxPerSec = e.target.valueAsNumber
         wavesurfer.zoom(minPxPerSec)
+        emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
       })
     })
   }
@@ -82,9 +95,17 @@ onUnmounted(() => {
 <style scoped>
 div {
   background-color: aliceblue;
+  overflow-y: scroll;
 }
 
 .waveform ::part(cursor) {
   border: 1px solid #4cabe2;
+}
+
+.scrollable {
+  overflow-x: scroll;
+}
+.scrollchild {
+  background-color: red;
 }
 </style>

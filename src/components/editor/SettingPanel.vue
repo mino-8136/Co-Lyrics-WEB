@@ -1,77 +1,127 @@
 <template>
   <v-container class="setting-panel">
     <div v-if="selectedObject">
-      <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-      <div v-for="(element, label) in selectedObject" :key="label">
-        <div v-if="ParameterInfo.getType(label) != ParameterInfo.UIType.none" class="parameter-row">
-          <v-chip class="parameter-name" @click="openAnimationDialog()">{{
-            ParameterInfo.getName(label)
-          }}</v-chip>
+      <v-tabs v-model="tab">
+        <v-tab value="basic">基本設定</v-tab>
+        <v-tab value="stylize">スタイル</v-tab>
+        <v-tab value="animation">アニメーション</v-tab>
+      </v-tabs>
 
-          <!-- 数値型の場合 -->
-          <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
-            <v-row v-if="isKeyframeSettings(element)">
-              <v-col v-for="(val, idx) in element" :key="idx" cols="12">
+      <v-tabs-window v-model="tab">
+        <v-tabs-window-item value="basic">
+          <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
+          <div v-for="(param, label) in selectedObject" :key="label">
+            <div
+              v-if="ParameterInfo.getType(label) != ParameterInfo.UIType.none"
+              class="parameter-row"
+            >
+              <!-- パラメータ名の表示 -->
+              <v-chip class="parameter-name">{{ ParameterInfo.getName(label) }} </v-chip>
+
+              <!-- 数値型の場合 -->
+              <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
+                <v-row v-if="isKeyframeSettings(param)">
+                  <v-col v-for="(keyframe, idx) in param" :key="idx" cols="12">
+                    <v-slider
+                      v-model="(keyframe as unknown as KeyframeSettings).value"
+                      :min="ParameterInfo.getMinValue(label) || 0"
+                      :max="ParameterInfo.getMaxValue(label) || 1000"
+                      step="1"
+                      append-icon="mdi-plus"
+                      @click:append="addKeyframe(param, idx)"
+                      hide-details
+                    >
+                      <template v-slot:prepend>
+                        <!-- イージング設定 -->
+                        <v-chip @click="openEasingDialog(keyframe, label)"
+                          ><v-icon> mdi-pen </v-icon></v-chip
+                        >
+                        <!-- キーフレームのフレーム数と値 -->
+                        <input
+                          class="parameter-value"
+                          v-model.number="(keyframe as unknown as KeyframeSettings).frame"
+                        />
+                        <p>→</p>
+                        <input
+                          class="parameter-value"
+                          v-model.number="(keyframe as unknown as KeyframeSettings).value"
+                        />
+                      </template>
+                    </v-slider>
+                  </v-col>
+                </v-row>
                 <v-slider
-                  v-model="(element[idx] as unknown as KeyframeSettings).value"
+                  v-else
+                  v-model="selectedObject[label]"
                   :min="ParameterInfo.getMinValue(label) || 0"
                   :max="ParameterInfo.getMaxValue(label) || 1000"
                   step="1"
-                  append-icon="mdi-plus"
-                  @click:append="addKeyframe(element, idx)"
+                  append-icon="mdi-"
                   hide-details
                 >
                   <template v-slot:prepend>
-                    <input
-                      class="parameter-value"
-                      v-model.number="(element[idx] as unknown as KeyframeSettings).frame"
-                    />
-                    <p>→</p>
-                    <input
-                      class="parameter-value"
-                      v-model.number="(element[idx] as unknown as KeyframeSettings).value"
-                    />
+                    <input class="parameter-value" v-model.number="selectedObject[label]" />
                   </template>
                 </v-slider>
-              </v-col>
-            </v-row>
-            <v-slider
-              v-else
-              v-model="selectedObject[label]"
-              :min="ParameterInfo.getMinValue(label) || 0"
-              :max="ParameterInfo.getMaxValue(label) || 1000"
-              step="1"
-              append-icon="mdi-"
-              hide-details
-            >
-              <template v-slot:prepend>
-                <input class="parameter-value" v-model.number="selectedObject[label]" />
               </template>
-            </v-slider>
-          </template>
 
-          <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.text">
-            <textarea :id="label" v-model="selectedObject[label]" type="text" />
-          </template>
+              <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.text">
+                <textarea :id="label" v-model="selectedObject[label]" type="text" />
+              </template>
 
-          <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.select">
-            <v-select v-model="selectedObject[label]" :items="fontList"> </v-select>
-          </template>
+              <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.select">
+                <v-select v-model="selectedObject[label]" :items="fontList"> </v-select>
+              </template>
 
-          <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.color">
-            <input type="color" v-model="selectedObject[label]" />
-          </template>
+              <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.color">
+                <div class="text-center">
+                  <v-menu v-model="colorMenu" :close-on-content-click="false" location="end">
+                    <template v-slot:activator="{ props }">
+                      <v-btn :color="selectedObject[label]" v-bind="props" width="100px">
+                        {{ selectedObject[label] }}
+                      </v-btn>
+                    </template>
+                    <v-color-picker v-model="selectedObject[label]" :modes="['hexa']" flat />
+                  </v-menu>
+                </div>
+              </template>
 
-          <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.checkbox">
-            <v-checkbox v-model="selectedObject[label]" hide-details />
-          </template>
-        </div>
-      </div>
+              <template v-if="ParameterInfo.getType(label) === ParameterInfo.UIType.checkbox">
+                <v-checkbox v-model="selectedObject[label]" hide-details />
+              </template>
+            </div>
+          </div>
+        </v-tabs-window-item>
+
+        <v-tabs-window-item value="stylize">
+          <p>機能追加予定</p>
+        </v-tabs-window-item>
+
+        <v-tabs-window-item value="animation">
+          <p>{{ selectedObject.anim_name }}</p>
+          <p v-for="(parameter, index) in selectedObject.anim_parameters" :key="index">
+            {{ selectedObject.anim_parameters }}
+          </p>
+          <v-btn @click="openAnimationDialog()">
+            <v-icon>mdi-plus</v-icon>
+            アニメーション追加
+          </v-btn>
+        </v-tabs-window-item>
+      </v-tabs-window>
     </div>
 
+    <!-- イージング設定の呼び出し -->
+    <v-dialog v-model="easingPanel">
+      <EasingPanel
+        :getParam="currentParam"
+        @callAddEasing="addEasing"
+        v-model:panel="easingPanel"
+      />
+    </v-dialog>
+
     <!-- アニメーション設定の呼び出し -->
-    <v-dialog v-model="animationDialog">
-      <EasingPanel @callAddAnimaton="addAnimation" />
+    <v-dialog v-model="animationPanel">
+      <AnimationPanel @callAddAnimation="addAnimation" />
     </v-dialog>
   </v-container>
 </template>
@@ -81,16 +131,19 @@ import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import * as ParameterInfo from '@/components/objects/parameterInfo'
 import { type KeyframeSettings, isKeyframeSettings } from '@/components/objects/objectInfo'
+import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
+// import ColorPanel from '@/components/objects/ColorPanel.vue'
 import { fontListData } from '@/assets/fonts/fonts'
 
 const objectStore = useObjectStore()
-const animationDialog = ref(false)
 const fontList = fontListData.map((font) => font.name)
+const tab = ref('basic')
+const colorMenu = ref(false)
 
 // 選択されたオブジェクトの情報が自動的に表示される
-const selectedObject = computed(() => {
-  return objectStore.objects.find((obj) => obj.selected)
+const selectedObject: Record<string, any> = computed(() => {
+  return objectStore.objects.find((obj) => obj.id === objectStore.selectedObjectId)
 })
 
 // ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数
@@ -105,13 +158,37 @@ function addKeyframe(element: KeyframeSettings[], idx: number) {
   })
 }
 
-function openAnimationDialog() {
-  animationDialog.value = true
+//////////////////////////////
+// イージング設定に関する記述 //
+//////////////////////////////
+const easingPanel = ref(false)
+const currentParam = ref({
+  label: '',
+  param: '' as unknown as KeyframeSettings
+})
+function openEasingDialog(param: KeyframeSettings, label: string) {
+  currentParam.value.param = param
+  currentParam.value.label = label
+  easingPanel.value = true
 }
 
-// 指定したプロパティにアニメーションを追加
+function addEasing(easing: string) {
+  console.log(currentParam.value)
+  currentParam.value.param.animation = easing
+}
+
+//////////////////////////////////
+// アニメーション設定に関する記述 //
+//////////////////////////////////
+const animationPanel = ref(false)
+function openAnimationDialog() {
+  animationPanel.value = true
+}
+
+// 指定したプロパティの移動タイプを追加
 function addAnimation(element: KeyframeSettings, index: number, animation: string) {
   element.animation = animation
+  console.log(element)
 }
 </script>
 
