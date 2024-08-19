@@ -1,11 +1,15 @@
 <template>
-  <v-card>
-    <v-card-title> {{ props.getParam.label }}の移動タイプを選択 </v-card-title>
+  <v-card class="EasingPanel">
+    <v-card-title>{{ props.getParam.label }}の移動タイプを選択</v-card-title>
     <v-row>
       <v-col v-for="effect in effects" :key="effect.id" class="d-flex" cols="2">
         <v-container>
-          <v-img :width="200" aspect-ratio="1" class="bg-grey-lighten-2" cover> </v-img>
-          <v-btn @click="emits('callAddEasing', effect.name), (panel = false)">
+          <canvas
+            :id="'canvas-' + effect.id"
+            class="bg-grey-lighten-2"
+            style="width: 100%; height: auto"
+          ></canvas>
+          <v-btn @click="handleButtonClick(effect.name, effect.id)">
             {{ effect.name }}
           </v-btn>
         </v-container>
@@ -15,19 +19,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineModel } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
+import gsap from 'gsap'
 
-// 受け取ったパラメータの種類
 const props = defineProps({
   getParam: Object
 })
-const emits = defineEmits({
-  callAddEasing: String
-})
+const emits = defineEmits(['callAddEasing', 'update:panel']) // emits に 'update:panel' を追加
 
-const panel = defineModel('panel')
-
-// 仮のイージングリスト
 const effects = ref([
   { id: 1, name: 'none' },
   { id: 2, name: 'power1.in' },
@@ -61,4 +60,71 @@ const effects = ref([
   { id: 30, name: 'sine.out' },
   { id: 31, name: 'sine.inOut' }
 ])
+
+const handleButtonClick = (name: string, id: number) => {
+  emits('callAddEasing', name)
+  emits('update:panel', false) // ダイアログを閉じるために panel を false に更新
+  nextTick(() => drawGraph(name, id)) // グラフを描画
+}
+
+const drawGraph = (easing: string, id: number) => {
+  const canvas = document.getElementById('canvas-' + id) as HTMLCanvasElement
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
+  // キャンバスのサイズを動的に設定
+  canvas.width = canvas.clientWidth
+  canvas.height = canvas.clientWidth * 1.2
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.beginPath()
+
+  const yOffset = canvas.height * 0.1
+  const graphHeight = canvas.height * 0.8
+
+  // 開始位置の横線
+  ctx.moveTo(0, yOffset + graphHeight)
+  ctx.lineTo(canvas.width, yOffset + graphHeight)
+
+  // 終了位置の横線
+  ctx.moveTo(0, yOffset)
+  ctx.lineTo(canvas.width, yOffset)
+
+  ctx.strokeStyle = 'ccc'
+  ctx.lineWidth = 0.4
+  ctx.stroke()
+
+  ctx.beginPath()
+  ctx.moveTo(0, yOffset + graphHeight)
+
+  const points = 100
+  for (let i = 0; i <= points; i++) {
+    const progress = i / points
+    const value = gsap.parseEase(easing)(progress)
+    const x = (i / points) * canvas.width
+    const y = yOffset + (1 - value) * graphHeight
+    ctx.lineTo(x, y)
+  }
+
+  ctx.strokeStyle = '#ff0000'
+  ctx.lineWidth = 2
+  ctx.stroke()
+}
+
+onMounted(() => {
+  effects.value.forEach((effect) => {
+    nextTick(() => drawGraph(effect.name, effect.id))
+  })
+})
 </script>
+
+<style scoped>
+.EasingPanel {
+  margin: auto;
+  width: 60%;
+  min-width: 300px;
+  height: 50%;
+  border: 1px solid #ccc;
+  overflow-y: auto;
+}
+</style>
