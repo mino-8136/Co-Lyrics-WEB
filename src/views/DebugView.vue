@@ -1,4 +1,5 @@
 <template>
+  <PreviewPanel />
   <v-container class="timeline-panel">
     <div class="header d-flex">
       <input type="range" min="10" max="1000" value="100" />
@@ -10,17 +11,13 @@
         <v-virtual-scroll :items="layers" height="200" item-height="40">
           <template v-slot="{ item, index }">
             <div class="layer">
-              <div
-                class="layerTimeline"
-                @contextmenu.prevent="onTimelineContextMenu($event, index)"
-              >
-                <object-bar
-                  v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
+              <div class="layerTimeline">
+                <object-note
+                  v-for="object in objectStore.objects"
                   :key="object.id"
                   :object="object"
-                  @contextmenu.prevent="onObjectContextMenu($event, object.id)"
                   @click="selectObject(object.id)"
-                ></object-bar>
+                ></object-note>
               </div>
             </div>
           </template>
@@ -33,9 +30,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
-import ObjectBar from '@/components/objects/ObjectBar.vue'
+import ObjectNote from '@/components/objects/ObjectNote.vue'
 import Waveformbar from '@/components/objects/WaveformBar.vue'
 import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
+import PreviewPanel from '@/components/editor/PreviewPanel.vue'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -49,25 +47,6 @@ const layers = ref(
 function selectObject(objectId: number) {
   // クリックしたオブジェクトを選択
   objectStore.selectedObjectId = objectId
-}
-
-// オブジェクトの追加
-function addObject(layerIndex: number, type: string) {
-  const settings: BaseSettings = {
-    id: objectStore.counter,
-    start: 0,
-    end: 100,
-    layer: layerIndex
-  }
-
-  if (type === 'text') {
-    objectStore.addObject(new TextObject(settings))
-  } else if (type === 'image') {
-    // 画像オブジェクトを追加
-  } else {
-    objectStore.addObject(new BaseObject(settings))
-  }
-  // console.log(objectStore.objects)
 }
 
 function frameToTime(frame: number): string {
