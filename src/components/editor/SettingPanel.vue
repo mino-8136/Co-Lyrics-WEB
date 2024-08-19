@@ -10,7 +10,7 @@
       <v-tabs-window v-model="tab">
         <v-tabs-window-item value="basic">
           <!-- 選択されたオブジェクトの種類に基づいてUIを表示 -->
-          <div v-for="(element, label) in selectedObject" :key="label">
+          <div v-for="(param, label) in selectedObject" :key="label">
             <div
               v-if="ParameterInfo.getType(label) != ParameterInfo.UIType.none"
               class="parameter-row"
@@ -21,26 +21,26 @@
 
               <!-- 数値型の場合 -->
               <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
-                <v-row v-if="isKeyframeSettings(element)">
-                  <v-col v-for="(val, idx) in element" :key="idx" cols="12">
+                <v-row v-if="isKeyframeSettings(param)">
+                  <v-col v-for="(keyframe, idx) in param" :key="idx" cols="12">
                     <v-slider
-                      v-model="(element[idx] as unknown as KeyframeSettings).value"
+                      v-model="(keyframe as unknown as KeyframeSettings).value"
                       :min="ParameterInfo.getMinValue(label) || 0"
                       :max="ParameterInfo.getMaxValue(label) || 1000"
                       step="1"
                       append-icon="mdi-plus"
-                      @click:append="addKeyframe(element, idx)"
+                      @click:append="addKeyframe(param, idx)"
                       hide-details
                     >
                       <template v-slot:prepend>
                         <input
                           class="parameter-value"
-                          v-model.number="(element[idx] as unknown as KeyframeSettings).frame"
+                          v-model.number="(keyframe as unknown as KeyframeSettings).frame"
                         />
                         <p>→</p>
                         <input
                           class="parameter-value"
-                          v-model.number="(element[idx] as unknown as KeyframeSettings).value"
+                          v-model.number="(keyframe as unknown as KeyframeSettings).value"
                         />
                       </template>
                     </v-slider>
@@ -105,9 +105,14 @@
       </v-tabs-window>
     </div>
 
+    <!-- イージング設定の呼び出し -->
+    <v-dialog v-model="easingPanel">
+      <EasingPanel @callAddEasing="addEasing" />
+    </v-dialog>
+
     <!-- アニメーション設定の呼び出し -->
-    <v-dialog v-model="animationDialog">
-      <EasingPanel @callAddAnimaton="addAnimation" />
+    <v-dialog v-model="animationPanel">
+      <AnimationPanel @callAddAnimation="addAnimation" />
     </v-dialog>
   </v-container>
 </template>
@@ -122,11 +127,8 @@ import EasingPanel from '@/components/editor/EasingPanel.vue'
 import { fontListData } from '@/assets/fonts/fonts'
 
 const objectStore = useObjectStore()
-const animationDialog = ref(false)
 const fontList = fontListData.map((font) => font.name)
-
 const tab = ref('basic')
-
 const colorMenu = ref(false)
 
 // 選択されたオブジェクトの情報が自動的に表示される
@@ -146,14 +148,33 @@ function addKeyframe(element: KeyframeSettings[], idx: number) {
   })
 }
 
-function openAnimationDialog() {
-  animationDialog.value = true
+//////////////////////////////
+// イージング設定に関する記述 //
+//////////////////////////////
+const easingPanel = ref(false)
+const currentParam = ref()
+function openEasingDialog(param: KeyframeSettings) {
+  currentParam.value = param
+  easingPanel.value = true
 }
 
-// 指定したプロパティにアニメーションを追加
+function addEasing(element: KeyframeSettings, index: number, easing: string) {
+  element.animation = easing
+}
+
+//////////////////////////////////
+// アニメーション設定に関する記述 //
+//////////////////////////////////
+const animationPanel = ref(false)
+function openAnimationDialog() {
+  animationPanel.value = true
+}
+
+// 指定したプロパティの移動タイプを追加
 function addAnimation(element: KeyframeSettings, index: number, animation: string) {
   element.animation = animation
 }
+
 </script>
 
 <style scoped>
