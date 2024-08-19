@@ -55,9 +55,9 @@ export function defineSketch(project) {
       p.pop()
     }
 
-    //////////////////////
-    // テキスト周りの関数 //
-    //////////////////////
+    //////////////////////////////
+    // テキストレンダリングの関数 //
+    //////////////////////////////
 
 
     // テキストオブジェクトからcharacterオブジェクトを生成する関数
@@ -70,12 +70,45 @@ export function defineSketch(project) {
       return char_cache
     }
 
+    const applyEffect = (object: TextObject) => {
+      // エフェクトの効果量を計算する
+      const totalEffect = {
+        X: 0,
+        Y: 0,
+        scale: 1,
+        opacity: 1,
+        angle: 0,
+      }
+      // まずは単エフェクトの場合を考える
+      // 適用するエフェクトをanimations.tsから取得する
+      const effectName = object.anim_name
+    
+      // animations.tsから見つけたエフェクトの関数を呼び出す
+      
+
+      // 計算結果をtotalEffectに加算する
+
+
+      // 返す
+      return totalEffect
+    }
+
     // レンダリングを担当する関数
     const renderTextObject = (object: TextObject) => {
       p.push()
+      // スタイライズエフェクトの処理
+
+
+      // 見た目の設定
+      // TODO: 縁取りの場合はstrokeWeightを設定する
       p.textFont(fonts)
       p.textSize(object.textSize[0].value)
       p.fill(object.color)
+
+      // エフェクトの処理
+
+
+      // トランスフォーム実行
       p.translate(lerpValue(object.X, object.start), lerpValue(object.Y, object.start))
       p.rotate(object.angle[0].value)
       p.scale(object.scale[0].value / 100)
@@ -103,9 +136,11 @@ export function defineSketch(project) {
       })
     }
 
-    ////////////////////////////////
+    ////////////////////////////
+    // キーフレームのための関数 //
+    ////////////////////////////
 
-    // アニメーション位置を決める関数
+    // キーフレーム間の値を補完する関数1
     function lerpValue(param: KeyframeSettings[], objectStartFrame: number) {
       // Parameterが配列であるという前提で行く
       const lastSection = param.length - 1
@@ -133,7 +168,7 @@ export function defineSketch(project) {
       return currentValue
     }
 
-    // アニメーションの値を補完する関数
+    // キーフレーム間の値を補完する関数2
     function getEaseValue(
       param: KeyframeSettings[],
       currentSection: number,

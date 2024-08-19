@@ -11,21 +11,32 @@ const calculateAnimationProgress: FadeAnimationFunction = (startFrame, endFrame,
 }
 
 // フェードインの進行度を計算する関数
-const fadeIn: FadeAnimationFunction = (startFrame, endFrame, currentFrame) => {
+export const fadeIn: FadeAnimationFunction = (startFrame, endFrame, currentFrame) => {
   const progress = calculateAnimationProgress(startFrame, endFrame, currentFrame)
   return progress // 進行度そのままがオペーシティ
 }
 
 // フェードアウトの進行度を計算する関数
-const fadeOut: FadeAnimationFunction = (startFrame, endFrame, currentFrame) => {
+export const fadeOut: FadeAnimationFunction = (startFrame, endFrame, currentFrame) => {
   const progress = calculateAnimationProgress(startFrame, endFrame, currentFrame)
   return 1 - progress // 進行度を反転させてオペーシティとする
 }
 
-export { fadeIn, fadeOut }
+// TODO: ここは別のファイルで管理したほうがやりやすいかも
+const effectsMap = { 
+  'フェードイン': fadeIn,
+  'フェードアウト': fadeOut,
+  '標準登場': standardAnimation
+}
+
+function executeEffect(effectName: keyof typeof effectsMap, ...effectParameters: any[] ){
+  // 関数を呼び出す
+  const effectFunction = effectsMap[effectName]
+  return effectFunction(...effectParameters)
+}
 
 
-function setupAppearance(obj: any, objIndex: number, objTotal: number, tracks: any, dialogSettings: any) {
+function standardAnimation(obj: any, objIndex: number, objTotal: number, tracks: any, dialogSettings: any) {
   const time = tracks[0]; // 時間[s]
   const interval = tracks[1]; // 間隔[s]
   const scale = tracks[2]; // 拡大率

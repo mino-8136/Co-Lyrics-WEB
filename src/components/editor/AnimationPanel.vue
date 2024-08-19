@@ -39,6 +39,6 @@ const props = defineProps({
   getParameter: Object
 })
 const emits = defineEmits({
-  addAnimation: String
+  addParameter: String
 })
 </script>
