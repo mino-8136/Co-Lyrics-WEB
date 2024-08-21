@@ -28,12 +28,12 @@
                       :max="ParameterInfo.getMaxValue(label) || 1000"
                       step="1"
                       append-icon="mdi-plus"
-                      @click:append="addKeyframe(param, idx)"
+                      @click:append="addKeyframe(param as unknown as KeyframeSettings[], parseInt(idx))"
                       hide-details
-                    >
+                    ></v-slider>
                       <template v-slot:prepend>
                         <!-- イージング設定 -->
-                        <v-chip @click="openEasingDialog(keyframe, label)"
+                        <v-chip @click="openEasingDialog(keyframe as unknown as KeyframeSettings, label)"
                           ><v-icon> mdi-pen </v-icon></v-chip
                         >
                         <!-- キーフレームのフレーム数と値 -->
