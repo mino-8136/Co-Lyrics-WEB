@@ -24,7 +24,7 @@
               <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
                 <v-row v-if="isKeyframeSettings(param)">
                   <transition-group name="list" tag="div" style="width: 100%">
-                    <v-col v-for="(keyframe, idx) in param" :key="keyframe" cols="12">
+                    <v-col v-for="(keyframe, idx) in param" :key="keyframe.id" cols="12">
                       <v-slider
                         v-model="keyframe.value"
                         :min="ParameterInfo.getMinValue(label) || 0"
