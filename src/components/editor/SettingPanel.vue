@@ -16,7 +16,9 @@
               class="parameter-row"
             >
               <!-- パラメータ名の表示 -->
-              <v-chip class="parameter-name">{{ ParameterInfo.getName(label) }} </v-chip>
+              <v-chip class="parameter-name" variant="outlined" size="small" label
+                >{{ ParameterInfo.getName(label) }}
+              </v-chip>
 
               <!-- 数値型の場合 -->
               <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
@@ -254,12 +256,11 @@ div.ease-setting {
 }
 
 .parameter-name {
-  width: 100px;
+  width: 80px;
   font-weight: bold;
   justify-content: center;
   margin-right: 10px;
   text-align: center;
-  border: 1px solid #555;
 }
 
 .parameter-value {
