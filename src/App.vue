@@ -8,9 +8,10 @@ import { RouterView } from 'vue-router'
       <v-toolbar-title>研究用リリック</v-toolbar-title>
       <v-spacer></v-spacer>
       <!-- <v-btn text to="/">Home</v-btn>でいいのか疑問 -->
-      <v-btn text @click="()=>$router.push('/')">Home</v-btn>
-      <v-btn text  @click="()=>$router.push('/edit')">Edit</v-btn>
-      <v-btn text  @click="()=>$router.push('/debug')">Debug</v-btn>
+      <v-btn @click="() => $router.push('/')">Home</v-btn>
+      <v-btn @click="() => $router.push('/edit')">Edit</v-btn>
+      <v-btn @click="() => $router.push('/testplay')">TestPlay</v-btn>
+      <v-btn @click="() => $router.push('/debug')">Debug</v-btn>
     </v-toolbar>
     <v-main>
       <RouterView />
