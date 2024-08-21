@@ -28,18 +28,22 @@
                       :max="ParameterInfo.getMaxValue(label) || 1000"
                       step="1"
                       append-icon="mdi-plus"
-                      @click:append="addKeyframe(param as unknown as KeyframeSettings[], parseInt(idx))"
+                      @click:append="
+                        addKeyframe(param as unknown as KeyframeSettings[], parseInt(idx))
+                      "
                       hide-details
                     >
                       <template v-slot:prepend>
                         <!-- イージング設定 -->
-                        <v-chip @click="openEasingDialog(keyframe as unknown as KeyframeSettings, label)"
+                        <v-chip
+                          @click="openEasingDialog(keyframe as unknown as KeyframeSettings, label)"
                           ><v-icon> mdi-pen </v-icon></v-chip
                         >
                         <!-- キーフレームのフレーム数と値 -->
                         <input
                           class="parameter-value"
                           v-model.number="(keyframe as unknown as KeyframeSettings).frame"
+                          @change="sortKeyframe(param as unknown as KeyframeSettings[])"
                         />
                         <p>→</p>
                         <input
@@ -189,6 +193,10 @@ function openAnimationDialog() {
 function addAnimation(element: KeyframeSettings, index: number, animation: string) {
   element.animation = animation
   console.log(element)
+}
+
+function sortKeyframe(element: KeyframeSettings[]) {
+  element.sort((a, b) => a.frame - b.frame)
 }
 </script>
 

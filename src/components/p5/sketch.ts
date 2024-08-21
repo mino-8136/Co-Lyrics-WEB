@@ -22,6 +22,7 @@ export function defineSketch(project: any) {
 
       p.smooth()
       p.angleMode(p.DEGREES)
+      p.colorMode(p.RGB, 255, 255, 255, 100)
       p.frameRate(project.framerate)
 
       p.background(0)
@@ -41,6 +42,7 @@ export function defineSketch(project: any) {
 
       renderObjects.forEach((object) => {
         // individual_objectがtrueかつ、char_cacheが未定義の場合、分解してキャッシュする
+        // (TODO: この処理はpreview.vueに移したほうがwatchとかできて良いかもしれない)
         if (object.individual_object && object.char_cache.length == 0) {
           object.char_cache = addCharCache(object)
         }
@@ -100,11 +102,13 @@ export function defineSketch(project: any) {
       // TODO: 縁取りの場合はstrokeWeightを設定する
       p.textFont(fonts)
       p.textSize(object.textSize[0].value)
-      p.fill(object.color)
+      const col = p.color(object.color)
+      col.setAlpha(lerpValue(object.opacity, object.start))
+      p.fill(col)
 
       // エフェクトの処理
 
-      // トランスフォーム実行
+      // 全体的なトランスフォーム実行
       p.translate(lerpValue(object.X, object.start), lerpValue(object.Y, object.start))
       p.rotate(lerpValue(object.angle, object.start))
       p.scale(lerpValue(convertToPercentage(object.scale), object.start))
@@ -116,22 +120,28 @@ export function defineSketch(project: any) {
       p.push()
       p.textFont(fonts)
       p.textSize(object.textSize[0].value)
-      p.fill(object.color)
+      const col = p.color(object.color)
+      col.setAlpha(lerpValue(object.opacity, object.start))
+      p.fill(col)
+
+      // 全体的なトランスフォームの実行
+      p.translate(lerpValue(object.X, object.start), lerpValue(object.Y, object.start))
+      p.rotate(lerpValue(object.angle, object.start))
+      p.scale(lerpValue(convertToPercentage(object.scale), object.start))
+
+      // 個別のトランスフォームの実行
       object.char_cache.forEach((charObject: CharacterObject) => {
         p.push()
         p.translate(
-          lerpValue(object.X, object.start) +
-            object.spacing_x * charObject.index +
-            charObject.animX,
-          lerpValue(object.Y, object.start) + object.spacing_y * charObject.index + charObject.animY
+          object.spacing_x * charObject.index + charObject.animX,
+          object.spacing_y * charObject.index + charObject.animY
         )
-        p.rotate(lerpValue(object.angle, object.start) + charObject.animAngle)
-        p.scale(
-          lerpValue(convertToPercentage(object.scale), object.start) + charObject.animScale / 100
-        )
+        p.rotate(charObject.animAngle)
+        p.scale(charObject.animScale / 100)
         p.text(charObject.char, 0, 0)
         p.pop()
       })
+      p.pop()
     }
 
     ////////////////////////////
@@ -238,8 +248,8 @@ export function defineSketch(project: any) {
 
 declare module 'p5' {
   interface p5InstanceExtensions {
-    addRenderObjects: (currentObjects: TextObject[]) => void;
-    updateCurrentFrame: (frame: number) => void;
-    updateCanvasScale: () => void;
+    addRenderObjects: (currentObjects: TextObject[]) => void
+    updateCurrentFrame: (frame: number) => void
+    updateCanvasScale: () => void
   }
 }
