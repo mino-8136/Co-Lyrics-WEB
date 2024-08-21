@@ -7,7 +7,8 @@ let renderObjects: TextObject[] = []
 let currentFrame = 0
 let fonts: p5.Font
 
-export function defineSketch(project) {
+export function defineSketch(project: any) {
+  // 実際はtimelineStoreを引数に取る
   return function sketch(p: p5) {
     p.preload = () => {
       fonts = p.loadFont('src/assets/fonts/SourceHanSansJP/SourceHanSansJP-Medium.otf')
@@ -194,7 +195,7 @@ export function defineSketch(project) {
     }
 
     // keyframeに登録されたGSAPのアニメーションの実行結果を返す関数
-    function getAnimationStateAtTime(progress, easeType) {
+    function getAnimationStateAtTime(progress: number, easeType: string | undefined) {
       if (easeType === 'none' || easeType == null) {
         return progress
       }
@@ -219,7 +220,7 @@ export function defineSketch(project) {
     ////////////////////////////
     // 外部に公開するための関数 //
     ////////////////////////////
-    p.addRenderObjects = (currentObjects: TextObject) => {
+    p.addRenderObjects = (currentObjects: TextObject[]) => {
       //console.log(objects)
       renderObjects = currentObjects
     }
@@ -234,3 +235,11 @@ export function defineSketch(project) {
   }
 }
 // export function hoge(){} で公開して呼び出してもいい
+
+declare module 'p5' {
+  interface p5InstanceExtensions {
+    addRenderObjects: (currentObjects: TextObject[]) => void;
+    updateCurrentFrame: (frame: number) => void;
+    updateCanvasScale: () => void;
+  }
+}
