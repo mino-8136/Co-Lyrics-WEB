@@ -21,38 +21,42 @@
               <!-- 数値型の場合 -->
               <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
                 <v-row v-if="isKeyframeSettings(param)">
-                  <v-col v-for="(keyframe, idx) in param" :key="idx" cols="12">
-                    <v-slider
-                      v-model="(keyframe as unknown as KeyframeSettings).value"
-                      :min="ParameterInfo.getMinValue(label) || 0"
-                      :max="ParameterInfo.getMaxValue(label) || 1000"
-                      step="1"
-                      append-icon="mdi-plus"
-                      @click:append="
-                        addKeyframe(param as unknown as KeyframeSettings[], parseInt(idx))
-                      "
-                      hide-details
-                    >
-                      <template v-slot:prepend>
-                        <!-- イージング設定 -->
-                        <v-chip
-                          @click="openEasingDialog(keyframe as unknown as KeyframeSettings, label)"
-                          ><v-icon> mdi-pen </v-icon></v-chip
-                        >
-                        <!-- キーフレームのフレーム数と値 -->
-                        <input
-                          class="parameter-value"
-                          v-model.number="(keyframe as unknown as KeyframeSettings).frame"
-                          @change="sortKeyframe(param as unknown as KeyframeSettings[])"
-                        />
-                        <p>→</p>
-                        <input
-                          class="parameter-value"
-                          v-model.number="(keyframe as unknown as KeyframeSettings).value"
-                        />
-                      </template>
-                    </v-slider>
-                  </v-col>
+                  <transition-group name="list" tag="div" style="width: 100%">
+                    <v-col v-for="(keyframe, idx) in param" :key="keyframe" cols="12">
+                      <v-slider
+                        v-model="(keyframe as unknown as KeyframeSettings).value"
+                        :min="ParameterInfo.getMinValue(label) || 0"
+                        :max="ParameterInfo.getMaxValue(label) || 500"
+                        step="1"
+                        append-icon="mdi-plus"
+                        @click:append="
+                          addKeyframe(param as unknown as KeyframeSettings[], parseInt(idx))
+                        "
+                        hide-details
+                      >
+                        <template v-slot:prepend>
+                          <!-- イージング設定 -->
+                          <v-chip
+                            @click="
+                              openEasingDialog(keyframe as unknown as KeyframeSettings, label)
+                            "
+                            ><v-icon> mdi-pen </v-icon></v-chip
+                          >
+                          <!-- キーフレームのフレーム数と値 -->
+                          <input
+                            class="parameter-value"
+                            v-model.number="(keyframe as unknown as KeyframeSettings).frame"
+                            @change="sortKeyframe(param as unknown as KeyframeSettings[])"
+                          />
+                          <p>→</p>
+                          <input
+                            class="parameter-value"
+                            v-model.number="(keyframe as unknown as KeyframeSettings).value"
+                          />
+                        </template>
+                      </v-slider>
+                    </v-col>
+                  </transition-group>
                 </v-row>
                 <v-slider
                   v-else
@@ -152,12 +156,13 @@ const selectedObject: Record<string, any> = computed(() => {
 
 // ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数
 function addKeyframe(element: KeyframeSettings[], idx: number) {
-  const newFrame =
+  console.log(element, idx)
+  const newKeyframe =
     element.length - 1 !== idx
-      ? Math.floor(element[idx].frame + element[idx + 1].frame / 2)
+      ? Math.floor((element[idx].frame + element[idx + 1].frame) / 2)
       : element[idx].frame + 10
   element.splice(idx + 1, 0, {
-    frame: newFrame,
+    frame: newKeyframe,
     value: element[idx].value
   })
 }
@@ -195,8 +200,8 @@ function addAnimation(element: KeyframeSettings, index: number, animation: strin
   console.log(element)
 }
 
-function sortKeyframe(element: KeyframeSettings[]) {
-  element.sort((a, b) => a.frame - b.frame)
+function sortKeyframe(param: KeyframeSettings[]) {
+  param.sort((a, b) => a.frame - b.frame)
 }
 </script>
 
@@ -237,5 +242,20 @@ textarea {
   padding: 8px 12px;
   box-sizing: border-box;
   border: 1px solid #ccc;
+}
+
+/* リストアニメーション */
+.list-move, /* 移動する要素にトランジションを適用 */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.list-leave-active {
+  position: absolute;
 }
 </style>
