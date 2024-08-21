@@ -28,7 +28,7 @@ const props = defineProps({
 const emits = defineEmits(['callAddEasing', 'update:panel']) // emits に 'update:panel' を追加
 
 const effects = ref([
-  { id: 1, name: 'none' },
+  { id: 1, name: '' },
   { id: 2, name: 'power1.in' },
   { id: 3, name: 'power1.out' },
   { id: 4, name: 'power1.inOut' },

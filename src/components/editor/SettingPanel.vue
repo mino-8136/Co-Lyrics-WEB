@@ -36,12 +36,19 @@
                       >
                         <template v-slot:prepend>
                           <!-- イージング設定 -->
-                          <v-chip
+                          <div
+                            class="ease-setting"
+                            :style="{
+                              backgroundColor:
+                                (keyframe as unknown as KeyframeSettings).animation?.length ?? 0 > 0
+                                  ? '#09b7f6'
+                                  : '#ccc'
+                            }"
                             @click="
                               openEasingDialog(keyframe as unknown as KeyframeSettings, label)
                             "
-                            ><v-icon> mdi-pen </v-icon></v-chip
-                          >
+                          ></div>
+
                           <!-- キーフレームのフレーム数と値 -->
                           <input
                             class="parameter-value"
@@ -53,6 +60,16 @@
                             class="parameter-value"
                             v-model.number="(keyframe as unknown as KeyframeSettings).value"
                           />
+                        </template>
+                        <template v-slot:append>
+                          <v-icon
+                            v-if="parseInt(idx) > 0"
+                            @click="
+                              deleteKeyframe(param as unknown as KeyframeSettings[], parseInt(idx))
+                            "
+                            >mdi-delete</v-icon
+                          >
+                          <v-icon v-else></v-icon>
                         </template>
                       </v-slider>
                     </v-col>
@@ -98,6 +115,7 @@
                 <v-checkbox v-model="selectedObject[label]" hide-details />
               </template>
             </div>
+            <v-divider></v-divider>
           </div>
         </v-tabs-window-item>
 
@@ -167,6 +185,16 @@ function addKeyframe(element: KeyframeSettings[], idx: number) {
   })
 }
 
+// 指定したキーフレームを削除する関数
+function deleteKeyframe(element: KeyframeSettings[], idx: number) {
+  element.splice(idx, 1)
+}
+
+// キーフレーム順に並び替える関数
+function sortKeyframe(param: KeyframeSettings[]) {
+  param.sort((a, b) => a.frame - b.frame)
+}
+
 //////////////////////////////
 // イージング設定に関する記述 //
 //////////////////////////////
@@ -199,10 +227,6 @@ function addAnimation(element: KeyframeSettings, index: number, animation: strin
   element.animation = animation
   console.log(element)
 }
-
-function sortKeyframe(param: KeyframeSettings[]) {
-  param.sort((a, b) => a.frame - b.frame)
-}
 </script>
 
 <style scoped>
@@ -215,10 +239,18 @@ function sortKeyframe(param: KeyframeSettings[]) {
   overflow-y: auto;
 }
 
+div.ease-setting {
+  width: 12px;
+  height: 12px;
+  border-radius: 100%;
+  margin-right: 10px;
+  background-color: #09b7f6;
+}
+
 .parameter-row {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  margin: 8px 1px;
 }
 
 .parameter-name {
