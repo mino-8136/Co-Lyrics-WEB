@@ -30,7 +30,7 @@
                       append-icon="mdi-plus"
                       @click:append="addKeyframe(param as unknown as KeyframeSettings[], parseInt(idx))"
                       hide-details
-                    ></v-slider>
+                    >
                       <template v-slot:prepend>
                         <!-- イージング設定 -->
                         <v-chip @click="openEasingDialog(keyframe as unknown as KeyframeSettings, label)"

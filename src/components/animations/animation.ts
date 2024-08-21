@@ -29,11 +29,11 @@ const effectsMap = {
   '標準登場': standardAnimation
 }
 
-function executeEffect(effectName: keyof typeof effectsMap, ...effectParameters: any[] ){
-  // 関数を呼び出す
-  const effectFunction = effectsMap[effectName]
-  return effectFunction(...effectParameters)
-}
+// function executeEffect(effectName: keyof typeof effectsMap, ...effectParameters: any[] ){
+//   // 関数を呼び出す
+//   const effectFunction = effectsMap[effectName]
+//   return effectFunction(...effectParameters)
+// }
 
 
 function standardAnimation(obj: any, objIndex: number, objTotal: number, tracks: any, dialogSettings: any) {
