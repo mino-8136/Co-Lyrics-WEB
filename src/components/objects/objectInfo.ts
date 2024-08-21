@@ -3,11 +3,14 @@
 // 数値パラメータを配列に変更
 
 // キーフレームの情報管理
-export interface KeyframeSettings {
+export interface KeyframeSetting {
   value: number
   frame: number
+  id?: string
   animation?: string
 }
+
+export type KeyframeSettings = KeyframeSetting[]
 
 // KeyframeSettings 型か number 型かを判定する関数
 // TODO:配列かどうかで判定しているので、もう少し詳細の判定が必要
@@ -30,12 +33,12 @@ export interface AnimationSettings {
 }
 
 export interface StandardRenderSettings {
-  X: KeyframeSettings[]
-  Y: KeyframeSettings[]
-  //Z: KeyframeSettings[]
-  scale: KeyframeSettings[]
-  opacity: KeyframeSettings[]
-  angle: KeyframeSettings[]
+  X: KeyframeSettings
+  Y: KeyframeSettings
+  //Z: KeyframeSettings
+  scale: KeyframeSettings
+  opacity: KeyframeSettings
+  angle: KeyframeSettings
   //blend: number
 }
 
@@ -60,7 +63,7 @@ export class BaseObject implements BaseSettings {
 export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
   type: string
   //name: string
-  textSize: KeyframeSettings[]
+  textSize: number
   //display_speed: number
   individual_object: boolean
   //display_coordinates: boolean
@@ -82,15 +85,15 @@ export interface TextSettings extends BaseSettings, AnimationSettings, StandardR
 }
 
 export class TextObject extends BaseObject implements TextSettings {
-  X: KeyframeSettings[]
-  Y: KeyframeSettings[]
-  scale: KeyframeSettings[]
-  opacity: KeyframeSettings[]
-  angle: KeyframeSettings[]
+  X: KeyframeSettings
+  Y: KeyframeSettings
+  scale: KeyframeSettings
+  opacity: KeyframeSettings
+  angle: KeyframeSettings
   anim_name: string
   anim_parameters: any
   type: string
-  textSize: KeyframeSettings[]
+  textSize: number
   individual_object: boolean
   align: number
   spacing_x: number
@@ -104,8 +107,7 @@ export class TextObject extends BaseObject implements TextSettings {
     // 追加時は結局BaseSettingくらいの中身になる
     super(settings)
     this.X = [
-      { value: 0, frame: this.start },
-      { value: 100, frame: this.end }
+      { value: 0, frame: this.start }
     ]
     this.Y = [{ value: 0, frame: this.start }]
     this.scale = [{ value: 100, frame: this.start }]
@@ -114,7 +116,7 @@ export class TextObject extends BaseObject implements TextSettings {
     this.anim_name = 'サンプル'
     this.anim_parameters = []
     this.type = 'text'
-    this.textSize = [{ value: 50, frame: this.start }]
+    this.textSize = 40
     this.individual_object = false
     this.align = 0
     this.spacing_x = 30
@@ -154,11 +156,11 @@ export interface ImageSettings extends BaseSettings, AnimationSettings, Standard
 }
 
 export class ImageObject extends BaseObject implements ImageSettings {
-  X: KeyframeSettings[]
-  Y: KeyframeSettings[]
-  scale: KeyframeSettings[]
-  opacity: KeyframeSettings[]
-  angle: KeyframeSettings[]
+  X: KeyframeSettings
+  Y: KeyframeSettings
+  scale: KeyframeSettings
+  opacity: KeyframeSettings
+  angle: KeyframeSettings
   file: string
   anim_name: string
   anim_parameters: any
@@ -166,8 +168,7 @@ export class ImageObject extends BaseObject implements ImageSettings {
   constructor(settings: BaseSettings) {
     super(settings)
     this.X = [
-      { value: 0, frame: this.start },
-      { value: 100, frame: this.end }
+      { value: 0, frame: this.start }
     ]
     this.Y = [{ value: 0, frame: this.start }]
     this.scale = [{ value: 100, frame: this.start }]

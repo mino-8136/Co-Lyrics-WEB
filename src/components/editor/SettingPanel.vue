@@ -26,14 +26,12 @@
                   <transition-group name="list" tag="div" style="width: 100%">
                     <v-col v-for="(keyframe, idx) in param" :key="keyframe" cols="12">
                       <v-slider
-                        v-model="(keyframe as unknown as KeyframeSettings).value"
+                        v-model="keyframe.value"
                         :min="ParameterInfo.getMinValue(label) || 0"
                         :max="ParameterInfo.getMaxValue(label) || 500"
                         step="1"
                         append-icon="mdi-plus"
-                        @click:append="
-                          addKeyframe(param as unknown as KeyframeSettings[], parseInt(idx))
-                        "
+                        @click:append="addKeyframe(param, idx)"
                         hide-details
                       >
                         <template v-slot:prepend>
@@ -41,34 +39,22 @@
                           <div
                             class="ease-setting"
                             :style="{
-                              backgroundColor:
-                                (keyframe as unknown as KeyframeSettings).animation?.length ?? 0 > 0
-                                  ? '#09b7f6'
-                                  : '#ccc'
+                              backgroundColor: keyframe.animation != undefined ? '#09b7f6' : '#ccc'
                             }"
-                            @click="
-                              openEasingDialog(keyframe as unknown as KeyframeSettings, label)
-                            "
+                            @click="openEasingDialog(keyframe, label)"
                           ></div>
 
                           <!-- キーフレームのフレーム数と値 -->
                           <input
                             class="parameter-value"
-                            v-model.number="(keyframe as unknown as KeyframeSettings).frame"
-                            @change="sortKeyframe(param as unknown as KeyframeSettings[])"
+                            v-model.number="keyframe.frame"
+                            @change="sortKeyframe(param)"
                           />
                           <p>→</p>
-                          <input
-                            class="parameter-value"
-                            v-model.number="(keyframe as unknown as KeyframeSettings).value"
-                          />
+                          <input class="parameter-value" v-model.number="keyframe.value" />
                         </template>
                         <template v-slot:append>
-                          <v-icon
-                            v-if="parseInt(idx) > 0"
-                            @click="
-                              deleteKeyframe(param as unknown as KeyframeSettings[], parseInt(idx))
-                            "
+                          <v-icon v-if="idx > 0" @click="deleteKeyframe(param, idx)"
                             >mdi-delete</v-icon
                           >
                           <v-icon v-else></v-icon>
@@ -158,7 +144,11 @@
 import { ref, computed } from 'vue'
 import { useObjectStore } from '@/stores/objectStore'
 import * as ParameterInfo from '@/components/objects/parameterInfo'
-import { type KeyframeSettings, isKeyframeSettings } from '@/components/objects/objectInfo'
+import {
+  type KeyframeSettings,
+  type KeyframeSetting,
+  isKeyframeSettings
+} from '@/components/objects/objectInfo'
 import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
 // import ColorPanel from '@/components/objects/ColorPanel.vue'
@@ -174,27 +164,33 @@ const selectedObject: Record<string, any> = computed(() => {
   return objectStore.objects.find((obj) => obj.id === objectStore.selectedObjectId)
 })
 
+// 一意のIDを生成する関数
+function generateUniqueId() {
+    return Date.now().toString(36) + Math.random().toString(36);
+}
+
 // ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数
-function addKeyframe(element: KeyframeSettings[], idx: number) {
-  console.log(element, idx)
+function addKeyframe(keyframes: KeyframeSettings, idx: number) {
+  console.log(keyframes, idx)
   const newKeyframe =
-    element.length - 1 !== idx
-      ? Math.floor((element[idx].frame + element[idx + 1].frame) / 2)
-      : element[idx].frame + 10
-  element.splice(idx + 1, 0, {
+    keyframes.length - 1 !== idx
+      ? Math.floor((keyframes[idx].frame + keyframes[idx + 1].frame) / 2)
+      : keyframes[idx].frame + 10
+  keyframes.splice(idx + 1, 0, {
     frame: newKeyframe,
-    value: element[idx].value
+    value: keyframes[idx].value,
+    id: generateUniqueId()
   })
 }
 
 // 指定したキーフレームを削除する関数
-function deleteKeyframe(element: KeyframeSettings[], idx: number) {
-  element.splice(idx, 1)
+function deleteKeyframe(keyframes: KeyframeSettings, idx: number) {
+  keyframes.splice(idx, 1)
 }
 
 // キーフレーム順に並び替える関数
-function sortKeyframe(param: KeyframeSettings[]) {
-  param.sort((a, b) => a.frame - b.frame)
+function sortKeyframe(keyframes: KeyframeSettings) {
+  keyframes.sort((a, b) => a.frame - b.frame)
 }
 
 //////////////////////////////
@@ -203,17 +199,16 @@ function sortKeyframe(param: KeyframeSettings[]) {
 const easingPanel = ref(false)
 const currentParam = ref({
   label: '',
-  param: '' as unknown as KeyframeSettings
+  keyframe: {} as KeyframeSetting
 })
-function openEasingDialog(param: KeyframeSettings, label: string) {
-  currentParam.value.param = param
+function openEasingDialog(keyframe: KeyframeSetting, label: string) {
+  currentParam.value.keyframe = keyframe
   currentParam.value.label = label
   easingPanel.value = true
 }
 
 function addEasing(easing: string) {
-  console.log(currentParam.value)
-  currentParam.value.param.animation = easing
+  currentParam.value.keyframe.animation = easing
 }
 
 //////////////////////////////////
@@ -225,7 +220,7 @@ function openAnimationDialog() {
 }
 
 // 指定したプロパティの移動タイプを追加
-function addAnimation(element: KeyframeSettings, index: number, animation: string) {
+function addAnimation(element: KeyframeSetting, index: number, animation: string) {
   element.animation = animation
   console.log(element)
 }

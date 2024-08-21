@@ -1,6 +1,6 @@
 import { gsap } from 'gsap'
 import type p5 from 'p5'
-import type { TextObject, KeyframeSettings } from '@/components/objects/objectInfo'
+import type { TextObject, KeyframeSetting, KeyframeSettings } from '@/components/objects/objectInfo'
 import { CharacterObject } from '@/components/objects/objectInfo'
 
 let renderObjects: TextObject[] = []
@@ -101,7 +101,7 @@ export function defineSketch(project: any) {
       // 見た目の設定
       // TODO: 縁取りの場合はstrokeWeightを設定する
       p.textFont(fonts)
-      p.textSize(object.textSize[0].value)
+      p.textSize(object.textSize)
       const col = p.color(object.color)
       col.setAlpha(lerpValue(object.opacity, object.start))
       p.fill(col)
@@ -119,7 +119,7 @@ export function defineSketch(project: any) {
     const renderIndividualText = (object: TextObject) => {
       p.push()
       p.textFont(fonts)
-      p.textSize(object.textSize[0].value)
+      p.textSize(object.textSize)
       const col = p.color(object.color)
       col.setAlpha(lerpValue(object.opacity, object.start))
       p.fill(col)
@@ -149,7 +149,7 @@ export function defineSketch(project: any) {
     ////////////////////////////
 
     // 受け取ったobjectのパラメータをすべて百分率にして返す関数
-    const convertToPercentage = (param: KeyframeSettings[]) => {
+    const convertToPercentage = (param: KeyframeSettings) => {
       const convertedParam = JSON.parse(JSON.stringify(param))
       convertedParam.forEach((keyframe: { value: number }) => {
         keyframe.value = keyframe.value / 100
@@ -158,26 +158,26 @@ export function defineSketch(project: any) {
     }
 
     // キーフレーム間の値を補完する関数1
-    function lerpValue(param: KeyframeSettings[], objectStartFrame: number) {
+    function lerpValue(keyframes: KeyframeSettings, objectStartFrame: number) {
       // Parameterが配列であるという前提で行く
-      const lastSection = param.length - 1
-      const currentSection = getCurrentSection(param, objectStartFrame)
+      const lastSection = keyframes.length - 1
+      const currentSection = getCurrentSection(keyframes, objectStartFrame)
       const nextSection = currentSection + 1
 
       // 最初の相対キーフレームに到達していない場合、最初の値で止める
       if (currentSection === -1) {
-        return param[0].value
+        return keyframes[0].value
       }
 
       // 最後の相対キーフレームに到達していた場合、最後の値で止める
       // console.log(param, "curr: ", currentSection, "last: " , lastSection)
       if (currentSection == lastSection) {
-        return param[currentSection].value
+        return keyframes[currentSection].value
       }
 
       // それ以外の場合、値を補完して返す
       const currentValue = getEaseValue(
-        param,
+        keyframes,
         currentSection,
         nextSection,
         currentFrame - objectStartFrame
@@ -187,7 +187,7 @@ export function defineSketch(project: any) {
 
     // キーフレーム間の値を補完する関数2
     function getEaseValue(
-      param: KeyframeSettings[],
+      param: KeyframeSettings,
       currentSection: number,
       nextSection: number,
       currentFrame: number
@@ -215,7 +215,7 @@ export function defineSketch(project: any) {
 
     // どの区間のフレームを参照するかを求める(CurrentFrameを超えない最大のキーフレーム)
     // 最初のキーフレームに到達していない場合に-1を返す
-    function getCurrentSection(param: KeyframeSettings[], objectStartFrame: number) {
+    function getCurrentSection(param: KeyframeSettings, objectStartFrame: number) {
       let index = -1
       for (let i = 0; i < param.length; i++) {
         if (objectStartFrame + param[i].frame <= currentFrame) {

@@ -49,7 +49,7 @@ const objectStyle = computed(() => ({
 
 // キーフレームの設定
 const keyFrameList = computed(() => {
-  let keyFrameList: KeyframeSettings[] = []
+  let keyFrameList: KeyframeSettings = []
   Object.entries(props.object).reduce((acc, [key, value]) => {
     // KeyframeSettingsの配列であるかを判定
     if (Array.isArray(value) && value.length > 1) {
