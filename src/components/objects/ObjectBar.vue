@@ -12,20 +12,22 @@
       v-for="(keyframe, index) in keyFrameList"
       :key="index"
       class="keyframe"
-      :style="{ left: `${keyframe.frame * 3 - 5}px` }"
+      :style="{ left: `${keyframe.frame * scaler - 5}px` }"
     ></div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { BaseObject, TextObject, ImageObject } from './objectInfo'
 import { type KeyframeSettings } from './objectInfo'
+import { useTimelineStore } from '@/stores/objectStore'
 
 const props = defineProps<{
   object: BaseObject | TextObject | ImageObject
 }>()
-const scaler = ref(3)
+const timelineStore = useTimelineStore()
+const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
 
 const baseObject = ref(props.object)
 const tempStart = ref(baseObject.value.start)
@@ -115,10 +117,28 @@ const stopResize = () => {
   isResizing.value = false
 }
 
+watch(
+  () => timelineStore.pxPerSec,
+  (newPxPerSec) => {
+    scaler.value = newPxPerSec / timelineStore.framerate
+  }
+)
+
+
 window.addEventListener('mouseup', stopResize)
 window.addEventListener('mousemove', resize)
 window.addEventListener('mouseup', stopMove)
 window.addEventListener('mousemove', move)
+
+
+onUnmounted(() => {
+  window.removeEventListener('mouseup', stopResize)
+  window.removeEventListener('mousemove', resize)
+  window.removeEventListener('mouseup', stopMove)
+  window.removeEventListener('mousemove', move)
+})
+
+
 </script>
 
 <style scoped>

@@ -33,14 +33,12 @@ export const useTimelineStore = defineStore('timeline', {
     framerate: 30,
     totalFrame: 1800,
     currentFrame: 0,
-    canvasScale: 1
+    canvasScale: 1,
+    pxPerSec: 90
   }),
   actions: {
     setCurrentFrame(frame: number) {
       this.currentFrame = frame
-    },
-    incrementFrame() {
-      this.currentFrame++
     },
     updateCanvasScale(receivedWidth: number) {
       this.canvasScale = receivedWidth / this.width

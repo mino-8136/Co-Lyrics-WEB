@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import WaveSurfer from 'wavesurfer.js'
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 
@@ -38,7 +38,7 @@ onMounted(() => {
       progressColor: '#383351',
       url: '/src/assets/music/demo.mp3',
       height: 40,
-      minPxPerSec: 90, // ここを1フレームあたりの幅に合わせる
+      minPxPerSec: timelineStore.pxPerSec, // ここが1フレームあたりの幅
       autoplay: false,
       autoScroll: true,
       dragToSeek: true,
@@ -63,7 +63,6 @@ onMounted(() => {
     })
     wavesurfer.on('scroll', (scroll) => {
       const scrollPosition = scroll * wavesurfer.options.minPxPerSec // スクロール位置を計算
-      console.log('aaa', scrollPosition, scroll)
       emits('callSetScrollPosition', scrollPosition)
     })
 
@@ -71,19 +70,19 @@ onMounted(() => {
     wavesurfer.on('ready', () => {
       emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
     })
-
-    // スケーラーの追加
-    wavesurfer.once('decode', () => {
-      const slider = document.querySelector('input[type="range"]')
-
-      slider.addEventListener('input', (e) => {
-        const minPxPerSec = e.target.valueAsNumber
-        wavesurfer.zoom(minPxPerSec)
-        emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
-      })
-    })
   }
 })
+
+// pxPerSecの変更を監視
+watch(
+  () => timelineStore.pxPerSec,
+  (newPxPerSec) => {
+    if (wavesurfer) {
+      wavesurfer.zoom(newPxPerSec)
+      emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
+    }
+  }
+)
 
 onUnmounted(() => {
   if (wavesurfer) {

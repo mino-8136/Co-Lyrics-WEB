@@ -3,7 +3,7 @@
     <div class="header d-flex">
       <p>Frame:</p>
       <input :value="timelineStore.currentFrame" style="width: 60px" />
-      <input type="range" min="30" max="500" v-model="timelineSpan" />
+      <input type="range" min="30" max="500" v-model="timelineStore.pxPerSec" />
     </div>
 
     <div class="timeline-container">
@@ -14,7 +14,10 @@
       <div class="timeline" style="overflow-y: auto; height: 200px">
         <div
           class="seekbar"
-          :style="{ left: (timelineStore.currentFrame * timelineSpan) / 30 + 'px' }"
+          :style="{
+            left:
+              (timelineStore.currentFrame * timelineStore.pxPerSec) / timelineStore.framerate + 'px'
+          }"
         ></div>
         <div
           class="layer"
@@ -24,7 +27,7 @@
         >
           <div
             class="layerTimeline"
-            :style="{ backgroundSize: timelineSpan / 30 + 'px' }"
+            :style="{ backgroundSize: timelineStore.pxPerSec / timelineStore.framerate + 'px' }"
             @contextmenu.prevent="onTimelineContextMenu($event, index)"
           >
             <object-bar
@@ -56,8 +59,7 @@ const layers = ref(
     name: 'Layer'
   }))
 )
-const waveformWidth = ref(90)
-const timelineSpan = ref(90)
+const waveformWidth = ref(900)
 
 // タイムラインメニュー
 function onTimelineContextMenu(event: MouseEvent, index: number) {
