@@ -4,7 +4,7 @@
     <div class="header d-flex">
       <p>Frame:</p>
       <input :value="timelineStore.currentFrame" style="width: 60px" />
-      <input type="range" min="30" max="500" v-model="timelineSpan" />
+      <input type="range" min="30" max="400" v-model="timelineStore.pxPerSec" />
     </div>
 
     <div class="timeline-container">
@@ -15,7 +15,10 @@
       <div class="timeline" style="overflow-y: scroll; height: 200px">
         <div
           class="seekbar"
-          :style="{ left: (timelineStore.currentFrame * timelineSpan) / 30 + 'px' }"
+          :style="{
+            left:
+              (timelineStore.currentFrame * timelineStore.pxPerSec) / timelineStore.framerate + 'px'
+          }"
         ></div>
         <div
           class="layer"
@@ -23,7 +26,10 @@
           :key="index"
           :style="{ width: waveformWidth }"
         >
-          <div class="layerTimeline" :style="{ backgroundSize: timelineSpan / 30 + 'px' }">
+          <div
+            class="layerTimeline"
+            :style="{ backgroundSize: timelineStore.pxPerSec / timelineStore.framerate + 'px' }"
+          >
             <object-note
               v-for="object in objectStore.objects"
               :key="object.id"
@@ -58,7 +64,6 @@ function setWaveformWidth(width: number) {
 }
 
 function setScrollPosition(position: number) {
-  console.log('ccc', position)
   const scrollable = document.querySelector('.timeline')
   if (scrollable) {
     scrollable.scrollLeft = position
@@ -78,7 +83,7 @@ function frameToTime(frame: number): string {
 
 // ゲーム開始前の処理
 const startGame = () => {
-  // 
+  //
 }
 
 // スペースキーが押されたときの処理
@@ -93,20 +98,12 @@ window.addEventListener('keydown', (event) => {
     })
 
     // 最も近いオブジェクトについて、正解かどうかを判定
-    
   }
 })
-
-
-
-
 
 onUnmounted(() => {
   window.removeEventListener('keydown', () => {})
 })
-
-
-
 </script>
 
 <style scoped>

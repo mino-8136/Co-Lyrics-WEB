@@ -8,14 +8,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onUnmounted } from 'vue'
 import { BaseObject, TextObject, ImageObject } from './objectInfo'
+import { useTimelineStore } from '@/stores/objectStore'
 import { type KeyframeSettings } from './objectInfo'
 
 const props = defineProps<{
   object: BaseObject | TextObject | ImageObject
 }>()
-const scaler = ref(3)
+const timelineStore = useTimelineStore()
+const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
 
 const baseObject = ref(props.object)
 const tempStart = ref(baseObject.value.start)
@@ -25,6 +27,13 @@ const objectStyle = computed(() => ({
   position: 'absolute'
 }))
 const isCorrect = ref(false)
+
+watch(
+  () => timelineStore.pxPerSec,
+  (newPxPerSec) => {
+    scaler.value = newPxPerSec / timelineStore.framerate
+  }
+)
 
 //////////////////////////
 // オブジェクト操作の関数 //
