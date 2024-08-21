@@ -2,7 +2,7 @@
   <div ref="waveform" class="waveform"></div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import WaveSurfer from 'wavesurfer.js'
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
@@ -11,7 +11,7 @@ import { useTimelineStore } from '@/stores/objectStore'
 const timelineStore = useTimelineStore()
 
 const waveform = ref(null) // DOM要素への参照を作成
-let wavesurfer = null // wavesurferのインスタンスを保持する変数
+let wavesurfer: WaveSurfer // wavesurferのインスタンスを保持する変数
 
 const emits = defineEmits(['callGetWaveformWidth', 'callSetScrollPosition'])
 
