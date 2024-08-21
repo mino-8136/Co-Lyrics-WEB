@@ -114,10 +114,10 @@ export class TextObject extends BaseObject implements TextSettings {
     this.anim_name = 'サンプル'
     this.anim_parameters = []
     this.type = 'text'
-    this.textSize = [{ value: 28, frame: this.start }]
+    this.textSize = [{ value: 50, frame: this.start }]
     this.individual_object = false
     this.align = 0
-    this.spacing_x = 20
+    this.spacing_x = 30
     this.spacing_y = 0
     this.color = '#ffffff'
     this.font = 'SourceHanSansJP'
@@ -126,6 +126,7 @@ export class TextObject extends BaseObject implements TextSettings {
   }
 }
 
+// p5.js内で用いるのがメイン
 export class CharacterObject {
   index: number
   parent: TextObject
@@ -142,8 +143,8 @@ export class CharacterObject {
       (this.char = parent.text[index]),
       (this.animX = 0),
       (this.animY = 0),
-      (this.animScale = 0),
-      (this.animOpacity = 0),
+      (this.animScale = 100),
+      (this.animOpacity = 100),
       (this.animAngle = 0)
   }
 }

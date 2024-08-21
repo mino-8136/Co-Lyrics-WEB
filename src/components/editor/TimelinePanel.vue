@@ -147,7 +147,7 @@ function setWaveformWidth(width: number) {
 }
 
 function setScrollPosition(position: number) {
-  console.log('ccc', position)
+  // console.log('ccc', position)
   const scrollable = document.querySelector('.timeline')
   if (scrollable) {
     scrollable.scrollLeft = position

@@ -6,14 +6,11 @@
       ref="canvasContainer"
       :style="{ height: 500 - informationHeight + 'px' }"
     ></div>
-    <div id="information">
-      <v-btn @click="renderObjects" icon="mdi-play"></v-btn>
-    </div>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, onBeforeUnmount, watch } from 'vue'
+import { onMounted, ref, watch, onUnmounted } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import p5 from 'p5'
 import { defineSketch } from '@/components/p5/sketch'
@@ -24,19 +21,20 @@ const informationHeight = 80
 
 // マウント時に p5.canvas を生成
 const p = ref()
-const canvasContainer = ref<HTMLDivElement | null>(null)
+const canvasContainer = ref<HTMLDivElement>()
 onMounted(() => {
   // canvasのsizeを取得し、スケールを計算
   if (canvasContainer.value) {
     const { width, height } = canvasContainer.value.getBoundingClientRect()
     timelineStore.canvasScale = calculateCanvasScale(width, height)
   }
+  if (!p.value) {
+    let sketch = defineSketch(timelineStore)
+    p.value = new p5(sketch)
 
-  let sketch = defineSketch(timelineStore)
-  p.value = new p5(sketch)
-
-  // ウィンドウのリサイズイベントを監視
-  window.addEventListener('resize', updateCanvasSize)
+    // ウィンドウのリサイズイベントを監視
+    window.addEventListener('resize', updateCanvasSize)
+  }
 })
 
 watch(
@@ -56,7 +54,7 @@ function updateCanvasSize() {
   }
 }
 
-function calculateCanvasScale(width:number, height:number): number {
+function calculateCanvasScale(width: number, height: number): number {
   //console.log(width, height)
   if ((width / 16) * 9 > height) {
     return height / timelineStore.height
@@ -69,8 +67,9 @@ function renderObjects() {
   p.value.addRenderObjects(objectStore.currentObjects(timelineStore.currentFrame))
 }
 
-onBeforeUnmount(() => {
+onUnmounted(() => {
   window.removeEventListener('resize', updateCanvasSize)
+  p.value?.remove()
 })
 </script>
 
