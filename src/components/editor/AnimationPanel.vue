@@ -5,7 +5,7 @@
       <v-col v-for="effect in effects" :key="effect.id" class="d-flex" cols="4">
         <v-container>
           <v-img :width="200" aspect-ratio="1" class="bg-grey-lighten-2" cover> </v-img>
-          <v-btn @click="emits.addAnimation()">
+          <v-btn @click="emits('addParameter')">
             {{ effect.name }}
           </v-btn>
         </v-container>
@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits } from 'vue'
+import { ref } from 'vue'
 import { gsap } from 'gsap'
 
 // 仮のアニメーションリスト

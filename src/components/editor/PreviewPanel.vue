@@ -16,7 +16,7 @@
 import { onMounted, ref, onBeforeUnmount, watch } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import p5 from 'p5'
-import { defineSketch } from '@/components/p5/sketch.ts'
+import { defineSketch } from '@/components/p5/sketch'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -56,7 +56,7 @@ function updateCanvasSize() {
   }
 }
 
-function calculateCanvasScale(width, height) {
+function calculateCanvasScale(width:number, height:number): number {
   //console.log(width, height)
   if ((width / 16) * 9 > height) {
     return height / timelineStore.height

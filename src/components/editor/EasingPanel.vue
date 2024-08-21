@@ -1,6 +1,6 @@
 <template>
   <v-card class="EasingPanel">
-    <v-card-title>{{ props.getParam.label }}の移動タイプを選択</v-card-title>
+    <v-card-title>{{ props.getParam?.label }}の移動タイプを選択</v-card-title>
     <v-row>
       <v-col v-for="effect in effects" :key="effect.id" class="d-flex" cols="2">
         <v-container>

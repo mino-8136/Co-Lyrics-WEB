@@ -12,7 +12,7 @@
 import { onMounted, ref } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import p5 from 'p5'
-import { defineSketch } from '@/components/p5/sketch.ts'
+import { defineSketch } from '@/components/p5/sketch'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
