@@ -142,7 +142,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useObjectStore } from '@/stores/objectStore'
+import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import * as ParameterInfo from '@/components/objects/parameterInfo'
 import {
   type KeyframeSettings,
@@ -155,13 +155,14 @@ import EasingPanel from '@/components/editor/EasingPanel.vue'
 import { fontListData } from '@/assets/fonts/fonts'
 
 const objectStore = useObjectStore()
+const timelineStore = useTimelineStore()
 const fontList = fontListData.map((font) => font.name)
 const tab = ref('basic')
 const colorMenu = ref(false)
 
 // 選択されたオブジェクトの情報が自動的に表示される
 const selectedObject: Record<string, any> = computed(() => {
-  return objectStore.objects.find((obj) => obj.id === objectStore.selectedObjectId)
+  return objectStore.objects.find((obj) => obj.id === timelineStore.selectedObjectId)
 })
 
 // 一意のIDを生成する関数

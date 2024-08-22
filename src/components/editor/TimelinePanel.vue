@@ -21,17 +21,17 @@
         ></div>
         <div
           class="layer"
-          v-for="(layer, index) in layers"
-          :key="index"
+          v-for="(layer, layerIndex) in layers"
+          :key="layerIndex"
           :style="{ width: waveformWidth }"
         >
           <div
             class="layerTimeline"
             :style="{ backgroundSize: timelineStore.pxPerSec / timelineStore.framerate + 'px' }"
-            @contextmenu.prevent="onTimelineContextMenu($event, index)"
+            @contextmenu.prevent="onTimelineContextMenu($event, layerIndex)"
           >
             <object-bar
-              v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
+              v-for="object in objectStore.objects.filter((obj) => obj.layer === layerIndex)"
               :key="object.id"
               :object="object"
               v-model:text="object.text"
@@ -63,7 +63,7 @@ const layers = ref(
 const waveformWidth = ref(900)
 
 // タイムラインメニュー
-function onTimelineContextMenu(event: MouseEvent, index: number) {
+function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
   event.preventDefault()
   ContextMenu.showContextMenu({
     x: event.clientX,
@@ -72,19 +72,19 @@ function onTimelineContextMenu(event: MouseEvent, index: number) {
       {
         label: 'テキストオブジェクトを追加',
         onClick: () => {
-          addObject(index, 'text')
+          addObject(layerIndex, 'text', event.offsetX)
         }
       },
       {
         label: '画像オブジェクトを追加',
         onClick: () => {
-          addObject(index, 'image')
+          addObject(layerIndex, 'image', event.offsetX)
         }
       },
       {
         label: '基底オブジェクトを追加',
         onClick: () => {
-          addObject(index, '')
+          addObject(layerIndex, '', event.offsetX)
         }
       }
     ]
@@ -95,12 +95,13 @@ function onTimelineContextMenu(event: MouseEvent, index: number) {
 // オブジェクトクリックで選択
 function selectObject(objectId: number) {
   // クリックしたオブジェクトを選択
-  objectStore.selectedObjectId = objectId
+  timelineStore.selectedObjectId = objectId
 }
 
 // オブジェクトを右クリックした場合のメニュー
-function onObjectContextMenu(event: MouseEvent, index: number) {
+function onObjectContextMenu(event: MouseEvent, objIndex: number) {
   event.preventDefault()
+  selectObject(objIndex)
   ContextMenu.showContextMenu({
     x: event.clientX,
     y: event.clientY,
@@ -108,7 +109,7 @@ function onObjectContextMenu(event: MouseEvent, index: number) {
       {
         label: 'オブジェクトを削除',
         onClick: () => {
-          removeObject(index)
+          removeObject(objIndex)
         }
       }
     ]
@@ -117,11 +118,12 @@ function onObjectContextMenu(event: MouseEvent, index: number) {
 }
 
 // オブジェクトの追加
-function addObject(layerIndex: number, type: string) {
+function addObject(layerIndex: number, type: string, offsetX: number = 0) {
+  const offset = Math.floor((offsetX / timelineStore.pxPerSec) * timelineStore.framerate)
   const settings: BaseSettings = {
     id: objectStore.counter,
-    start: 0,
-    end: 100,
+    start: Math.max(offset, 0),
+    end: offset + 100, // TODO: ここに最大値を設定できるようにする
     layer: layerIndex
   }
 
@@ -132,11 +134,12 @@ function addObject(layerIndex: number, type: string) {
   } else {
     objectStore.addObject(new BaseObject(settings))
   }
+  selectObject(objectStore.counter - 1)
   // console.log(objectStore.objects)
 }
 
-function removeObject(index: number) {
-  objectStore.removeObject(index)
+function removeObject(objIndex: number) {
+  objectStore.removeObject(objIndex)
 }
 
 ////////////////////////////

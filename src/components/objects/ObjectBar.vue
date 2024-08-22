@@ -2,6 +2,7 @@
   <div
     class="object"
     :style="{ ...objectStyle, position: 'absolute' }"
+    :class="timelineStore.selectedObjectId === baseObject.id ? 'selected' : ''"
     @mousedown="startMove"
     @mousemove="move"
     @mouseup="stopMove"
@@ -158,6 +159,10 @@ onUnmounted(() => {
   top: 50%;
   left: 20px;
   transform: translate(0%, -50%);
+}
+
+.object.selected {
+  border: 10px solid rgb(255, 0, 0);
 }
 
 .resize-handle {

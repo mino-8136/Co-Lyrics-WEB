@@ -5,7 +5,6 @@ export const useObjectStore = defineStore('objects', {
   state: () => ({
     counter: 0,
     objects: [] as (TextObject | ImageObject | BaseObject)[],
-    selectedObjectId: 0
   }),
   getters: {
     currentObjects: (state) => (frame: number) => {
@@ -34,7 +33,8 @@ export const useTimelineStore = defineStore('timeline', {
     totalFrame: 1800,
     currentFrame: 0,
     canvasScale: 1,
-    pxPerSec: 90
+    pxPerSec: 90,
+    selectedObjectId: 0,
   }),
   actions: {
     setCurrentFrame(frame: number) {

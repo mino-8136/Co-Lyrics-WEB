@@ -106,13 +106,11 @@ export class TextObject extends BaseObject implements TextSettings {
   constructor(settings: BaseSettings) {
     // 追加時は結局BaseSettingくらいの中身になる
     super(settings)
-    this.X = [
-      { value: 0, frame: this.start, id: '0' }
-    ]
-    this.Y = [{ value: 0, frame: this.start, id: '0' }]
-    this.scale = [{ value: 100, frame: this.start, id: '0' }]
-    this.opacity = [{ value: 100, frame: this.start, id: '0' }]
-    this.angle = [{ value: 0, frame: this.start, id: '0' }]
+    this.X = [{ value: 0, frame: 0, id: '0' }]
+    this.Y = [{ value: 0, frame: 0, id: '0' }]
+    this.scale = [{ value: 100, frame: 0, id: '0' }]
+    this.opacity = [{ value: 100, frame: 0, id: '0' }]
+    this.angle = [{ value: 0, frame: 0, id: '0' }]
     this.anim_name = 'サンプル'
     this.anim_parameters = []
     this.type = 'text'
@@ -167,13 +165,11 @@ export class ImageObject extends BaseObject implements ImageSettings {
 
   constructor(settings: BaseSettings) {
     super(settings)
-    this.X = [
-      { value: 0, frame: this.start, id: '0' }
-    ]
-    this.Y = [{ value: 0, frame: this.start, id: '0' }]
-    this.scale = [{ value: 100, frame: this.start, id: '0' }]
-    this.opacity = [{ value: 100, frame: this.start, id: '0' }]
-    this.angle = [{ value: 0, frame: this.start, id: '0' }]
+    this.X = [{ value: 0, frame: 0, id: '0' }]
+    this.Y = [{ value: 0, frame: 0, id: '0' }]
+    this.scale = [{ value: 100, frame: 0, id: '0' }]
+    this.opacity = [{ value: 100, frame: 0, id: '0' }]
+    this.angle = [{ value: 0, frame: 0, id: '0' }]
     this.file = ''
     this.anim_name = ''
     this.anim_parameters = []
