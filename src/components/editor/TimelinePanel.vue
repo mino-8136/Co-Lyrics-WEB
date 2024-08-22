@@ -34,6 +34,7 @@
               v-for="object in objectStore.objects.filter((obj) => obj.layer === index)"
               :key="object.id"
               :object="object"
+              v-model:text="object.text"
               @contextmenu.prevent="onObjectContextMenu($event, object.id)"
               @click="selectObject(object.id)"
             ></object-bar>

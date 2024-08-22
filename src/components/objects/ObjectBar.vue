@@ -6,6 +6,7 @@
     @mousemove="move"
     @mouseup="stopMove"
   >
+    <input v-if="baseObject instanceof TextObject" class="text" v-model="text" @mousedown.stop />
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
     <div
@@ -23,8 +24,9 @@ import { BaseObject, TextObject, ImageObject } from './objectInfo'
 import { type KeyframeSettings } from './objectInfo'
 import { useTimelineStore } from '@/stores/objectStore'
 
+const text = defineModel('text')
 const props = defineProps<{
-  object: BaseObject | TextObject | ImageObject
+  object: TextObject | ImageObject | BaseObject
 }>()
 const timelineStore = useTimelineStore()
 const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
@@ -124,12 +126,10 @@ watch(
   }
 )
 
-
 window.addEventListener('mouseup', stopResize)
 window.addEventListener('mousemove', resize)
 window.addEventListener('mouseup', stopMove)
 window.addEventListener('mousemove', move)
-
 
 onUnmounted(() => {
   window.removeEventListener('mouseup', stopResize)
@@ -137,8 +137,6 @@ onUnmounted(() => {
   window.removeEventListener('mouseup', stopMove)
   window.removeEventListener('mousemove', move)
 })
-
-
 </script>
 
 <style scoped>
@@ -147,11 +145,19 @@ onUnmounted(() => {
   --keysize: 10px;
 
   position: relative;
-  background-color: lightgray;
+  background-color: rgb(211, 211, 211);
   width: 150px;
   height: 40px;
   left: 20px;
   cursor: move;
+}
+
+.object .text {
+  position: absolute;
+  width: 8em;
+  top: 50%;
+  left: 20px;
+  transform: translate(0%, -50%);
 }
 
 .resize-handle {
