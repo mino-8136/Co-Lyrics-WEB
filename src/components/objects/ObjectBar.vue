@@ -24,6 +24,7 @@ import { ref, computed, watch, onUnmounted } from 'vue'
 import { BaseObject, TextObject, ImageObject } from './objectInfo'
 import { type KeyframeSettings } from './objectInfo'
 import { useTimelineStore } from '@/stores/objectStore'
+import gsap from 'gsap'
 
 const text = defineModel('text')
 const props = defineProps<{
@@ -41,6 +42,7 @@ const tempEnd = ref(baseObject.value.end)
 const isResizing = ref(false)
 const isMoving = ref(false)
 const lastMouseX = ref(0)
+const lastMouseY = ref(0)
 const side = ref('')
 
 const objectStyle = computed(() => ({
@@ -70,6 +72,7 @@ const keyFrameList = computed(() => {
 const startMove = (event: MouseEvent) => {
   isMoving.value = true
   lastMouseX.value = event.clientX
+  lastMouseY.value = event.clientY
 }
 
 const move = (event: MouseEvent) => {
@@ -79,6 +82,13 @@ const move = (event: MouseEvent) => {
     if (tempStart.value + dx >= 0) {
       tempStart.value += dx
       tempEnd.value += dx
+    }
+    // レイヤー変更に対応
+    const layerHeight = 40
+    if (Math.abs(event.clientY - lastMouseY.value) > layerHeight) {
+      baseObject.value.layer += Math.round((event.clientY - lastMouseY.value) / layerHeight)
+      lastMouseY.value = event.clientY
+      baseObject.value.layer = gsap.utils.clamp(0, 9, baseObject.value.layer)
     }
   }
 }
@@ -159,11 +169,11 @@ onUnmounted(() => {
   top: 50%;
   left: 20px;
   transform: translate(0%, -50%);
+  user-select: none;
 }
 
 .object.selected {
   box-shadow: 0 0 2px 2px rgb(241, 251, 156);
-  
 }
 
 .resize-handle {
