@@ -162,7 +162,8 @@ onUnmounted(() => {
 }
 
 .object.selected {
-  border: 10px solid rgb(255, 0, 0);
+  box-shadow: 0 0 2px 2px rgb(241, 251, 156);
+  
 }
 
 .resize-handle {
