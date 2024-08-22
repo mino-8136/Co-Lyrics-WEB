@@ -85,6 +85,7 @@ const move = (event: MouseEvent) => {
     }
     // レイヤー変更に対応
     const layerHeight = 40
+    // console.log(lastMouseY.value, event.clientY)
     if (Math.abs(event.clientY - lastMouseY.value) > layerHeight) {
       baseObject.value.layer += Math.round((event.clientY - lastMouseY.value) / layerHeight)
       lastMouseY.value = event.clientY
@@ -161,15 +162,17 @@ onUnmounted(() => {
   height: 40px;
   left: 20px;
   cursor: move;
+  user-select: none;
 }
 
 .object .text {
   position: absolute;
   width: 8em;
+  height: 1.2em;
   top: 50%;
   left: 20px;
   transform: translate(0%, -50%);
-  user-select: none;
+  border-bottom: 0.5px solid black;
 }
 
 .object.selected {
