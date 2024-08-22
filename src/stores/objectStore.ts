@@ -4,7 +4,7 @@ import { BaseObject, TextObject, ImageObject } from '@/components/objects/object
 export const useObjectStore = defineStore('objects', {
   state: () => ({
     counter: 0,
-    objects: [] as (TextObject | ImageObject | BaseObject)[],
+    objects: [] as (TextObject | ImageObject | BaseObject)[]
   }),
   getters: {
     currentObjects: (state) => (frame: number) => {
@@ -34,7 +34,7 @@ export const useTimelineStore = defineStore('timeline', {
     currentFrame: 0,
     canvasScale: 1,
     pxPerSec: 90,
-    selectedObjectId: 0,
+    selectedObjectId: 0
   }),
   actions: {
     setCurrentFrame(frame: number) {

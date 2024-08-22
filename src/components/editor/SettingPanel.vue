@@ -167,7 +167,7 @@ const selectedObject: Record<string, any> = computed(() => {
 
 // 一意のIDを生成する関数
 function generateUniqueId() {
-    return Date.now().toString(36) + Math.random().toString(36);
+  return Date.now().toString(36) + Math.random().toString(36)
 }
 
 // ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数
