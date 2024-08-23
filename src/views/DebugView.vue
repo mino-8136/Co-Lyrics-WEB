@@ -41,7 +41,7 @@
           font-size="10"
           fill="#333"
         >
-          {{ Math.round((x / width) * frameMax) }}
+          {{ Math.round(xRange[0] + (x / width) * (xRange[1] - xRange[0])) }}
         </text>
 
         <!-- 縦軸の数値 -->
@@ -97,16 +97,25 @@ const draggingIndex = ref(null)
 const offsetX = ref(0)
 const offsetY = ref(0)
 
-const frameMin = 0
-const frameMax = 200
+const startFrame = 0 // グラフの最初のフレーム
+const endFrame = 200 // グラフの最終フレーム
 
-const maxFrame = computed(() => Math.max(...keyframes.value.map((k) => k.frame)))
-const minValue = computed(() => Math.min(...keyframes.value.map((k) => k.value)))
-const maxValue = computed(() => Math.max(...keyframes.value.map((k) => k.value)))
+const maxDeltaX = 2 // X軸の値が1回のドラッグで変化できる最大量
+const maxDeltaY = 5 // Y軸の値が1回のドラッグで変化できる最大量
 
-// 縦軸の範囲を動的に計算して、中央が0になるように設定
+// xRange: frameの最小値と最大値を動的に設定
+const xRange = computed(() => {
+  const minFrame = Math.min(...keyframes.value.map((k) => k.frame))
+  const maxFrame = Math.max(...keyframes.value.map((k) => k.frame))
+  return [Math.min(startFrame, minFrame), Math.max(endFrame, maxFrame)]
+})
+
+// yRange: valueの範囲を動的に設定
 const yRange = computed(() => {
-  const maxAbsValue = Math.max(Math.abs(minValue.value), Math.abs(maxValue.value))
+  const maxAbsValue = Math.max(
+    Math.abs(Math.min(...keyframes.value.map((k) => k.value))),
+    Math.abs(Math.max(...keyframes.value.map((k) => k.value)))
+  )
   return [-maxAbsValue, maxAbsValue]
 })
 
@@ -126,7 +135,7 @@ const points = computed(() => {
       const t = j / numPoints
       const easedT = easingFunc(t)
 
-      const x = ((startFrame + j) / maxFrame.value) * width
+      const x = ((startFrame + j - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
       const y =
         height -
         ((startValue + easedT * (endValue - startValue) - yRange.value[0]) /
@@ -141,7 +150,9 @@ const points = computed(() => {
 })
 
 keyframes.value.forEach((kf) => {
-  kf.x = computed(() => (kf.frame / maxFrame.value) * width)
+  kf.x = computed(
+    () => ((kf.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
+  )
   kf.y = computed(
     () => height - ((kf.value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
   )
@@ -178,16 +189,51 @@ const startDrag = (index, event) => {
 const onMouseMove = (event) => {
   if (draggingIndex.value !== null) {
     const kf = keyframes.value[draggingIndex.value]
-    // frameの値を制限
-    const newFrame = Math.round(
-      ((event.offsetX - offsetX.value - padding.left) / width) * maxFrame.value
+
+    // 前後のframeの制限を取得
+    const prevFrame =
+      draggingIndex.value > 0 ? keyframes.value[draggingIndex.value - 1].frame : xRange.value[0]
+    const nextFrame =
+      draggingIndex.value < keyframes.value.length - 1
+        ? keyframes.value[draggingIndex.value + 1].frame
+        : xRange.value[1]
+
+    // X軸の値の変化を制限し、前後のフレームを超えないようにする
+    let newFrame = Math.round(
+      ((event.offsetX - offsetX.value - padding.left) / width) *
+        (xRange.value[1] - xRange.value[0]) +
+        xRange.value[0]
     )
-    kf.frame = Math.max(frameMin, Math.min(frameMax, newFrame))
-    kf.value = Math.round(
+
+    // 前のframeを超えず、次のframeを超えないようにする
+    if (newFrame <= prevFrame) {
+      newFrame = prevFrame + 1
+    } else if (newFrame >= nextFrame) {
+      newFrame = nextFrame - 1
+    }
+
+    const deltaX = newFrame - kf.frame
+
+    if (deltaX > maxDeltaX) {
+      kf.frame = Math.min(kf.frame + maxDeltaX, nextFrame)
+    } else if (deltaX < -maxDeltaX) {
+      kf.frame = Math.max(kf.frame - maxDeltaX, prevFrame)
+    } else {
+      kf.frame = Math.max(prevFrame, Math.min(nextFrame, newFrame))
+    }
+
+    // Y軸の値の変化を制限
+    const newValue = Math.round(
       ((height - (event.offsetY - offsetY.value - padding.top)) / height) *
         (yRange.value[1] - yRange.value[0]) +
         yRange.value[0]
     )
+    const deltaY = newValue - kf.value
+    if (Math.abs(deltaY) > maxDeltaY) {
+      kf.value += deltaY > 0 ? maxDeltaY : -maxDeltaY
+    } else {
+      kf.value = newValue
+    }
   }
 }
 
@@ -212,7 +258,8 @@ circle {
   stroke-width: 0.5;
 }
 
-.labels text {
+.labels {
+  user-select: none;
   font-family: Arial, sans-serif;
 }
 </style>
