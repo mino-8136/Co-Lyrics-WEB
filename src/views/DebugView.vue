@@ -4,7 +4,6 @@
       :width="width + padding.left + padding.right"
       :height="height + padding.top + padding.bottom"
       @mousedown="onMouseDown"
-      @contextmenu.prevent="onSvgContextMenu($event)"
     >
       <!-- グリッド線の描画 -->
       <g class="grid" :transform="`translate(${padding.left}, ${padding.top})`">
@@ -125,6 +124,19 @@ const yRange = computed(() => {
 const points = computed(() => {
   const allPoints = []
 
+  // 最初のキーフレームの前に水平線を追加
+  const firstKeyframe = keyframes.value[0]
+  const firstX = 0
+  const firstY =
+    height -
+    ((firstKeyframe.value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
+  const firstFrameX =
+    ((firstKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
+
+  // 最初のキーフレームから前の水平線
+  allPoints.push(`${firstX},${firstY}`, `${firstFrameX},${firstY}`)
+
+  // キーフレーム間の折れ線グラフ
   for (let i = 0; i < keyframes.value.length - 1; i++) {
     const startFrame = keyframes.value[i].frame
     const endFrame = keyframes.value[i + 1].frame
@@ -148,6 +160,17 @@ const points = computed(() => {
       allPoints.push(`${x},${y}`)
     }
   }
+
+  // 最後のキーフレームの後に水平線を追加
+  const lastKeyframe = keyframes.value[keyframes.value.length - 1]
+  const lastFrameX =
+    ((lastKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
+  const lastY =
+    height - ((lastKeyframe.value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
+  const lastX = width
+
+  // 最後のキーフレームから後の水平線
+  allPoints.push(`${lastFrameX},${lastY}`, `${lastX},${lastY}`)
 
   return allPoints.join(' ')
 })
@@ -181,26 +204,9 @@ const horizontalLines = computed(() => {
   return lines
 })
 
-// SVGを右クリックしたときのコンテキストメニュー
-function onSvgContextMenu(event) {
-  event.preventDefault()
-
-  const clickX = event.clientX - padding.left
-  const clickY = event.clientY - padding.top
-
-  ContextMenu.showContextMenu({
-    x: event.clientX,
-    y: event.clientY,
-    items: [
-      {
-        label: 'キーフレームを追加',
-        onClick: () => {
-          addKeyframe(clickX, clickY)
-        }
-      }
-    ]
-  })
-}
+/////////////////////
+// キーフレーム操作 //
+/////////////////////
 
 // キーフレームを右クリックしたときのコンテキストメニュー
 function onKeyframeContextMenu(event, index) {
@@ -220,20 +226,6 @@ function onKeyframeContextMenu(event, index) {
   })
 }
 
-// キーフレームを追加する関数
-function addKeyframe(x, y) {
-  const frame = Math.round((x / width) * (xRange.value[1] - xRange.value[0]) + xRange.value[0])
-  const value = Math.round(yRange.value[1] - (y / height) * (yRange.value[1] - yRange.value[0]))
-
-  keyframes.value.push({
-    frame,
-    value,
-    id: Date.now().toString(),
-    animation: 'linear'
-  })
-  keyframes.value.sort((a, b) => a.frame - b.frame)
-}
-
 // キーフレームを削除する関数
 function removeKeyframe(index) {
   keyframes.value.splice(index, 1)
@@ -251,7 +243,13 @@ const onMouseMove = (event) => {
   if (draggingIndex.value !== null) {
     const kf = keyframes.value[draggingIndex.value]
 
-    // 前後のframeの制限を取得
+    // フレームの変更
+    let newFrame = Math.round(
+      ((event.offsetX - offsetX.value) / width) * (xRange.value[1] - xRange.value[0]) +
+        xRange.value[0]
+    )
+
+    // フレームの制限: xRangeの範囲内かつ前後のキーフレームのフレームを超えないように
     const prevFrame =
       draggingIndex.value > 0 ? keyframes.value[draggingIndex.value - 1].frame : xRange.value[0]
     const nextFrame =
@@ -259,39 +257,18 @@ const onMouseMove = (event) => {
         ? keyframes.value[draggingIndex.value + 1].frame
         : xRange.value[1]
 
-    // X軸の値の変化を制限し、前後のフレームを超えないようにする
-    let newFrame = Math.round(
-      ((event.offsetX - offsetX.value - padding.left) / width) *
-        (xRange.value[1] - xRange.value[0]) +
-        xRange.value[0]
-    )
+    newFrame = Math.max(prevFrame + 1, Math.min(newFrame, nextFrame - 1))
+    kf.frame = newFrame
 
-    // 前のframeを超えず、次のframeを超えないようにする
-    if (newFrame <= prevFrame) {
-      newFrame = prevFrame + 1
-    } else if (newFrame >= nextFrame) {
-      newFrame = nextFrame - 1
-    }
-
-    const deltaX = newFrame - kf.frame
-
-    if (deltaX > maxDeltaX) {
-      kf.frame = Math.min(kf.frame + maxDeltaX, nextFrame)
-    } else if (deltaX < -maxDeltaX) {
-      kf.frame = Math.max(kf.frame - maxDeltaX, prevFrame)
-    } else {
-      kf.frame = Math.max(prevFrame, Math.min(nextFrame, newFrame))
-    }
-
-    // Y軸の値の変化を制限
+    // 値の変更
     const newValue = Math.round(
-      ((height - (event.offsetY - offsetY.value - padding.top)) / height) *
-        (yRange.value[1] - yRange.value[0]) +
-        yRange.value[0]
+      ((offsetY.value - event.offsetY) / height) * (yRange.value[1] - yRange.value[0]) +
+        yRange.value[1]
     )
-    const deltaY = newValue - kf.value
-    if (Math.abs(deltaY) > maxDeltaY) {
-      kf.value += deltaY > 0 ? maxDeltaY : -maxDeltaY
+
+    const deltaValue = newValue - kf.value
+    if (Math.abs(deltaValue) > maxDeltaY) {
+      kf.value += deltaValue > 0 ? maxDeltaY : -maxDeltaY
     } else {
       kf.value = newValue
     }
@@ -308,6 +285,7 @@ const endDrag = () => {
 <style scoped>
 svg {
   border: 1px solid #ccc;
+  user-select: none;
 }
 
 circle {
@@ -320,7 +298,6 @@ circle {
 }
 
 .labels {
-  user-select: none;
   font-family: Arial, sans-serif;
 }
 </style>
