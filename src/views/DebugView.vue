@@ -4,6 +4,7 @@
       :width="width + padding.left + padding.right"
       :height="height + padding.top + padding.bottom"
       @mousedown="onMouseDown"
+      @contextmenu.prevent="onSvgContextMenu($event)"
     >
       <!-- グリッド線の描画 -->
       <g class="grid" :transform="`translate(${padding.left}, ${padding.top})`">
@@ -70,6 +71,7 @@
           r="5"
           fill="red"
           @mousedown.stop="startDrag(index, $event)"
+          @contextmenu.prevent="onKeyframeContextMenu($event, index)"
         />
       </g>
     </svg>
@@ -79,6 +81,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { gsap } from 'gsap'
+import ContextMenu from '@imengyu/vue3-context-menu'
 
 const width = 500
 const height = 300
@@ -177,6 +180,64 @@ const horizontalLines = computed(() => {
   }
   return lines
 })
+
+// SVGを右クリックしたときのコンテキストメニュー
+function onSvgContextMenu(event) {
+  event.preventDefault()
+
+  const clickX = event.clientX - padding.left
+  const clickY = event.clientY - padding.top
+
+  ContextMenu.showContextMenu({
+    x: event.clientX,
+    y: event.clientY,
+    items: [
+      {
+        label: 'キーフレームを追加',
+        onClick: () => {
+          addKeyframe(clickX, clickY)
+        }
+      }
+    ]
+  })
+}
+
+// キーフレームを右クリックしたときのコンテキストメニュー
+function onKeyframeContextMenu(event, index) {
+  event.preventDefault()
+
+  ContextMenu.showContextMenu({
+    x: event.clientX,
+    y: event.clientY,
+    items: [
+      {
+        label: 'キーフレームを削除',
+        onClick: () => {
+          removeKeyframe(index)
+        }
+      }
+    ]
+  })
+}
+
+// キーフレームを追加する関数
+function addKeyframe(x, y) {
+  const frame = Math.round((x / width) * (xRange.value[1] - xRange.value[0]) + xRange.value[0])
+  const value = Math.round(yRange.value[1] - (y / height) * (yRange.value[1] - yRange.value[0]))
+
+  keyframes.value.push({
+    frame,
+    value,
+    id: Date.now().toString(),
+    animation: 'linear'
+  })
+  keyframes.value.sort((a, b) => a.frame - b.frame)
+}
+
+// キーフレームを削除する関数
+function removeKeyframe(index) {
+  keyframes.value.splice(index, 1)
+}
 
 const startDrag = (index, event) => {
   draggingIndex.value = index

@@ -3,6 +3,7 @@
     <div v-if="selectedObject">
       <v-tabs v-model="tab">
         <v-tab value="basic">基本設定</v-tab>
+        <v-tab v-if="selectedObject.type == 'text'" value="text">テキスト</v-tab>
         <v-tab value="stylize">スタイル</v-tab>
         <v-tab value="animation">アニメーション</v-tab>
       </v-tabs>
@@ -107,6 +108,10 @@
           </div>
         </v-tabs-window-item>
 
+        <v-tabs-window-item value="text">
+          <p>機能追加予定</p>
+        </v-tabs-window-item>
+        
         <v-tabs-window-item value="stylize">
           <p>機能追加予定</p>
         </v-tabs-window-item>

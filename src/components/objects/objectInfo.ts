@@ -23,6 +23,7 @@ export interface BaseSettings {
   start: number
   end: number
   layer: number
+  type: string
   //overlay: number
   //camera: number
 }
@@ -47,6 +48,7 @@ export class BaseObject implements BaseSettings {
   start: number
   end: number
   layer: number
+  type: string
   //overlay: number
   //camera: number
 
@@ -55,13 +57,13 @@ export class BaseObject implements BaseSettings {
     this.start = settings.start
     this.end = settings.end
     this.layer = settings.layer
+    this.type = "base"
     //this.overlay = settings.overlay
     //this.camera = settings.camera
   }
 }
 
 export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
-  type: string
   //name: string
   textSize: number
   //display_speed: number
