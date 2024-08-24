@@ -27,12 +27,23 @@ export interface AnimationSetting {
 export type AnimationSettings = AnimationSetting[]
 
 // エフェクト用の相対パラメータ
-export type RelativeParameters = {
+export type Transform = {
   X: number
   Y: number
   scale: number
   opacity: number
   angle: number
+}
+
+// p5.js内で用いるのがメイン
+export class CharacterObject {
+  index: number
+  parent: TextObject
+  char: string
+
+  constructor(index: number, parent: TextObject) {
+    ;(this.index = index), (this.parent = parent), (this.char = parent.text[index])
+  }
 }
 
 //////////////////////////////////////////////////////////////
@@ -137,29 +148,6 @@ export class TextObject extends BaseObject implements TextSettings {
     this.font = 'SourceHanSansJP'
     this.text = 'サンプルテキスト'
     this.char_cache = []
-  }
-}
-
-// p5.js内で用いるのがメイン
-export class CharacterObject {
-  index: number
-  parent: TextObject
-  char: string
-  animX: number
-  animY: number
-  animScale: number
-  animOpacity: number
-  animAngle: number
-
-  constructor(index: number, parent: TextObject) {
-    ;(this.index = index),
-      (this.parent = parent),
-      (this.char = parent.text[index]),
-      (this.animX = 0),
-      (this.animY = 0),
-      (this.animScale = 100),
-      (this.animOpacity = 100),
-      (this.animAngle = 0)
   }
 }
 
