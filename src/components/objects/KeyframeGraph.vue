@@ -293,7 +293,11 @@ const onMouseMove = (event: MouseEvent) => {
     )
 
     const deltaValue = newValue - kf.value
-    if (Math.abs(deltaValue) > maxDeltaY) {
+    // 範囲外かつ速度制限を超えた場合に制限する
+    if (
+      (newValue < yRange.value[0] || yRange.value[1] < newValue) &&
+      Math.abs(deltaValue) > maxDeltaY
+    ) {
       kf.value += deltaValue > 0 ? maxDeltaY : -maxDeltaY
     } else {
       kf.value = newValue
