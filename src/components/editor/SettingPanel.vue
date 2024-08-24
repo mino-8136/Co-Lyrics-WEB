@@ -171,7 +171,7 @@ import {
 } from '@/components/parameters/objectInfo'
 import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
-import KeyframeGraph from '@/components/objects/KeyframeGraph.vue'
+import KeyframeGraph from '@/components/editor/KeyframeGraph.vue'
 // import ColorPanel from '@/components/objects/ColorPanel.vue'
 import { fontListData } from '@/assets/fonts/fonts'
 
