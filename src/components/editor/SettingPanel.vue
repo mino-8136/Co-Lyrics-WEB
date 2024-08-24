@@ -17,14 +17,26 @@
               class="parameter-row"
             >
               <!-- パラメータ名の表示 -->
-              <v-chip class="parameter-name" variant="outlined" size="small" label
+              <v-chip
+                class="parameter-name"
+                variant="outlined"
+                size="small"
+                label
+                @click="toggleKeyframeGraph(label)"
                 >{{ ParameterInfo.getName(label) }}
               </v-chip>
 
               <!-- 数値型の場合 -->
               <template v-if="ParameterInfo.getType(label) == ParameterInfo.UIType.slider">
                 <v-row v-if="isKeyframeSettings(param)">
-                  <transition-group name="list" tag="div" style="width: 100%">
+                  <!-- キーフレームビューを表示するか -->
+                  <KeyframeGraph
+                    v-if="showKeyframes.includes(label)"
+                    :object="selectedObject"
+                    v-model:keyframes="selectedObject[label]"
+                  />
+
+                  <transition-group v-else name="list" tag="div" style="width: 100%">
                     <v-col v-for="(keyframe, idx) in param" :key="keyframe.id" cols="12">
                       <v-slider
                         v-model="keyframe.value"
@@ -111,7 +123,7 @@
         <v-tabs-window-item value="text">
           <p>機能追加予定</p>
         </v-tabs-window-item>
-        
+
         <v-tabs-window-item value="stylize">
           <p>機能追加予定</p>
         </v-tabs-window-item>
@@ -156,6 +168,7 @@ import {
 } from '@/components/objects/objectInfo'
 import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
+import KeyframeGraph from '@/components/objects/KeyframeGraph.vue'
 // import ColorPanel from '@/components/objects/ColorPanel.vue'
 import { fontListData } from '@/assets/fonts/fonts'
 
@@ -215,6 +228,16 @@ function openEasingDialog(keyframe: KeyframeSetting, label: string) {
 
 function addEasing(easing: string) {
   currentParam.value.keyframe.animation = easing
+}
+
+// キーフレームグラフの表示切り替え
+const showKeyframes = ref<string[]>([])
+function toggleKeyframeGraph(label: string) {
+  if (showKeyframes.value.includes(label)) {
+    showKeyframes.value = showKeyframes.value.filter((keyframe) => keyframe !== label)
+  } else {
+    showKeyframes.value.push(label)
+  }
 }
 
 //////////////////////////////////
