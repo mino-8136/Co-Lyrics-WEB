@@ -31,7 +31,7 @@ export const useTimelineStore = defineStore('timeline', {
     height: 720,
     framerate: 30,
     title: 'New Project',
-    audioPath: '/src/assets/music/LetterPosts.wav',
+    audioPath: '/src/assets/music/LetterPost.wav',
     ////////
     currentFrame: 0,
     canvasScale: 1,

@@ -124,7 +124,8 @@ function addObject(layerIndex: number, type: string, offsetX: number = 0) {
     id: objectStore.counter,
     start: Math.max(offset, 0),
     end: offset + 100, // TODO: ここに最大値を設定できるようにする
-    layer: layerIndex
+    layer: layerIndex,
+    type: type
   }
 
   if (type === 'text') {
