@@ -34,7 +34,7 @@
                     v-if="showKeyframes.includes(label)"
                     :start="selectedObject.start"
                     :end="selectedObject.end"
-                    :panelWidth="400"
+                    :panelWidth="getBoundingClientRect() * 0.75"
                     v-model:keyframes="selectedObject[label]"
                   />
 
@@ -183,6 +183,17 @@ const selectedObject: Record<string, any> = computed(() => {
 function generateUniqueId() {
   return Date.now().toString(36) + Math.random().toString(36)
 }
+
+// ウィンドウの幅を求める関数
+function getBoundingClientRect() {
+  const parent = document.querySelector('.setting-panel')
+  if (!parent) return 300
+  return parent.getBoundingClientRect().width
+}
+
+////////////////////////////
+// キーフレームに関する設定 //
+////////////////////////////
 
 // ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数
 function addKeyframe(keyframes: KeyframeSettings, idx: number) {
