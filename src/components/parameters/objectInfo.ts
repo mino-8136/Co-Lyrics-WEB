@@ -26,6 +26,17 @@ export interface AnimationSetting {
 
 export type AnimationSettings = AnimationSetting[]
 
+// エフェクト用の相対パラメータ
+export type RelativeParameters = {
+  X: number
+  Y: number
+  scale: number
+  opacity: number
+  angle: number
+}
+
+//////////////////////////////////////////////////////////////
+
 export interface BaseSettings {
   id: number
   start: number

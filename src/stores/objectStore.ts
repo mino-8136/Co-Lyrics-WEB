@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { BaseObject, TextObject, ImageObject } from '@/components/objects/objectInfo'
+import { BaseObject, TextObject, ImageObject } from '@/components/parameters/objectInfo'
 
 export const useObjectStore = defineStore('objects', {
   state: () => ({

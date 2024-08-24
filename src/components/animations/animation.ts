@@ -1,4 +1,23 @@
+import type { RelativeParameters } from '../parameters/objectInfo'
 type FadeAnimationFunction = (startFrame: number, endFrame: number, currentFrame: number) => number
+
+function starndardFunction(
+  obj: any,
+  objIndex: number,
+  tracks: any,
+  dialogSettings: any
+): RelativeParameters {
+  const effectParameter: RelativeParameters = {
+    X: 0,
+    Y: 0,
+    scale: 0,
+    opacity: 0,
+    angle: 0
+  }
+  effectParameter.X += 40
+
+  return effectParameter
+}
 
 const calculateAnimationProgress: FadeAnimationFunction = (startFrame, endFrame, currentFrame) => {
   if (currentFrame <= startFrame) {

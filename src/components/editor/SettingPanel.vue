@@ -161,14 +161,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
-import * as ParameterInfo from '@/components/objects/parameterInfo'
+import * as ParameterInfo from '@/components/parameters/parameterInfo'
 import {
   type KeyframeSettings,
   type KeyframeSetting,
   isKeyframeSettings,
   type AnimationSetting,
   type AnimationSettings
-} from '@/components/objects/objectInfo'
+} from '@/components/parameters/objectInfo'
 import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
 import KeyframeGraph from '@/components/objects/KeyframeGraph.vue'

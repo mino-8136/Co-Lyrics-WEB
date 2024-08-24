@@ -1,7 +1,7 @@
 import { gsap } from 'gsap'
 import type p5 from 'p5'
-import type { TextObject, KeyframeSetting, KeyframeSettings } from '@/components/objects/objectInfo'
-import { CharacterObject } from '@/components/objects/objectInfo'
+import type { TextObject, KeyframeSetting, KeyframeSettings } from '@/components/parameters/objectInfo'
+import { CharacterObject } from '@/components/parameters/objectInfo'
 
 let renderObjects: TextObject[] = []
 let currentFrame = 0
@@ -72,7 +72,7 @@ export function defineSketch(project: any) {
       return char_cache
     }
 
-    const applyEffect = (object: TextObject) => {
+    const applyEffects = (object: TextObject) => {
       // エフェクトの効果量を計算する
       const totalEffect = {
         X: 0,
@@ -230,6 +230,7 @@ export function defineSketch(project: any) {
     ////////////////////////////
     // 外部に公開するための関数 //
     ////////////////////////////
+
     p.addRenderObjects = (currentObjects: TextObject[]) => {
       //console.log(objects)
       renderObjects = currentObjects

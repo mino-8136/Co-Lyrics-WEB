@@ -84,7 +84,7 @@ import { ref, computed } from 'vue'
 import { gsap } from 'gsap'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
-import { type KeyframeSettings, type KeyframeSetting } from '@/components/objects/objectInfo'
+import { type KeyframeSettings, type KeyframeSetting } from '@/components/parameters/objectInfo'
 
 const displayEasingPanel = ref(false)
 const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })

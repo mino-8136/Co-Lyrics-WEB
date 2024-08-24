@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { type AnimationSettings, type AnimationSetting, TextObject } from '../objects/objectInfo'
+import { type AnimationSettings, type AnimationSetting, TextObject } from '../parameters/objectInfo'
 
 const showPanel = defineModel<boolean>('show', { required: true })
 const animations = defineModel<AnimationSettings>('animations', { required: true })
@@ -30,11 +30,40 @@ function handleButtonClick(effect: string, parameter: Array<number>) {
 
 // 仮のアニメーションリスト
 const effects = ref([
-  { id: 0, name: 'none' },
-  { id: 1, name: 'ランダム配置' },
-  { id: 2, name: 'フェード' },
-  { id: 3, name: '' }
+  { id: 0, name: 'none', parameter: [0, 0, 0, 0, 0] },
+  { id: 1, name: 'ランダム配置', parameter: [0, 0, 0, 0, 0] },
+  { id: 2, name: 'フェード', parameter: [0, 0, 0, 0, 0] }
 ])
+
+function mojiokuriDefaultParameter() {
+  return [0, 0, 0, 0, 0]
+}
+
+import { useTimelineStore } from '@/stores/objectStore'
+import { BaseObject } from '@/components/objects/objectInfo'
+const timelineStore = useTimelineStore()
+const object = ref() as TextObject
+
+function mojiokuri() {
+  let time = 30 // default 30
+  let span = 10 // default 10
+  let delay = 5 // default 0
+
+  let progress = (timelineStore.currentFrame - object.start - object.id * span - delay) / time
+  progress = Math.min(progress, 1)
+
+  if (progress < 0) {
+    // 表示しない
+  } else {
+    // X座標をprogerss * 100だけ移動する
+  }
+}
+
+function randomPositionDefaultParameter() {
+  return [0, 0, 0, 0, 0]
+}
+
+function randomPosition() {}
 
 // ここではアニメーションのパラメータのみを定義し、
 // 実際のアニメーションはp5.jsのdraw関数内で行う。
