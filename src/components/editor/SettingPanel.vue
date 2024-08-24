@@ -55,7 +55,7 @@
                             :style="{
                               backgroundColor: keyframe.animation != undefined ? '#09b7f6' : '#ccc'
                             }"
-                            @click="openEasingDialog(keyframe, label)"
+                            @click="openEasingDialog(keyframe)"
                           ></div>
 
                           <!-- キーフレームのフレーム数と値 -->
@@ -143,13 +143,7 @@
     </div>
 
     <!-- イージング設定の呼び出し -->
-    <v-dialog v-model="easingPanel">
-      <EasingPanel
-        :getParam="currentParam"
-        @callAddEasing="addEasing"
-        v-model:panel="easingPanel"
-      />
-    </v-dialog>
+    <EasingPanel v-model:show="showEasingPanel" v-model:easing="currentKeyframe" />
 
     <!-- アニメーション設定の呼び出し -->
     <v-dialog v-model="animationPanel">
@@ -191,7 +185,7 @@ function generateUniqueId() {
 
 // ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数
 function addKeyframe(keyframes: KeyframeSettings, idx: number) {
-  console.log(keyframes, idx)
+  // console.log(keyframes, idx)
   const newKeyframe =
     keyframes.length - 1 !== idx
       ? Math.floor((keyframes[idx].frame + keyframes[idx + 1].frame) / 2)
@@ -216,19 +210,12 @@ function sortKeyframe(keyframes: KeyframeSettings) {
 //////////////////////////////
 // イージング設定に関する記述 //
 //////////////////////////////
-const easingPanel = ref(false)
-const currentParam = ref({
-  label: '',
-  keyframe: {} as KeyframeSetting
-})
-function openEasingDialog(keyframe: KeyframeSetting, label: string) {
-  currentParam.value.keyframe = keyframe
-  currentParam.value.label = label
-  easingPanel.value = true
-}
+const showEasingPanel = ref(false)
+const currentKeyframe = ref<KeyframeSetting>({} as KeyframeSetting)
 
-function addEasing(easing: string) {
-  currentParam.value.keyframe.animation = easing
+function openEasingDialog(keyframe: KeyframeSetting) {
+  currentKeyframe.value = keyframe
+  showEasingPanel.value = true
 }
 
 // キーフレームグラフの表示切り替え

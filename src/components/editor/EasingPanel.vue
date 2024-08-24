@@ -1,31 +1,46 @@
 <template>
-  <v-card class="EasingPanel">
-    <v-card-title>{{ props.getParam?.label }}の移動タイプを選択</v-card-title>
-    <v-row>
-      <v-col v-for="effect in effects" :key="effect.id" class="d-flex" cols="2">
-        <v-container>
-          <canvas
-            :id="'canvas-' + effect.id"
-            class="bg-grey-lighten-2"
-            style="width: 100%; height: auto"
-          ></canvas>
-          <v-btn @click="handleButtonClick(effect.name, effect.id)">
-            {{ effect.name }}
-          </v-btn>
-        </v-container>
-      </v-col>
-    </v-row>
-  </v-card>
+  <v-dialog class="EasingPanel" v-model="showPanel">
+    <v-card>
+      <v-card-text>
+        <v-row>
+          <v-col
+            v-for="effect in effects"
+            :key="effect.id"
+            class="d-flex"
+            cols="12"
+            sm="4"
+            md="3"
+            lg="2"
+            xl="2"
+          >
+            <v-container class="items">
+              <svg
+                :id="'svg-' + effect.id"
+                class="bg-grey-lighten-2"
+                :width="width + 'px'"
+                :height="height + 'px'"
+              >
+                <rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#ccc" />
+                <path :d="drawPath(effect.name)" fill="none" stroke="#ff0000" stroke-width="2" />
+              </svg>
+              <v-btn block @click="handleButtonClick(effect.name, effect.id)">
+                {{ effect.name }}
+              </v-btn>
+            </v-container>
+          </v-col>
+        </v-row>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref } from 'vue'
+import { type KeyframeSetting } from '@/components/objects/objectInfo'
 import gsap from 'gsap'
 
-const props = defineProps({
-  getParam: Object
-})
-const emits = defineEmits(['callAddEasing', 'update:panel']) // emits に 'update:panel' を追加
+const showPanel = defineModel<boolean>('show', { required: true })
+const easing = defineModel<KeyframeSetting>('easing', { required: true })
 
 const effects = ref([
   { id: 1, name: 'none' },
@@ -61,70 +76,44 @@ const effects = ref([
   { id: 31, name: 'sine.inOut' }
 ])
 
+const width = 100
+const height = 120
+
 const handleButtonClick = (name: string, id: number) => {
-  emits('callAddEasing', name)
-  emits('update:panel', false) // ダイアログを閉じるために panel を false に更新
-  nextTick(() => drawGraph(name, id)) // グラフを描画
+  easing.value.animation = name
+  showPanel.value = false
 }
 
-const drawGraph = (easing: string, id: number) => {
-  const canvas = document.getElementById('canvas-' + id) as HTMLCanvasElement
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-
-  // キャンバスのサイズを動的に設定
-  canvas.width = canvas.clientWidth
-  canvas.height = canvas.clientWidth * 1.2
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  ctx.beginPath()
-
-  const yOffset = canvas.height * 0.1
-  const graphHeight = canvas.height * 0.8
-
-  // 開始位置の横線
-  ctx.moveTo(0, yOffset + graphHeight)
-  ctx.lineTo(canvas.width, yOffset + graphHeight)
-
-  // 終了位置の横線
-  ctx.moveTo(0, yOffset)
-  ctx.lineTo(canvas.width, yOffset)
-
-  ctx.strokeStyle = 'ccc'
-  ctx.lineWidth = 0.4
-  ctx.stroke()
-
-  ctx.beginPath()
-  ctx.moveTo(0, yOffset + graphHeight)
-
+const drawPath = (easingName: string) => {
   const points = 100
+  let path = `M 0 ${height - height * 0.1}`
   for (let i = 0; i <= points; i++) {
     const progress = i / points
-    const value = gsap.parseEase(easing)(progress)
-    const x = (i / points) * canvas.width
-    const y = yOffset + (1 - value) * graphHeight
-    ctx.lineTo(x, y)
+    const value = gsap.parseEase(easingName)(progress)
+    const x = (i / points) * width
+    const y = height * 0.1 + (1 - value) * (height - height * 0.2)
+    path += ` L ${x.toFixed(2)} ${y.toFixed(2)}`
   }
-
-  ctx.strokeStyle = '#ff0000'
-  ctx.lineWidth = 2
-  ctx.stroke()
+  return path
 }
-
-onMounted(() => {
-  effects.value.forEach((effect) => {
-    nextTick(() => drawGraph(effect.name, effect.id))
-  })
-})
 </script>
 
 <style scoped>
 .EasingPanel {
   margin: auto;
   width: 60%;
-  min-width: 300px;
-  height: 50%;
-  border: 1px solid #ccc;
+  min-width: 400px;
+  height: 60%;
   overflow-y: auto;
+}
+
+v-card {
+  width: 100%;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>

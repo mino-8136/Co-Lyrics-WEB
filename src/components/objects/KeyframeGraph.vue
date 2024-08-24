@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container>
     <svg
       :width="width + padding.left + padding.right"
       :height="height + padding.top + padding.bottom"
@@ -74,7 +74,8 @@
         />
       </g>
     </svg>
-  </div>
+  </v-container>
+  <EasingPanel v-model:show="displayEasingPanel" v-model:easing="selectedKeyframe" />
 </template>
 
 <script setup lang="ts">
@@ -82,18 +83,19 @@ import { ref, computed } from 'vue'
 import { gsap } from 'gsap'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
-import { type KeyframeSettings } from '@/components/objects/objectInfo'
+import { type KeyframeSettings, type KeyframeSetting } from '@/components/objects/objectInfo'
+
+const displayEasingPanel = ref(false)
+const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })
+const selectedKeyframe = ref<KeyframeSetting>({} as KeyframeSetting)
 
 const props = defineProps<{
   start: number
   end: number
 }>()
 
-const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })
-
 const width = 500
 const height = 300
-
 const padding = { top: 20, right: 40, bottom: 40, left: 40 }
 
 const draggingIndex = ref(-1)
@@ -219,6 +221,12 @@ function onKeyframeContextMenu(event: MouseEvent, index: number) {
     y: event.clientY,
     items: [
       {
+        label: 'イージングを変更',
+        onClick: () => {
+          showEasingPanel(index)
+        }
+      },
+      {
         label: 'キーフレームを削除',
         onClick: () => {
           removeKeyframe(index)
@@ -226,6 +234,12 @@ function onKeyframeContextMenu(event: MouseEvent, index: number) {
       }
     ]
   })
+}
+
+// イージングパネルを表示する関数
+function showEasingPanel(index: number) {
+  selectedKeyframe.value = keyframes.value[index]
+  displayEasingPanel.value = true
 }
 
 // キーフレームを削除する関数
