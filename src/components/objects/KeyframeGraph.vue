@@ -65,8 +65,8 @@
         <circle
           v-for="(kf, index) in keyframes"
           :key="kf.id"
-          :cx="kf.frame"
-          :cy="kf.value"
+          :cx="kf.x"
+          :cy="kf.y"
           r="5"
           fill="red"
           @mousedown.stop="startDrag(index, $event)"
@@ -85,37 +85,42 @@ import EasingPanel from '@/components/editor/EasingPanel.vue'
 import { type KeyframeSettings } from '@/components/objects/objectInfo'
 import { BaseObject } from '@/components/objects/objectInfo'
 
-const keyframes = defineModel('keyframes') as unknown as KeyframeSettings
-const props = defineProps({
-  object: BaseObject
-})
 
 const width = 500
 const height = 300
+
 const padding = { top: 20, right: 40, bottom: 40, left: 40 }
+
+const keyframes = ref([
+  { frame: 0, value: 0, id: '0', animation: 'power1.out' },
+  { frame: 40, value: 257, id: 'm0720msp0.r0rs36iks', animation: 'power1.inOut' },
+  { frame: 80, value: 79, id: 'm0720ngq0.q36boa566rl', animation: 'back.inOut' },
+  { frame: 100, value: -210, id: 'm0720nz00.62q3zc0rt6t', animation: 'power4.out' },
+  { frame: 120, value: 116, id: 'm0720oq70.9p18czdndna' }
+])
 
 const draggingIndex = ref(null)
 const offsetX = ref(0)
 const offsetY = ref(0)
 
-const startFrame = props.object?.start // グラフの最初のフレーム
-const endFrame = props.object?.end // グラフの最終フレーム
+const startFrame = 0 // グラフの最初のフレーム
+const endFrame = 200 // グラフの最終フレーム
 
 const maxDeltaX = 2 // X軸の値が1回のドラッグで変化できる最大量
 const maxDeltaY = 5 // Y軸の値が1回のドラッグで変化できる最大量
 
 // xRange: frameの最小値と最大値を動的に設定
 const xRange = computed(() => {
-  const minFrame = Math.min(...keyframes.map((k) => k.frame))
-  const maxFrame = Math.max(...keyframes.map((k) => k.frame))
+  const minFrame = Math.min(...keyframes.value.map((k) => k.frame))
+  const maxFrame = Math.max(...keyframes.value.map((k) => k.frame))
   return [Math.min(startFrame, minFrame), Math.max(endFrame, maxFrame)]
 })
 
 // yRange: valueの範囲を動的に設定
 const yRange = computed(() => {
   const maxAbsValue = Math.max(
-    Math.abs(Math.min(...keyframes.map((k) => k.value))),
-    Math.abs(Math.max(...keyframes.map((k) => k.value)))
+    Math.abs(Math.min(...keyframes.value.map((k) => k.value))),
+    Math.abs(Math.max(...keyframes.value.map((k) => k.value)))
   )
   return [-maxAbsValue, maxAbsValue]
 })
@@ -124,7 +129,7 @@ const points = computed(() => {
   const allPoints = []
 
   // 最初のキーフレームの前に水平線を追加
-  const firstKeyframe = keyframes[0]
+  const firstKeyframe = keyframes.value[0]
   const firstX = 0
   const firstY =
     height -
@@ -136,12 +141,12 @@ const points = computed(() => {
   allPoints.push(`${firstX},${firstY}`, `${firstFrameX},${firstY}`)
 
   // キーフレーム間の折れ線グラフ
-  for (let i = 0; i < keyframes.length - 1; i++) {
-    const startFrame = keyframes[i].frame
-    const endFrame = keyframes[i + 1].frame
-    const startValue = keyframes[i].value
-    const endValue = keyframes[i + 1].value
-    const easingFunc = gsap.parseEase(keyframes[i].animation || 'none')
+  for (let i = 0; i < keyframes.value.length - 1; i++) {
+    const startFrame = keyframes.value[i].frame
+    const endFrame = keyframes.value[i + 1].frame
+    const startValue = keyframes.value[i].value
+    const endValue = keyframes.value[i + 1].value
+    const easingFunc = gsap.parseEase(keyframes.value[i].animation || 'none')
 
     const numPoints = endFrame - startFrame
 
@@ -161,7 +166,7 @@ const points = computed(() => {
   }
 
   // 最後のキーフレームの後に水平線を追加
-  const lastKeyframe = keyframes[keyframes.length - 1]
+  const lastKeyframe = keyframes.value[keyframes.value.length - 1]
   const lastFrameX =
     ((lastKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
   const lastY =
@@ -172,6 +177,15 @@ const points = computed(() => {
   allPoints.push(`${lastFrameX},${lastY}`, `${lastX},${lastY}`)
 
   return allPoints.join(' ')
+})
+
+keyframes.value.forEach((kf) => {
+  kf.x = computed(
+    () => ((kf.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
+  )
+  kf.y = computed(
+    () => height - ((kf.value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
+  )
 })
 
 // グリッド線を描画するための座標を計算
@@ -218,20 +232,20 @@ function onKeyframeContextMenu(event, index) {
 
 // キーフレームを削除する関数
 function removeKeyframe(index) {
-  keyframes.splice(index, 1)
+  keyframes.value.splice(index, 1)
 }
 
 const startDrag = (index, event) => {
   draggingIndex.value = index
-  offsetX.value = event.offsetX - keyframes[index].frame
-  offsetY.value = event.offsetY - keyframes[index].value
+  offsetX.value = event.offsetX - keyframes.value[index].x
+  offsetY.value = event.offsetY - keyframes.value[index].y
   document.addEventListener('mousemove', onMouseMove)
   document.addEventListener('mouseup', endDrag)
 }
 
 const onMouseMove = (event) => {
   if (draggingIndex.value !== null) {
-    const kf = keyframes[draggingIndex.value]
+    const kf = keyframes.value[draggingIndex.value]
 
     // フレームの変更
     let newFrame = Math.round(
@@ -241,10 +255,10 @@ const onMouseMove = (event) => {
 
     // フレームの制限: xRangeの範囲内かつ前後のキーフレームのフレームを超えないように
     const prevFrame =
-      draggingIndex.value > 0 ? keyframes[draggingIndex.value - 1].frame : xRange.value[0]
+      draggingIndex.value > 0 ? keyframes.value[draggingIndex.value - 1].frame : xRange.value[0]
     const nextFrame =
-      draggingIndex.value < keyframes.length - 1
-        ? keyframes[draggingIndex.value + 1].frame
+      draggingIndex.value < keyframes.value.length - 1
+        ? keyframes.value[draggingIndex.value + 1].frame
         : xRange.value[1]
 
     newFrame = Math.max(prevFrame + 1, Math.min(newFrame, nextFrame - 1))
