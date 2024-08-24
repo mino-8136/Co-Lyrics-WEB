@@ -29,9 +29,6 @@ export const parameterInfo: {
   color: { name: '色', type: UIType.color, min: 0, max: 0xffffff },
   font: { name: 'フォント', type: UIType.select },
   text: { name: 'テキスト', type: UIType.text },
-  ////////////////////////////////////////////////
-  anim_name: { name: 'アニメーション', type: UIType.none },
-  anim_parameters: { name: 'アニメーションパラメータ', type: UIType.none }
 }
 
 // パラメータを取得する関数

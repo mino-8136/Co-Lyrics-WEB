@@ -6,7 +6,7 @@
         <v-col v-for="effect in effects" :key="effect.id" class="d-flex" cols="4">
           <v-container>
             <v-img :width="200" aspect-ratio="1" class="bg-grey-lighten-2" cover> </v-img>
-            <v-btn @click="handleButtonClick(effect.name, effect.id)">
+            <v-btn @click="handleButtonClick(effect.name, effect.parameter)">
               {{ effect.name }}
             </v-btn>
           </v-container>
@@ -18,12 +18,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { type AnimationSettings, type AnimationSetting, TextObject } from '../objects/objectInfo'
 
 const showPanel = defineModel<boolean>('show', { required: true })
-const animation = defineModel('animation', { required: true })
+const animations = defineModel<AnimationSettings>('animations', { required: true })
 
-function handleButtonClick(effect: string, id: number) {
-  animation.value = effect
+function handleButtonClick(effect: string, parameter: Array<number>) {
+  animations.value.push({ anim_name: effect, anim_parameters: parameter })
   showPanel.value = false
 }
 

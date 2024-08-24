@@ -200,7 +200,7 @@ export function defineSketch(project: any) {
         (param[nextSection].frame - param[currentSection].frame)
       return (
         initialValue +
-        deltaValue * getAnimationStateAtTime(progress, param[currentSection].animation)
+        deltaValue * getAnimationStateAtTime(progress, param[currentSection].easeType)
       )
     }
 

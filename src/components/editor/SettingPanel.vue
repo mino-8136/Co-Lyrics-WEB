@@ -54,7 +54,7 @@
                           <div
                             class="ease-setting"
                             :style="{
-                              backgroundColor: keyframe.animation != undefined ? '#09b7f6' : '#ccc'
+                              backgroundColor: keyframe.easeType != undefined ? '#09b7f6' : '#ccc'
                             }"
                             @click="openEasingDialog(keyframe)"
                           ></div>
@@ -131,10 +131,13 @@
         </v-tabs-window-item>
 
         <v-tabs-window-item value="animation">
-          <p>{{ selectedObject.anim_name }}</p>
-          <p v-for="(parameter, index) in selectedObject.anim_parameters" :key="index">
-            {{ selectedObject.anim_parameters }}
-          </p>
+          <!-- <p>{{ selectedObject.animations.length > 0 ? selectedObject.animations : '未追加' }}</p> -->
+
+          <div v-for="(parameters, index) in selectedObject.animations" :key="index">
+            <p>{{ parameters.anim_name }}</p>
+            <p>{{ parameters.anim_parameters }}</p>
+            <div v-for="(parameter, indexChild) in parameters.parameter" :key="indexChild"></div>
+          </div>
           <v-btn @click="openAnimationDialog()">
             <v-icon>mdi-plus</v-icon>
             アニメーション追加
@@ -148,9 +151,9 @@
 
     <!-- アニメーション設定の呼び出し -->
     <AnimationPanel
-      v-if="selectedObject && 'anim_name' in selectedObject"
+      v-if="selectedObject && 'animations' in selectedObject"
       v-model:show="animationPanel"
-      v-model:animation="selectedObject.anim_name"
+      v-model:animations="selectedObject.animations"
     />
   </v-container>
 </template>
@@ -162,7 +165,9 @@ import * as ParameterInfo from '@/components/objects/parameterInfo'
 import {
   type KeyframeSettings,
   type KeyframeSetting,
-  isKeyframeSettings
+  isKeyframeSettings,
+  type AnimationSetting,
+  type AnimationSettings
 } from '@/components/objects/objectInfo'
 import AnimationPanel from '@/components/editor/AnimationPanel.vue'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
@@ -252,7 +257,7 @@ function openAnimationDialog() {
 
 // 指定したプロパティの移動タイプを追加
 function addAnimation(element: KeyframeSetting, index: number, animation: string) {
-  element.animation = animation
+  element.easeType = animation
 }
 </script>
 

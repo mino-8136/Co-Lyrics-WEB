@@ -80,7 +80,7 @@ const width = 100
 const height = 120
 
 const handleButtonClick = (name: string, id: number) => {
-  easing.value.animation = name
+  easing.value.easeType = name
   showPanel.value = false
 }
 
