@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <svg
-      :width="width + padding.left + padding.right"
+      :width="props.panelWidth + padding.left + padding.right"
       :height="height + padding.top + padding.bottom"
       @mousedown="onMouseDown"
     >
@@ -22,7 +22,7 @@
           :key="'h-' + index"
           :x1="0"
           :y1="y"
-          :x2="width"
+          :x2="props.panelWidth"
           :y2="y"
           stroke="#ccc"
           stroke-width="0.5"
@@ -41,7 +41,7 @@
           font-size="10"
           fill="#333"
         >
-          {{ Math.round(xRange[0] + (x / width) * (xRange[1] - xRange[0])) }}
+          {{ Math.round(xRange[0] + (x / props.panelWidth) * (xRange[1] - xRange[0])) }}
         </text>
 
         <!-- 縦軸の数値 -->
@@ -92,10 +92,10 @@ const selectedKeyframe = ref<KeyframeSetting>({} as KeyframeSetting)
 const props = defineProps<{
   start: number
   end: number
+  panelWidth: number
 }>()
 
-const width = 500
-const height = 300
+const height = 150
 const padding = { top: 20, right: 40, bottom: 40, left: 40 }
 
 const draggingIndex = ref(-1)
@@ -134,7 +134,7 @@ const points = computed(() => {
     height -
     ((firstKeyframe.value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
   const firstFrameX =
-    ((firstKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
+    ((firstKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
 
   // 最初のキーフレームから前の水平線
   allPoints.push(`${firstX},${firstY}`, `${firstFrameX},${firstY}`)
@@ -153,7 +153,8 @@ const points = computed(() => {
       const t = j / numPoints
       const easedT = easingFunc(t)
 
-      const x = ((startFrame + j - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
+      const x =
+        ((startFrame + j - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
       const y =
         height -
         ((startValue + easedT * (endValue - startValue) - yRange.value[0]) /
@@ -167,10 +168,10 @@ const points = computed(() => {
   // 最後のキーフレームの後に水平線を追加
   const lastKeyframe = keyframes.value[keyframes.value.length - 1]
   const lastFrameX =
-    ((lastKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
+    ((lastKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
   const lastY =
     height - ((lastKeyframe.value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
-  const lastX = width
+  const lastX = props.panelWidth
 
   // 最後のキーフレームから後の水平線
   allPoints.push(`${lastFrameX},${lastY}`, `${lastX},${lastY}`)
@@ -180,7 +181,7 @@ const points = computed(() => {
 
 // フレームと値から x 座標を計算する関数
 const computeX = (frame: number) => {
-  return ((frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
+  return ((frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
 }
 
 // フレームと値から y 座標を計算する関数
@@ -191,7 +192,7 @@ const computeY = (value: number) => {
 // グリッド線を描画するための座標を計算
 const verticalLines = computed(() => {
   const lines = []
-  const step = width / 10
+  const step = props.panelWidth / 10
   for (let i = 0; i <= 10; i++) {
     lines.push(i * step)
   }
@@ -200,7 +201,7 @@ const verticalLines = computed(() => {
 
 const horizontalLines = computed(() => {
   const lines = []
-  const numLines = 10 // 横線の本数
+  const numLines = 4 // 横線の本数
   const step = height / numLines
   for (let i = 0; i <= numLines; i++) {
     lines.push(i * step)
@@ -266,7 +267,7 @@ const onMouseMove = (event: MouseEvent) => {
 
     // フレームの変更
     let newFrame = Math.round(
-      ((event.offsetX - offsetX.value) / width) * (xRange.value[1] - xRange.value[0]) +
+      ((event.offsetX - offsetX.value) / props.panelWidth) * (xRange.value[1] - xRange.value[0]) +
         xRange.value[0]
     )
 

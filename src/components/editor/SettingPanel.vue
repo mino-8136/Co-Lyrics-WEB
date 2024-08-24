@@ -34,6 +34,7 @@
                     v-if="showKeyframes.includes(label)"
                     :start="selectedObject.start"
                     :end="selectedObject.end"
+                    :panelWidth="400"
                     v-model:keyframes="selectedObject[label]"
                   />
 
