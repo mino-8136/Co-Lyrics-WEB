@@ -83,37 +83,35 @@ import { gsap } from 'gsap'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
 import { type KeyframeSettings } from '@/components/objects/objectInfo'
-import { BaseObject } from '@/components/objects/objectInfo'
 
+const props = defineProps<{
+  start: number
+  end: number
+}>()
+
+const keyframes = defineModel<KeyframeSettings>('keyframes')
 
 const width = 500
 const height = 300
 
 const padding = { top: 20, right: 40, bottom: 40, left: 40 }
 
-const keyframes = ref([
-  { frame: 0, value: 0, id: '0', animation: 'power1.out' },
-  { frame: 40, value: 257, id: 'm0720msp0.r0rs36iks', animation: 'power1.inOut' },
-  { frame: 80, value: 79, id: 'm0720ngq0.q36boa566rl', animation: 'back.inOut' },
-  { frame: 100, value: -210, id: 'm0720nz00.62q3zc0rt6t', animation: 'power4.out' },
-  { frame: 120, value: 116, id: 'm0720oq70.9p18czdndna' }
-])
-
 const draggingIndex = ref(null)
 const offsetX = ref(0)
 const offsetY = ref(0)
 
-const startFrame = 0 // グラフの最初のフレーム
-const endFrame = 200 // グラフの最終フレーム
+const startFrame = computed(() => props.start || 0)
+const endFrame = computed(() => props.end || 200)
 
 const maxDeltaX = 2 // X軸の値が1回のドラッグで変化できる最大量
 const maxDeltaY = 5 // Y軸の値が1回のドラッグで変化できる最大量
 
 // xRange: frameの最小値と最大値を動的に設定
 const xRange = computed(() => {
+  console.log(keyframes.value)
   const minFrame = Math.min(...keyframes.value.map((k) => k.frame))
   const maxFrame = Math.max(...keyframes.value.map((k) => k.frame))
-  return [Math.min(startFrame, minFrame), Math.max(endFrame, maxFrame)]
+  return [Math.min(startFrame.value, minFrame), Math.max(endFrame.value, maxFrame)]
 })
 
 // yRange: valueの範囲を動的に設定

@@ -32,7 +32,8 @@
                   <!-- キーフレームビューを表示するか -->
                   <KeyframeGraph
                     v-if="showKeyframes.includes(label)"
-                    :object="selectedObject"
+                    :start="selectedObject.start"
+                    :end="selectedObject.end"
                     v-model:keyframes="selectedObject[label]"
                   />
 
