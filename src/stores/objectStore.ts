@@ -30,7 +30,9 @@ export const useTimelineStore = defineStore('timeline', {
     width: 1280,
     height: 720,
     framerate: 30,
-    totalFrame: 1800,
+    title: 'New Project',
+    audioPath: '/src/assets/music/voca108_teto_2mix.wav',
+    ////////
     currentFrame: 0,
     canvasScale: 1,
     pxPerSec: 90,
@@ -45,3 +47,8 @@ export const useTimelineStore = defineStore('timeline', {
     }
   }
 })
+
+/*
+ /src/assets/music/voca108_teto_2mix.wav
+ /src/assets/music/demo.mp3
+*/

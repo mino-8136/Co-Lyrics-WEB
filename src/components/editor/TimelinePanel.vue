@@ -3,7 +3,7 @@
     <div class="header d-flex">
       <p>Frame:</p>
       <input :value="timelineStore.currentFrame" style="width: 60px" />
-      <input type="range" min="30" max="400" v-model="timelineStore.pxPerSec" />
+      <input type="range" min="50" max="400" v-model="timelineStore.pxPerSec" />
     </div>
 
     <div class="timeline-container">

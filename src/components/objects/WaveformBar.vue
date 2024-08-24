@@ -36,7 +36,7 @@ onMounted(() => {
       container: waveform.value,
       waveColor: '#4F4A85',
       progressColor: '#383351',
-      url: '/src/assets/music/demo.mp3',
+      url: timelineStore.audioPath,
       height: 40,
       minPxPerSec: timelineStore.pxPerSec, // ここが1フレームあたりの幅
       autoplay: false,
