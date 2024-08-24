@@ -131,7 +131,9 @@ export function defineSketch(project: any) {
         )
         p.rotate(effectValue.angle)
         p.scale(effectValue.scale / 100)
-        col.setAlpha(effectValue.opacity)
+        col.setAlpha(
+          (lerpValue(object.opacity, object.start) / 100) * (effectValue.opacity / 100) * 100
+        )
         p.fill(col)
 
         p.text(charObject.text, 0, 0)

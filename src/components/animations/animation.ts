@@ -38,5 +38,25 @@ export const effects: Effect[] = [
 
       return transform
     }
+  },
+  {
+    name: '明滅登場',
+    params: reactive({ entrance: 150, exit: 150 }),
+    parameters: {
+      enter: { min: 0, max: 300, label: '登場', uiType: UIType.slider }
+    },
+    applyEffect: (
+      currentFrame: number,
+      baseObject: Transform,
+      params: { [key: string]: any }
+    ): Transform => {
+      const transform = new Transform(baseObject.id, baseObject.start)
+      const { entrance } = params
+
+      if (entrance > 0 && currentFrame <= entrance && currentFrame % 2 === 1) {
+        transform.opacity = 0
+      }
+      return transform
+    }
   }
 ]
