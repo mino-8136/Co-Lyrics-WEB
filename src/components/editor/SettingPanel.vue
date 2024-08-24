@@ -252,7 +252,6 @@ function openAnimationDialog() {
 // 指定したプロパティの移動タイプを追加
 function addAnimation(element: KeyframeSetting, index: number, animation: string) {
   element.animation = animation
-  console.log(element)
 }
 </script>
 

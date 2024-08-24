@@ -65,8 +65,8 @@
         <circle
           v-for="(kf, index) in keyframes"
           :key="kf.id"
-          :cx="kf.x"
-          :cy="kf.y"
+          :cx="computeX(kf.frame)"
+          :cy="computeY(kf.value)"
           r="5"
           fill="red"
           @mousedown.stop="startDrag(index, $event)"
@@ -89,29 +89,27 @@ const props = defineProps<{
   end: number
 }>()
 
-const keyframes = defineModel<KeyframeSettings>('keyframes')
+const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })
 
 const width = 500
 const height = 300
 
 const padding = { top: 20, right: 40, bottom: 40, left: 40 }
 
-const draggingIndex = ref(null)
+const draggingIndex = ref(-1)
 const offsetX = ref(0)
 const offsetY = ref(0)
 
-const startFrame = computed(() => props.start || 0)
-const endFrame = computed(() => props.end || 200)
+const startFrame = computed(() => props.start)
+const endFrame = computed(() => props.end)
 
 const maxDeltaX = 2 // X軸の値が1回のドラッグで変化できる最大量
 const maxDeltaY = 5 // Y軸の値が1回のドラッグで変化できる最大量
 
 // xRange: frameの最小値と最大値を動的に設定
 const xRange = computed(() => {
-  console.log(keyframes.value)
-  const minFrame = Math.min(...keyframes.value.map((k) => k.frame))
-  const maxFrame = Math.max(...keyframes.value.map((k) => k.frame))
-  return [Math.min(startFrame.value, minFrame), Math.max(endFrame.value, maxFrame)]
+  // console.log(startFrame.value, endFrame.value)
+  return [0, endFrame.value - startFrame.value]
 })
 
 // yRange: valueの範囲を動的に設定
@@ -120,7 +118,8 @@ const yRange = computed(() => {
     Math.abs(Math.min(...keyframes.value.map((k) => k.value))),
     Math.abs(Math.max(...keyframes.value.map((k) => k.value)))
   )
-  return [-maxAbsValue, maxAbsValue]
+  const adjustedMaxAbsValue = Math.max(maxAbsValue, 100)
+  return [-adjustedMaxAbsValue, adjustedMaxAbsValue]
 })
 
 const points = computed(() => {
@@ -177,14 +176,15 @@ const points = computed(() => {
   return allPoints.join(' ')
 })
 
-keyframes.value.forEach((kf) => {
-  kf.x = computed(
-    () => ((kf.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
-  )
-  kf.y = computed(
-    () => height - ((kf.value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
-  )
-})
+// フレームと値から x 座標を計算する関数
+const computeX = (frame: number) => {
+  return ((frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * width
+}
+
+// フレームと値から y 座標を計算する関数
+const computeY = (value: number) => {
+  return height - ((value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
+}
 
 // グリッド線を描画するための座標を計算
 const verticalLines = computed(() => {
@@ -211,7 +211,7 @@ const horizontalLines = computed(() => {
 /////////////////////
 
 // キーフレームを右クリックしたときのコンテキストメニュー
-function onKeyframeContextMenu(event, index) {
+function onKeyframeContextMenu(event: MouseEvent, index: number) {
   event.preventDefault()
 
   ContextMenu.showContextMenu({
@@ -229,19 +229,24 @@ function onKeyframeContextMenu(event, index) {
 }
 
 // キーフレームを削除する関数
-function removeKeyframe(index) {
+function removeKeyframe(index: number) {
   keyframes.value.splice(index, 1)
 }
 
-const startDrag = (index, event) => {
+const startDrag = (index: number, event: MouseEvent) => {
+  //console.log('startDrag', index)
   draggingIndex.value = index
-  offsetX.value = event.offsetX - keyframes.value[index].x
-  offsetY.value = event.offsetY - keyframes.value[index].y
+  // 座標を動的に計算する
+  const frameX = computeX(keyframes.value[index].frame)
+  const valueY = computeY(keyframes.value[index].value)
+  offsetX.value = event.offsetX - frameX
+  offsetY.value = event.offsetY - valueY
+
+  // ドラッグ中のイベントリスナーを追加
   document.addEventListener('mousemove', onMouseMove)
   document.addEventListener('mouseup', endDrag)
 }
-
-const onMouseMove = (event) => {
+const onMouseMove = (event: MouseEvent) => {
   if (draggingIndex.value !== null) {
     const kf = keyframes.value[draggingIndex.value]
 
@@ -253,7 +258,7 @@ const onMouseMove = (event) => {
 
     // フレームの制限: xRangeの範囲内かつ前後のキーフレームのフレームを超えないように
     const prevFrame =
-      draggingIndex.value > 0 ? keyframes.value[draggingIndex.value - 1].frame : xRange.value[0]
+      draggingIndex.value > 0 ? keyframes.value[draggingIndex.value - 1].frame : xRange.value[0] - 1
     const nextFrame =
       draggingIndex.value < keyframes.value.length - 1
         ? keyframes.value[draggingIndex.value + 1].frame
@@ -280,7 +285,7 @@ const onMouseMove = (event) => {
 const endDrag = () => {
   document.removeEventListener('mousemove', onMouseMove)
   document.removeEventListener('mouseup', endDrag)
-  draggingIndex.value = null
+  draggingIndex.value = -1
 }
 </script>
 
