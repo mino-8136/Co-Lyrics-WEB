@@ -147,9 +147,7 @@
     <EasingPanel v-model:show="showEasingPanel" v-model:easing="currentKeyframe" />
 
     <!-- アニメーション設定の呼び出し -->
-    <v-dialog v-model="animationPanel">
-      <AnimationPanel @callAddAnimation="addAnimation" />
-    </v-dialog>
+    <AnimationPanel v-model:show="animationPanel" v-model:animation="selectedObject.anim_name" />
   </v-container>
 </template>
 
