@@ -1,7 +1,14 @@
 import { gsap } from 'gsap'
 import type p5 from 'p5'
-import type { TextObject, KeyframeSetting, KeyframeSettings } from '@/components/parameters/objectInfo'
+import {
+  type TextObject,
+  type KeyframeSetting,
+  type KeyframeSettings,
+  type AnimationSettings,
+  Transform
+} from '@/components/parameters/objectInfo'
 import { CharacterObject } from '@/components/parameters/objectInfo'
+import { effects } from '@/components/animations/animation'
 
 let renderObjects: TextObject[] = []
 let currentFrame = 0
@@ -48,11 +55,8 @@ export function defineSketch(project: any) {
         }
 
         // テキストオブジェクトの描画
-        if (object.individual_object) {
-          renderIndividualText(object)
-        } else {
-          renderTextObject(object)
-        }
+
+        renderText(object)
       })
 
       p.pop()
@@ -72,73 +76,63 @@ export function defineSketch(project: any) {
       return char_cache
     }
 
-    const applyEffects = (object: TextObject) => {
-      // エフェクトの効果量を計算する
-      const totalEffect = {
-        X: 0,
-        Y: 0,
-        scale: 1,
-        opacity: 1,
-        angle: 0
-      }
-      // まずは単エフェクトの場合を考える
-      // 適用するエフェクトをanimations.tsから取得する
-      const effectName = object.anim_name
+    // すべてのエフェクトを適用する関数
+    function applyEffects(
+      index: number,
+      startFrame: number,
+      animations: AnimationSettings
+    ): Transform {
+      const baseValue = new Transform(index, startFrame)
 
-      // animations.tsから見つけたエフェクトの関数を呼び出す
+      animations.forEach((animation) => {
+        // effects 配列から対応するエフェクトを検索
+        const effect = effects.find((effect) => effect.name === animation.anim_name)
+        if (effect) {
+          // エフェクトの適用処理を呼び出し
+          Object.assign(
+            baseValue,
+            effect.applyEffect(currentFrame, baseValue, animation.anim_parameters)
+          )
+        }
+      })
 
-      // 計算結果をtotalEffectに加算する
-
-      // 返す
-      return totalEffect
+      return baseValue
     }
-
-    // レンダリングを担当する関数
-    const renderTextObject = (object: TextObject) => {
+    const renderText = (object: TextObject) => {
       p.push()
+
       // スタイライズエフェクトの処理
-
-      // 見た目の設定
-      // TODO: 縁取りの場合はstrokeWeightを設定する
       p.textFont(fonts)
       p.textSize(object.textSize)
       const col = p.color(object.color)
-      col.setAlpha(lerpValue(object.opacity, object.start))
-      p.fill(col)
-
-      // エフェクトの処理
-
-      // 全体的なトランスフォーム実行
-      p.translate(lerpValue(object.X, object.start), lerpValue(object.Y, object.start))
-      p.rotate(lerpValue(object.angle, object.start))
-      p.scale(lerpValue(convertToPercentage(object.scale), object.start))
-      p.text(object.text, 0, 0)
-      p.pop()
-    }
-
-    const renderIndividualText = (object: TextObject) => {
-      p.push()
-      p.textFont(fonts)
-      p.textSize(object.textSize)
-      const col = p.color(object.color)
-      col.setAlpha(lerpValue(object.opacity, object.start))
-      p.fill(col)
 
       // 全体的なトランスフォームの実行
       p.translate(lerpValue(object.X, object.start), lerpValue(object.Y, object.start))
       p.rotate(lerpValue(object.angle, object.start))
       p.scale(lerpValue(convertToPercentage(object.scale), object.start))
 
+      // p.text(object.text, 0, 0)
+
       // 個別のトランスフォームの実行
-      object.char_cache.forEach((charObject: CharacterObject) => {
+      object.char_cache.forEach((charObject: TextObject | CharacterObject) => {
+        // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
+        const effectValue = applyEffects(charObject.id, object.start, object.animations)
+        if (effectValue.opacity == 0) return
+        if (effectValue.scale == 0) return
+
+        console.log(effectValue)
+
         p.push()
         p.translate(
-          object.spacing_x * charObject.index + charObject.animX,
-          object.spacing_y * charObject.index + charObject.animY
+          object.spacing_x * charObject.id + effectValue.X,
+          object.spacing_y * charObject.id + effectValue.Y
         )
-        p.rotate(charObject.animAngle)
-        p.scale(charObject.animScale / 100)
-        p.text(charObject.char, 0, 0)
+        p.rotate(effectValue.angle)
+        p.scale(effectValue.scale / 100)
+        col.setAlpha(effectValue.opacity)
+        p.fill(col)
+
+        p.text(charObject.text, 0, 0)
         p.pop()
       })
       p.pop()
@@ -149,7 +143,7 @@ export function defineSketch(project: any) {
     ////////////////////////////
 
     // 受け取ったobjectのパラメータをすべて百分率にして返す関数
-    const convertToPercentage = (param: KeyframeSettings) => {
+    const convertToPercentage = (param: KeyframeSettings): KeyframeSettings => {
       const convertedParam = JSON.parse(JSON.stringify(param))
       convertedParam.forEach((keyframe: { value: number }) => {
         keyframe.value = keyframe.value / 100
@@ -158,7 +152,7 @@ export function defineSketch(project: any) {
     }
 
     // キーフレーム間の値を補完する関数1
-    function lerpValue(keyframes: KeyframeSettings, objectStartFrame: number) {
+    function lerpValue(keyframes: KeyframeSettings, objectStartFrame: number): number {
       // Parameterが配列であるという前提で行く
       const lastSection = keyframes.length - 1
       const currentSection = getCurrentSection(keyframes, objectStartFrame)

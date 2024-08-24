@@ -21,28 +21,40 @@ export function isKeyframeSettings(element: any): element is KeyframeSettings {
 
 export interface AnimationSetting {
   anim_name: string
-  anim_parameters: {}
+  anim_parameters: { [key: string]: any }
 }
 
 export type AnimationSettings = AnimationSetting[]
 
-// エフェクト用の相対パラメータ
-export type Transform = {
+// エフェクト処理用の相対パラメータ
+export class Transform {
+  id: number
+  start: number
   X: number
   Y: number
   scale: number
   opacity: number
   angle: number
+
+  constructor(id: number, start: number) {
+    this.id = id ?? 0
+    this.start = start ?? 0
+    this.X = 0
+    this.Y = 0
+    this.scale = 100
+    this.opacity = 100
+    this.angle = 0
+  }
 }
 
 // p5.js内で用いるのがメイン
 export class CharacterObject {
-  index: number
+  id: number
   parent: TextObject
-  char: string
+  text: string
 
   constructor(index: number, parent: TextObject) {
-    ;(this.index = index), (this.parent = parent), (this.char = parent.text[index])
+    ;(this.id = index), (this.parent = parent), (this.text = parent.text[index])
   }
 }
 

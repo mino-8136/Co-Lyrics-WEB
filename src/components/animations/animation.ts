@@ -1,10 +1,20 @@
 import { reactive } from 'vue'
 import { UIType } from '@/components/parameters/parameterInfo'
-import type { BaseObject, Transform, TextObject } from '../parameters/objectInfo'
-import { useTimelineStore } from '@/stores/objectStore'
-const timelineStore = useTimelineStore()
+import { type BaseObject, Transform, type TextObject } from '../parameters/objectInfo'
 
-export const effects = [
+// この形に従う
+export interface Effect {
+  name: string
+  params: { [key: string]: any }
+  parameters: { [key: string]: any }
+  applyEffect: (
+    currentFrame: number,
+    baseObject: Transform,
+    params: { [key: string]: any }
+  ) => Transform
+}
+
+export const effects: Effect[] = [
   {
     name: '文字送り',
     params: reactive({ time: 30, span: 10, delay: 5 }),
@@ -13,16 +23,21 @@ export const effects = [
       span: { min: 1, max: 20, label: 'スパン', uiType: UIType.slider },
       delay: { min: 0, max: 30, label: '遅延', uiType: UIType.slider }
     },
-    applyEffect: (object: TextObject, params: any) => {
+    applyEffect: (
+      currentFrame: number,
+      baseObject: Transform,
+      params: { [key: string]: any }
+    ): Transform => {
+      const transform = new Transform(baseObject.id, baseObject.start)
       const { time, span, delay } = params
-      let progress = (timelineStore.currentFrame - object.start - object.id * span - delay) / time
+      let progress = (currentFrame - baseObject.start - baseObject.id * span - delay) / time
       progress = Math.min(Math.max(progress, 0), 1) // 進捗は0と1の間に正規化
 
-      const 
       if (progress > 0) {
-        object.X = progress * 100 // X座標を progress * 100 だけ移動
+        transform.opacity = baseObject.opacity * progress
       }
-      return object
+
+      return transform
     }
   }
 ]
