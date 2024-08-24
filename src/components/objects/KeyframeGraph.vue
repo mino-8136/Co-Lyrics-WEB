@@ -62,6 +62,7 @@
       <g :transform="`translate(${padding.left}, ${padding.top})`">
         <polyline :points="points" stroke="blue" fill="none" />
         <!-- ドラッグ可能な丸 -->
+
         <circle
           v-for="(kf, index) in keyframes"
           :key="kf.id"
@@ -134,7 +135,8 @@ const points = computed(() => {
     height -
     ((firstKeyframe.value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
   const firstFrameX =
-    ((firstKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
+    ((firstKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) *
+    props.panelWidth
 
   // 最初のキーフレームから前の水平線
   allPoints.push(`${firstX},${firstY}`, `${firstFrameX},${firstY}`)
@@ -154,7 +156,8 @@ const points = computed(() => {
       const easedT = easingFunc(t)
 
       const x =
-        ((startFrame + j - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
+        ((startFrame + j - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) *
+        props.panelWidth
       const y =
         height -
         ((startValue + easedT * (endValue - startValue) - yRange.value[0]) /
@@ -168,7 +171,8 @@ const points = computed(() => {
   // 最後のキーフレームの後に水平線を追加
   const lastKeyframe = keyframes.value[keyframes.value.length - 1]
   const lastFrameX =
-    ((lastKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
+    ((lastKeyframe.frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) *
+    props.panelWidth
   const lastY =
     height - ((lastKeyframe.value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
   const lastX = props.panelWidth
