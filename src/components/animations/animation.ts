@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 import { UIType } from '@/components/parameters/parameterInfo'
 import { type BaseObject, Transform, type TextObject } from '../parameters/objectInfo'
+import gsap from 'gsap'
 
 // この形に従う
 export interface Effect {
@@ -31,11 +32,9 @@ export const effects: Effect[] = [
       const transform = new Transform(baseObject.id, baseObject.start)
       const { time, span, delay } = params
       let progress = (currentFrame - baseObject.start - baseObject.id * span - delay) / time
-      progress = Math.min(Math.max(progress, 0), 1) // 進捗は0と1の間に正規化
+      progress = gsap.utils.clamp(progress, 0, 1) // 進捗は0と1の間に正規化
 
-      if (progress > 0) {
-        transform.opacity = baseObject.opacity * progress
-      }
+      transform.opacity = baseObject.opacity * progress
 
       return transform
     }

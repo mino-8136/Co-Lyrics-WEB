@@ -48,14 +48,7 @@ export function defineSketch(project: any) {
       p.scale(project.canvasScale)
 
       renderObjects.forEach((object) => {
-        // individual_objectがtrueかつ、char_cacheが未定義の場合、分解してキャッシュする
-        // (TODO: この処理はpreview.vueに移したほうがwatchとかできて良いかもしれない)
-        if (object.individual_object && object.char_cache.length == 0) {
-          object.char_cache = addCharCache(object)
-        }
-
         // テキストオブジェクトの描画
-
         renderText(object)
       })
 
@@ -101,6 +94,14 @@ export function defineSketch(project: any) {
     const renderText = (object: TextObject) => {
       p.push()
 
+      // individual_objectがtrueかつ、char_cacheが未定義の場合、分解してキャッシュする
+      // (TODO: この処理はpreview.vueに移したほうがwatchとかできて良いかもしれない)
+      if (object.individual_object && object.char_cache.length == 0) {
+        object.char_cache = addCharCache(object)
+      } else if (!object.individual_object && object.char_cache.length > 0) {
+        object.char_cache = []
+      }
+
       // スタイライズエフェクトの処理
       p.textFont(fonts)
       p.textSize(object.textSize)
@@ -114,13 +115,14 @@ export function defineSketch(project: any) {
       // p.text(object.text, 0, 0)
 
       // 個別のトランスフォームの実行
-      object.char_cache.forEach((charObject: TextObject | CharacterObject) => {
+      const textQueue = object.char_cache.length > 0 ? object.char_cache : [object]
+      textQueue.forEach((charObject: TextObject | CharacterObject) => {
         // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
         const effectValue = applyEffects(charObject.id, object.start, object.animations)
         if (effectValue.opacity == 0) return
         if (effectValue.scale == 0) return
 
-        console.log(effectValue)
+        //console.log(effectValue)
 
         p.push()
         p.translate(
