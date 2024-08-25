@@ -2,8 +2,8 @@
   <v-container class="setting-panel">
     <div v-if="selectedObject">
       <v-tabs v-model="tab">
-        <v-tab value="basic">基本設定</v-tab>
-        <v-tab v-if="selectedObject.type === 'text'" value="text">テキスト</v-tab>
+        <v-tab v-if="'standardRenderSettings' in selectedObject" value="basic">基本設定</v-tab>
+        <v-tab v-if="'textSettings' in selectedObject" value="text">テキスト</v-tab>
         <v-tab value="stylize">スタイル</v-tab>
         <v-tab v-if="'animations' in selectedObject" value="animation">アニメーション</v-tab>
       </v-tabs>
@@ -12,12 +12,20 @@
         <v-tabs-window v-model="tab">
           <!-- 基本設定タブ -->
           <v-tabs-window-item value="basic">
-            <SettingsTab v-model:params="selectedObject.standardRenderSettings"> </SettingsTab>
+            <SettingsTab
+              v-if="'standardRenderSettings' in selectedObject"
+              v-model:params="selectedObject.standardRenderSettings"
+            >
+            </SettingsTab>
           </v-tabs-window-item>
 
           <!-- テキスト設定タブ -->
           <v-tabs-window-item value="text">
-            <SettingsTab v-model:params="selectedObject.textSettings"> </SettingsTab>
+            <SettingsTab
+              v-if="'textSettings' in selectedObject"
+              v-model:params="selectedObject.textSettings"
+            >
+            </SettingsTab>
           </v-tabs-window-item>
 
           <!-- スタイライズ設定タブ -->
@@ -27,7 +35,11 @@
 
           <!-- アニメーション設定タブ -->
           <v-tabs-window-item value="animation">
-            <AnimationTab v-model:params="selectedObject.animations"> </AnimationTab>
+            <AnimationTab
+              v-if="'animations' in selectedObject"
+              v-model:params="selectedObject.animations"
+            >
+            </AnimationTab>
           </v-tabs-window-item>
         </v-tabs-window>
       </div>

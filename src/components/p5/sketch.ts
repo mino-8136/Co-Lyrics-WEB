@@ -47,28 +47,22 @@ export function defineSketch(project: any) {
 
       renderObjects.forEach((object) => {
         // テキストオブジェクトの描画
-        renderText(object)
+        switch (object.type) {
+          case 'text':
+            renderText(object)
+            break
+          case 'image':
+            renderImage(object)
+            break
+        }
       })
 
       p.pop()
     }
 
-    //////////////////////////////
-    // テキストレンダリングの関数 //
-    //////////////////////////////
-
-    // テキストオブジェクトからcharacterオブジェクトを生成する関数
-    const addCharCache = (object: TextObject): CharacterObject[] => {
-      const char_cache: CharacterObject[] = [] // キャッシュの初期化
-      for (let i = 0; i < object.textSettings.text.length; i++) {
-        const charObject: CharacterObject = {
-          id: i,
-          text: object.textSettings.text[i]
-        }
-        char_cache.push(charObject)
-      }
-      return char_cache
-    }
+    ////////////////////////
+    // エフェクト処理の関数 //
+    ////////////////////////
 
     // エフェクトをトランスフォームに適用する関数
     function applyEffectToTransform(baseValue: Transform, effectValue: Transform): void {
@@ -94,6 +88,24 @@ export function defineSketch(project: any) {
 
       return baseValue
     }
+
+    //////////////////////////////
+    // テキストレンダリングの関数 //
+    //////////////////////////////
+
+    // テキストオブジェクトからcharacterオブジェクトを生成する関数
+    const addCharCache = (object: TextObject): CharacterObject[] => {
+      const char_cache: CharacterObject[] = [] // キャッシュの初期化
+      for (let i = 0; i < object.textSettings.text.length; i++) {
+        const charObject: CharacterObject = {
+          id: i,
+          text: object.textSettings.text[i]
+        }
+        char_cache.push(charObject)
+      }
+      return char_cache
+    }
+
     const renderText = (object: TextObject) => {
       p.push()
 
@@ -171,9 +183,9 @@ export function defineSketch(project: any) {
       p.pop()
     }
 
-    ////////////////////////////
-    // キーフレームのための関数 //
-    ////////////////////////////
+    //////////////////////////
+    // キーフレーム処理の関数 //
+    //////////////////////////
 
     // 受け取ったobjectのパラメータをすべて百分率にして返す関数
     const convertToPercentage = (param: KeyframeSettings): KeyframeSettings => {
