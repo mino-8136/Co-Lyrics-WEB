@@ -30,14 +30,26 @@
             :style="{ backgroundSize: timelineStore.pxPerSec / timelineStore.framerate + 'px' }"
             @contextmenu.prevent="onTimelineContextMenu($event, layerIndex)"
           >
-            <object-bar
+            <template
               v-for="object in objectStore.objects.filter((obj) => obj.layer === layerIndex)"
               :key="object.id"
-              :object="object"
-              v-model:text="object.text"
-              @contextmenu.prevent="onObjectContextMenu($event, object.id)"
-              @click="selectObject(object.id)"
-            ></object-bar>
+            >
+              <!-- TextObjectの場合はテキスト変更機能を用意 -->
+              <object-bar
+                v-if="object instanceof TextObject"
+                :object="object"
+                v-model:text="object.textSettings.text"
+                @contextmenu.prevent="onObjectContextMenu($event, object.id)"
+                @click="selectObject(object.id)"
+              />
+              <!-- その他のオブジェクトの場合 -->
+              <object-bar
+                v-else
+                :object="object"
+                @contextmenu.prevent="onObjectContextMenu($event, object.id)"
+                @click="selectObject(object.id)"
+              />
+            </template>
           </div>
         </div>
       </div>
@@ -49,9 +61,14 @@
 import { ref } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
-import ObjectBar from '@/components/objects/ObjectBar.vue'
-import Waveformbar from '@/components/objects/WaveformBar.vue'
-import { type BaseSettings, BaseObject, TextObject } from '@/components/parameters/objectInfo'
+import ObjectBar from '@/components/timeline/ObjectBar.vue'
+import Waveformbar from '@/components/timeline/WaveformBar.vue'
+import {
+  BaseObject,
+  BaseSettings,
+  ImageObject,
+  TextObject
+} from '@/components/parameters/objectInfo'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -131,7 +148,7 @@ function addObject(layerIndex: number, type: string, offsetX: number = 0) {
   if (type === 'text') {
     objectStore.addObject(new TextObject(settings))
   } else if (type === 'image') {
-    // 画像オブジェクトを追加
+    objectStore.addObject(new ImageObject(settings))
   } else {
     objectStore.addObject(new BaseObject(settings))
   }
@@ -157,13 +174,6 @@ function setScrollPosition(position: number) {
   if (scrollable) {
     scrollable.scrollLeft = position
   }
-}
-
-function frameToTime(frame: number): string {
-  const frameRate = 30
-  let minutes = Math.floor(frame / frameRate / 60)
-  let seconds = Math.floor(frame / frameRate) % 60
-  return '(' + minutes + '分' + seconds + '秒' + ')'
 }
 </script>
 

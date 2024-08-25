@@ -18,7 +18,7 @@
 
 <script setup lang="ts">
 import { type AnimationSettings } from '../parameters/objectInfo'
-import { effects } from '@/components/animations/animation'
+import { effects } from '@/assets/animations/animation'
 
 const showPanel = defineModel<boolean>('show', { required: true })
 const animations = defineModel<AnimationSettings>('animations', { required: true })

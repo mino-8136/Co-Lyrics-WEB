@@ -2,13 +2,11 @@ import { gsap } from 'gsap'
 import type p5 from 'p5'
 import {
   type TextObject,
-  type KeyframeSetting,
   type KeyframeSettings,
-  type AnimationSettings,
-  Transform
+  type AnimationSettings
 } from '@/components/parameters/objectInfo'
-import { CharacterObject } from '@/components/parameters/objectInfo'
-import { effects } from '@/components/animations/animation'
+import { Transform, CharacterObject } from '@/components/parameters/p5Info'
+import { effects } from '@/assets/animations/animation'
 
 let renderObjects: TextObject[] = []
 let currentFrame = 0
@@ -60,10 +58,13 @@ export function defineSketch(project: any) {
     //////////////////////////////
 
     // テキストオブジェクトからcharacterオブジェクトを生成する関数
-    const addCharCache = (object: TextObject) => {
-      const char_cache = [] // キャッシュの初期化
-      for (let i = 0; i < object.text.length; i++) {
-        const charObject = new CharacterObject(i, object)
+    const addCharCache = (object: TextObject): CharacterObject[] => {
+      const char_cache: CharacterObject[] = [] // キャッシュの初期化
+      for (let i = 0; i < object.textSettings.text.length; i++) {
+        const charObject: CharacterObject = {
+          id: i,
+          text: object.textSettings.text[i]
+        }
         char_cache.push(charObject)
       }
       return char_cache
@@ -96,27 +97,44 @@ export function defineSketch(project: any) {
 
       // individual_objectがtrueかつ、char_cacheが未定義の場合、分解してキャッシュする
       // (TODO: この処理はpreview.vueに移したほうがwatchとかできて良いかもしれない)
-      if (object.individual_object && object.char_cache.length == 0) {
-        object.char_cache = addCharCache(object)
-      } else if (!object.individual_object && object.char_cache.length > 0) {
-        object.char_cache = []
+      if (object.textSettings.individual_object && object.textSettings.char_cache.length == 0) {
+        object.textSettings.char_cache = addCharCache(object)
+      } else if (
+        !object.textSettings.individual_object &&
+        object.textSettings.char_cache.length > 0
+      ) {
+        object.textSettings.char_cache = []
       }
 
       // スタイライズエフェクトの処理
       p.textFont(fonts)
-      p.textSize(object.textSize)
-      const col = p.color(object.color)
+      p.textSize(object.textSettings.textSize)
+      const col = p.color(object.textSettings.color)
 
       // 全体的なトランスフォームの実行
-      p.translate(lerpValue(object.X, object.start), lerpValue(object.Y, object.start))
-      p.rotate(lerpValue(object.angle, object.start))
-      p.scale(lerpValue(convertToPercentage(object.scale), object.start))
+      p.translate(
+        lerpValue(object.standardRenderSettings.X, object.start),
+        lerpValue(object.standardRenderSettings.Y, object.start)
+      )
+      p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
+      p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
 
       // p.text(object.text, 0, 0)
 
       // 個別のトランスフォームの実行
-      const textQueue = object.char_cache.length > 0 ? object.char_cache : [object]
-      textQueue.forEach((charObject: TextObject | CharacterObject) => {
+      let textQueue: CharacterObject[] = []
+      if (object.textSettings.char_cache.length > 0) {
+        textQueue = object.textSettings.char_cache
+      } else {
+        textQueue = [
+          {
+            id: 0,
+            text: object.textSettings.text
+          }
+        ]
+      }
+
+      textQueue.forEach((charObject) => {
         // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
         const effectValue = applyEffects(charObject.id, object.start, object.animations)
         if (effectValue.opacity == 0) return
@@ -126,13 +144,15 @@ export function defineSketch(project: any) {
 
         p.push()
         p.translate(
-          object.spacing_x * charObject.id + effectValue.X,
-          object.spacing_y * charObject.id + effectValue.Y
+          object.textSettings.spacing_x * charObject.id + effectValue.X,
+          object.textSettings.spacing_y * charObject.id + effectValue.Y
         )
         p.rotate(effectValue.angle)
         p.scale(effectValue.scale / 100)
         col.setAlpha(
-          (lerpValue(object.opacity, object.start) / 100) * (effectValue.opacity / 100) * 100
+          (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
+            (effectValue.opacity / 100) *
+            100
         )
         p.fill(col)
 

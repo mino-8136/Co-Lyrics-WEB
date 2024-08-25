@@ -6,7 +6,6 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import WaveSurfer from 'wavesurfer.js'
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
-
 import { useTimelineStore } from '@/stores/objectStore'
 const timelineStore = useTimelineStore()
 

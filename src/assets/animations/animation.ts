@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
-import { UIType } from '@/components/parameters/parameterInfo'
-import { type BaseObject, Transform, type TextObject } from '../parameters/objectInfo'
+import { UIType } from '@/components/parameters/objectInfo'
+import { Transform } from '@/components/parameters/p5Info'
 import gsap from 'gsap'
 
 // この形に従う
