@@ -1,4 +1,3 @@
-import { reactive } from 'vue'
 import { UIType } from '@/components/parameters/objectInfo'
 import { Inform, Transform } from '@/components/parameters/p5Info'
 import gsap from 'gsap'

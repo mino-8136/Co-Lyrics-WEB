@@ -1,58 +1,60 @@
 <template>
-  <div v-for="(params, label) in parameters" :key="label">
-    <v-card variant="outlined" class="mb-2">
-      <template v-slot:title>
-        <p class="text-body-1">
-          {{ parameters[label].anim_name }}
-        </p>
-      </template>
-      <template v-slot:prepend>
-        <v-icon @click="openDescription(searchEffects(params).description)"
-          >mdi-file-document-outline
-        </v-icon>
-      </template>
-      <template v-slot:append>
-        <v-icon @click="upAnimation(label)">mdi-arrow-up </v-icon>
-        <v-icon @click="downAnimation(label)">mdi-arrow-down </v-icon>
-        <v-icon @click="delateAnimation(label)">mdi-delete</v-icon>
-      </template>
+  <div v-for="(params, label) in parameters" :key="params.anim_id">
+    <transition-group name="list">
+      <v-card variant="outlined" class="mb-2">
+        <template v-slot:title>
+          <p class="text-body-1">
+            {{ parameters[label].anim_name }}
+          </p>
+        </template>
+        <template v-slot:prepend>
+          <v-icon @click="openDescription(searchEffects(params).description)"
+            >mdi-file-document-outline
+          </v-icon>
+        </template>
+        <template v-slot:append>
+          <v-icon @click="upAnimation(label)">mdi-arrow-up </v-icon>
+          <v-icon @click="downAnimation(label)">mdi-arrow-down </v-icon>
+          <v-icon @click="delateAnimation(label)">mdi-delete</v-icon>
+        </template>
 
-      <div
-        v-for="(param, paramLabel) in searchEffects(params).parameters"
-        :key="param.name"
-        class="mx-2"
-      >
-        <div v-if="param.type != UIType.none" class="parameter-row">
-          <!-- パラメータ名の表示 -->
-          <v-chip class="parameter-name" variant="outlined" size="small" label>{{
-            param.name
-          }}</v-chip>
+        <div
+          v-for="(param, paramLabel) in searchEffects(params).parameters"
+          :key="param.name"
+          class="mx-2"
+        >
+          <div v-if="param.type != UIType.none" class="parameter-row">
+            <!-- パラメータ名の表示 -->
+            <v-chip class="parameter-name" variant="outlined" size="small" label>{{
+              param.name
+            }}</v-chip>
 
-          <!-- 数値型パラメータの場合 -->
-          <template v-if="param.type == UIType.slider">
-            <v-slider
-              v-model="parameters[label].anim_parameters[paramLabel]"
-              :min="param.min"
-              :max="param.max"
-              step="1"
-              hide-details
-            >
-              <template v-slot:prepend>
-                <input
-                  class="parameter-value"
-                  v-model.number="parameters[label].anim_parameters[paramLabel]"
-                />
-              </template>
-            </v-slider>
-          </template>
+            <!-- 数値型パラメータの場合 -->
+            <template v-if="param.type == UIType.slider">
+              <v-slider
+                v-model="parameters[label].anim_parameters[paramLabel]"
+                :min="param.min"
+                :max="param.max"
+                step="1"
+                hide-details
+              >
+                <template v-slot:prepend>
+                  <input
+                    class="parameter-value"
+                    v-model.number="parameters[label].anim_parameters[paramLabel]"
+                  />
+                </template>
+              </v-slider>
+            </template>
 
-          <!-- チェックボックス型パラメータの場合 -->
-          <template v-if="param.type === UIType.checkbox">
-            <v-checkbox v-model="parameters[label].anim_parameters[paramLabel]" hide-details />
-          </template>
+            <!-- チェックボックス型パラメータの場合 -->
+            <template v-if="param.type === UIType.checkbox">
+              <v-checkbox v-model="parameters[label].anim_parameters[paramLabel]" hide-details />
+            </template>
+          </div>
         </div>
-      </div>
-    </v-card>
+      </v-card>
+    </transition-group>
   </div>
 
   <v-btn block variant="outlined" class="mb-2 elevation-1" @click="openAnimationDialog()">
@@ -164,5 +166,20 @@ function delateAnimation(index: number) {
   width: 40px;
   text-align: center;
   color: #555;
+}
+
+/* リストアニメーション */
+.list-move, /* 移動する要素にトランジションを適用 */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.2s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.list-leave-active {
+  position: absolute;
 }
 </style>

@@ -25,6 +25,7 @@ export function isKeyframeSettings(element: any): element is KeyframeSettings {
 export interface AnimationSetting {
   anim_name: string
   anim_parameters: { [key: string]: any }
+  anim_id: string
 }
 
 export type AnimationSettings = AnimationSetting[]

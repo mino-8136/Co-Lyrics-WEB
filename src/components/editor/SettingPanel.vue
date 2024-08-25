@@ -40,7 +40,6 @@ import { ref, computed } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import SettingsTab from '../setting/SettingsTab.vue'
 import AnimationTab from '../setting/AnimationTab.vue'
-import type { ImageObject, TextObject } from '../parameters/objectInfo'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()

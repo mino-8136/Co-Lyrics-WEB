@@ -19,6 +19,7 @@
 <script setup lang="ts">
 import { type AnimationSettings } from '../parameters/objectInfo'
 import { effects } from '@/assets/animations/animation'
+import { generateUniqueId } from '@/components/utils/common'
 
 const showPanel = defineModel<boolean>('show', { required: true })
 const animations = defineModel<AnimationSettings>('animations', { required: true })
@@ -27,7 +28,8 @@ function handleButtonClick(effectName: string, parameters: Record<string, any>) 
   const deepCopiedParameters = JSON.parse(JSON.stringify(parameters))
   animations.value.push({
     anim_name: effectName,
-    anim_parameters: deepCopiedParameters
+    anim_parameters: deepCopiedParameters,
+    anim_id: generateUniqueId()
   })
   showPanel.value = false
 }

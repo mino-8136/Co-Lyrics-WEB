@@ -150,6 +150,7 @@ import {
 import EasingPanel from '@/components/setting/EasingPanel.vue'
 import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
 import { fontListData } from '@/assets/fonts/fonts'
+import { generateUniqueId } from '@/components/utils/common'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -174,11 +175,6 @@ function getBoundingClientRect() {
 ////////////////////////////
 // キーフレームに関する設定 //
 ////////////////////////////
-
-// 一意のキーフレームIDを生成する関数
-function generateUniqueId() {
-  return Date.now().toString(36) + Math.random().toString(36)
-}
 
 // ボタンが押されたとき、指定したインデックスの次にキーフレームを追加する関数
 // TODO: 追加位置を吟味
