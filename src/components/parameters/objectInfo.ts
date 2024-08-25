@@ -115,6 +115,10 @@ export class StandardRenderSettings extends PropertyMethod {
 }
 
 export class TextSettings extends PropertyMethod {
+  text: string
+  color: string
+  font: string
+  spacing_x: number
   //name: string
   textSize: number
   //display_speed: number
@@ -127,19 +131,17 @@ export class TextSettings extends PropertyMethod {
   //soft: boolean
   //monospace: boolean
   align: number
-  spacing_x: number
+
   spacing_y: number
   //precision: number
-  color: string
   //color2: '000000'
-  font: string
-  text: string
+
   char_cache: CharacterObject[] // 効率的な描画のために分解したテキストを保持する(p5.jsで利用)
 
   static parameterInfo = {
     textSize: { name: 'サイズ', type: UIType.none, min: 1, max: 100 },
     individual_object: { name: 'バラバラ', type: UIType.checkbox },
-    align: { name: '整列', type: UIType.select },
+    align: { name: '整列', type: UIType.none },
     spacing_x: { name: '水平間隔', type: UIType.slider, min: 0, max: 100 },
     spacing_y: { name: '垂直間隔', type: UIType.none, min: 0, max: 100 },
     color: { name: '色', type: UIType.color },
