@@ -7,10 +7,11 @@ import gsap from 'gsap'
 export interface Effect {
   name: string
   params: { [key: string]: any }
+  description: string
   parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応
   applyEffect: (
     currentFrame: number,
-    baseObject: Transform,
+    baseObject: Transform, // readonlyなものとして扱うこと
     params: { [key: string]: any }
   ) => Transform
 }
@@ -18,11 +19,13 @@ export interface Effect {
 export const effects: Effect[] = [
   {
     name: '文字送り',
-    params: reactive({ time: 0, span: 1, delay: 0 }),
+    params: { time: 1, interval: 1, delay: 0 },
+    description:
+      '文字を一文字ずつ表示します。[時間]だけをマイナスにすると順番に文字が消えていきます。[遅延]を大きくして[間隔]だけをマイナスにすると後ろから文字が表れます。',
     parameters: {
-      time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
-      span: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
-      delay: { name: '遅延(f)', type: UIType.slider, min: 0, max: 30 }
+      time: { name: '時間(f)', type: UIType.slider, min: -60, max: 60 },
+      interval: { name: '間隔(f)', type: UIType.slider, min: -20, max: 20 },
+      delay: { name: '遅延(f)', type: UIType.slider, min: -20, max: 20 }
     },
     applyEffect: (
       currentFrame: number,
@@ -30,9 +33,12 @@ export const effects: Effect[] = [
       params: { [key: string]: any }
     ): Transform => {
       const transform = new Transform(baseObject.id, baseObject.start)
-      const { time, span, delay } = params
-      let progress = (currentFrame - baseObject.start - baseObject.id * span - delay) / time
-      progress = gsap.utils.clamp(progress, 0, 1) // 進捗は0と1の間に正規化
+      const { time, interval, delay } = params
+
+      let progress = (currentFrame - baseObject.start - baseObject.id * interval - delay) / time
+      if (progress >= 0) {
+        progress = 1
+      } // 進捗は0と1の間に正規化
 
       transform.opacity = baseObject.opacity * progress
 
@@ -40,10 +46,12 @@ export const effects: Effect[] = [
     }
   },
   {
-    name: '明滅登場',
-    params: reactive({ entrance: 150 }),
+    name: 'フェードイン',
+    params: { time: 10, interval: 1 },
+    description: '[時間]で指定したフレーム数で、不透明度が0→100に変化します。',
     parameters: {
-      entrance: { name: '登場', type: UIType.slider, min: 0, max: 300 }
+      time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
+      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 }
     },
     applyEffect: (
       currentFrame: number,
@@ -51,10 +59,63 @@ export const effects: Effect[] = [
       params: { [key: string]: any }
     ): Transform => {
       const transform = new Transform(baseObject.id, baseObject.start)
-      const { entrance } = params
+      const { time, interval } = params
 
-      if (entrance > 0 && currentFrame <= entrance && currentFrame % 2 === 1) {
+      const progress = (currentFrame - baseObject.start - baseObject.id * interval) / time
+      transform.opacity = baseObject.opacity * progress
+
+      return transform
+    }
+  },
+  {
+    name: '明滅登場',
+    params: { time: 5, interval: 1 },
+    description: '文字を一文字ずつ表示します',
+    parameters: {
+      time: { name: '登場時間(f)', type: UIType.slider, min: 0, max: 90 },
+      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 }
+    },
+    applyEffect: (
+      currentFrame: number,
+      baseObject: Transform,
+      params: { [key: string]: any }
+    ): Transform => {
+      const transform = new Transform(baseObject.id, baseObject.start)
+      const { time, interval } = params
+      const progress = currentFrame - baseObject.start - baseObject.id * interval
+
+      if (progress < 0) transform.opacity = 0
+      else if (progress < time && Math.round(progress) % 2 === 0) {
         transform.opacity = 0
+      }
+      return transform
+    }
+  },
+  {
+    name: 'スライドイン',
+    params: { time: 10, interval: 1, X: 50, Y: 0 },
+    description: '指定した相対座標([X],[Y])からスライドインします。',
+    parameters: {
+      time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
+      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
+      X: { name: 'X', type: UIType.slider, min: -500, max: 500 },
+      Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 }
+    },
+    applyEffect: (
+      currentFrame: number,
+      baseObject: Transform,
+      params: { [key: string]: any }
+    ): Transform => {
+      const transform = new Transform(baseObject.id, baseObject.start)
+      const { time, interval, X, Y } = params
+      const progress = currentFrame - baseObject.start - baseObject.id * interval
+
+      if (progress < 0) {
+        transform.X = X
+        transform.Y = Y
+      } else if (progress < time) {
+        transform.X = X * (1 - progress / time)
+        transform.Y = Y * (1 - progress / time)
       }
       return transform
     }

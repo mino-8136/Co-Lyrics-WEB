@@ -6,13 +6,22 @@
           {{ parameters[label].anim_name }}
         </p>
       </template>
+      <template v-slot:prepend>
+        <v-icon @click="openDescription(searchEffects(params).description)"
+          >mdi-file-document-outline
+        </v-icon>
+      </template>
       <template v-slot:append>
         <v-icon @click="upAnimation(label)">mdi-arrow-up </v-icon>
         <v-icon @click="downAnimation(label)">mdi-arrow-down </v-icon>
         <v-icon @click="delateAnimation(label)">mdi-delete</v-icon>
       </template>
 
-      <div v-for="(param, paramLabel) in searchEffects(params)" :key="param.name" class="mx-2">
+      <div
+        v-for="(param, paramLabel) in searchEffects(params).parameters"
+        :key="param.name"
+        class="mx-2"
+      >
         <div v-if="param.type != UIType.none" class="parameter-row">
           <!-- パラメータ名の表示 -->
           <v-chip class="parameter-name" variant="outlined" size="small" label>{{
@@ -52,6 +61,18 @@
   </v-btn>
   <!-- アニメーション設定の呼び出し -->
   <AnimationPanel v-model:show="animationPanel" v-model:animations="selectedObject.animations" />
+
+  <v-dialog v-model="descriptionPanel" max-width="800px">
+    <v-card>
+      <v-card-title>エフェクトの説明</v-card-title>
+      <v-card-text>
+        <p>{{ description }}</p>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn @click="descriptionPanel = false">閉じる</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
@@ -67,7 +88,6 @@ import { effects } from '@/assets/animations/animation'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
-
 const parameters = defineModel<AnimationSettings>('params', { required: true })
 
 // 選択されたオブジェクトの情報(setting panelと同じ)
@@ -79,6 +99,9 @@ const selectedObject: Record<string, any> = computed(() => {
 // アニメーション設定に関する記述 //
 //////////////////////////////////
 const animationPanel = ref(false)
+const descriptionPanel = ref(false)
+let description = ''
+
 function openAnimationDialog() {
   animationPanel.value = true
 }
@@ -89,10 +112,16 @@ function searchEffects(animation: AnimationSetting): { [key: string]: any } {
   const effect = effects.find((effect) => effect.name === animation.anim_name)
   if (effect) {
     // console.log(Object.keys(effect.parameters).map((key) => effect.parameters[key].name))
-    return effect.parameters
+    return effect
   } else {
     return {}
   }
+}
+
+// 説明書を開く関数
+function openDescription(text: string) {
+  description = text
+  descriptionPanel.value = true
 }
 
 function upAnimation(index: number) {

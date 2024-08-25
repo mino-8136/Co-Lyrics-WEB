@@ -70,6 +70,15 @@ export function defineSketch(project: any) {
       return char_cache
     }
 
+    // エフェクトをトランスフォームに適用する関数
+    function applyEffectToTransform(baseValue: Transform, effectValue: Transform): void {
+      baseValue.X += effectValue.X
+      baseValue.Y += effectValue.Y
+      baseValue.angle += effectValue.angle
+      baseValue.scale *= effectValue.scale / 100
+      baseValue.opacity *= effectValue.opacity / 100
+    }
+
     // すべてのエフェクトを適用する関数
     function applyEffects(
       index: number,
@@ -82,11 +91,8 @@ export function defineSketch(project: any) {
         // effects 配列から対応するエフェクトを検索
         const effect = effects.find((effect) => effect.name === animation.anim_name)
         if (effect) {
-          // エフェクトの適用処理を呼び出し
-          Object.assign(
-            baseValue,
-            effect.applyEffect(currentFrame, baseValue, animation.anim_parameters)
-          )
+          const effectValue = effect.applyEffect(currentFrame, baseValue, animation.anim_parameters)
+          applyEffectToTransform(baseValue, effectValue)
         }
       })
 
