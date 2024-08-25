@@ -7,7 +7,7 @@ import gsap from 'gsap'
 export interface Effect {
   name: string
   params: { [key: string]: any }
-  parameters: { [key: string]: any }
+  parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応
   applyEffect: (
     currentFrame: number,
     baseObject: Transform,
@@ -20,9 +20,9 @@ export const effects: Effect[] = [
     name: '文字送り',
     params: reactive({ time: 30, span: 10, delay: 5 }),
     parameters: {
-      time: { min: 1, max: 60, label: '時間', uiType: UIType.slider },
-      span: { min: 1, max: 20, label: 'スパン', uiType: UIType.slider },
-      delay: { min: 0, max: 30, label: '遅延', uiType: UIType.slider }
+      time: { name: '時間(f)', type: UIType.slider, min: 1, max: 60 },
+      span: { name: '間隔(f)', type: UIType.slider, min: 1, max: 20 },
+      delay: { name: '遅延(f)', type: UIType.slider, min: 0, max: 30 }
     },
     applyEffect: (
       currentFrame: number,
@@ -41,9 +41,9 @@ export const effects: Effect[] = [
   },
   {
     name: '明滅登場',
-    params: reactive({ entrance: 150, exit: 150 }),
+    params: reactive({ entrance: 150 }),
     parameters: {
-      enter: { min: 0, max: 300, label: '登場', uiType: UIType.slider }
+      entrance: { name: '登場', type: UIType.slider, min: 0, max: 300 }
     },
     applyEffect: (
       currentFrame: number,

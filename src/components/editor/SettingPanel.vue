@@ -5,46 +5,32 @@
         <v-tab value="basic">基本設定</v-tab>
         <v-tab v-if="selectedObject.type === 'text'" value="text">テキスト</v-tab>
         <v-tab value="stylize">スタイル</v-tab>
-        <v-tab value="animation">アニメーション</v-tab>
+        <v-tab v-if="'animations' in selectedObject" value="animation">アニメーション</v-tab>
       </v-tabs>
 
-      <v-tabs-window v-model="tab">
-        <!-- 基本設定タブ -->
-        <v-tabs-window-item value="basic">
-          <SettingsTab v-model:params="selectedObject.standardRenderSettings"> </SettingsTab>
-        </v-tabs-window-item>
+      <div class="scroll">
+        <v-tabs-window v-model="tab">
+          <!-- 基本設定タブ -->
+          <v-tabs-window-item value="basic">
+            <SettingsTab v-model:params="selectedObject.standardRenderSettings"> </SettingsTab>
+          </v-tabs-window-item>
 
-        <!-- テキスト設定タブ -->
-        <v-tabs-window-item value="text">
-          <SettingsTab v-model:params="selectedObject.textSettings"> </SettingsTab>
-        </v-tabs-window-item>
+          <!-- テキスト設定タブ -->
+          <v-tabs-window-item value="text">
+            <SettingsTab v-model:params="selectedObject.textSettings"> </SettingsTab>
+          </v-tabs-window-item>
 
-        <!-- スタイライズ設定タブ -->
-        <v-tabs-window-item value="stylize">
-          <p>機能追加予定</p>
-        </v-tabs-window-item>
+          <!-- スタイライズ設定タブ -->
+          <v-tabs-window-item value="stylize">
+            <p>機能追加予定</p>
+          </v-tabs-window-item>
 
-        <!-- アニメーション設定タブ -->
-        <v-tabs-window-item value="animation">
-          <div v-for="(animation, index) in selectedObject.animations" :key="index">
-            <p>{{ animation.anim_name }}</p>
-            <p>{{ animation.anim_parameters }}</p>
-            <div v-for="(parameter, paramKey) in animation.anim_parameters" :key="paramKey">
-              <!-- アニメーションパラメータの表示と操作 -->
-            </div>
-          </div>
-          <v-btn @click="openAnimationDialog()">
-            <v-icon>mdi-plus</v-icon>
-            アニメーション追加
-          </v-btn>
-          <!-- アニメーション設定の呼び出し -->
-          <AnimationPanel
-            v-if="selectedObject && 'animations' in selectedObject"
-            v-model:show="animationPanel"
-            v-model:animations="selectedObject.animations"
-          />
-        </v-tabs-window-item>
-      </v-tabs-window>
+          <!-- アニメーション設定タブ -->
+          <v-tabs-window-item value="animation">
+            <AnimationTab v-model:params="selectedObject.animations"> </AnimationTab>
+          </v-tabs-window-item>
+        </v-tabs-window>
+      </div>
     </div>
   </v-container>
 </template>
@@ -52,8 +38,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
-import AnimationPanel from '@/components/setting/AnimationPanel.vue'
 import SettingsTab from '../setting/SettingsTab.vue'
+import AnimationTab from '../setting/AnimationTab.vue'
+import type { ImageObject, TextObject } from '../parameters/objectInfo'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -63,14 +50,6 @@ const tab = ref('basic')
 const selectedObject: Record<string, any> = computed(() => {
   return objectStore.objects.find((obj) => obj.id === timelineStore.selectedObjectId)
 })
-
-//////////////////////////////////
-// アニメーション設定に関する記述 //
-//////////////////////////////////
-const animationPanel = ref(false)
-function openAnimationDialog() {
-  animationPanel.value = true
-}
 </script>
 
 <style scoped>
@@ -80,6 +59,11 @@ function openAnimationDialog() {
   height: 500px;
   padding: 12px;
   border: 1px solid #ccc;
-  overflow-y: auto;
+  overflow-y: hidden;
+}
+
+.scroll {
+  height: 435px;
+  overflow-y: scroll;
 }
 </style>
