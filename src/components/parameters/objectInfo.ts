@@ -98,7 +98,7 @@ export class StandardRenderSettings extends PropertyMethod {
   static parameterInfo = {
     X: { name: 'X座標', type: UIType.keyframe, min: -1024, max: 1024 },
     Y: { name: 'Y座標', type: UIType.keyframe, min: -1024, max: 1024 },
-    scale: { name: '拡大率', type: UIType.keyframe, min: 0, max: 300 },
+    scale: { name: '拡大率', type: UIType.keyframe, min: 0, max: 500 },
     opacity: { name: '不透明度', type: UIType.keyframe, min: 0, max: 100 },
     angle: { name: '回転', type: UIType.keyframe, min: -360, max: 360 }
   }
@@ -150,9 +150,9 @@ export class TextSettings extends PropertyMethod {
   constructor() {
     super()
     this.textSize = 40
-    this.individual_object = false
+    this.individual_object = true
     this.align = 0
-    this.spacing_x = 30
+    this.spacing_x = 40
     this.spacing_y = 0
     this.color = '#ffffff'
     this.font = 'SourceHanSansJP'

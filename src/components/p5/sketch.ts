@@ -5,7 +5,7 @@ import {
   type KeyframeSettings,
   type AnimationSettings
 } from '@/components/parameters/objectInfo'
-import { Transform, CharacterObject } from '@/components/parameters/p5Info'
+import { Transform, Inform, CharacterObject } from '@/components/parameters/p5Info'
 import { effects } from '@/assets/animations/animation'
 
 let renderObjects: TextObject[] = []
@@ -80,18 +80,14 @@ export function defineSketch(project: any) {
     }
 
     // すべてのエフェクトを適用する関数
-    function applyEffects(
-      index: number,
-      startFrame: number,
-      animations: AnimationSettings
-    ): Transform {
-      const baseValue = new Transform(index, startFrame)
+    function applyEffects(inform: Inform, animations: AnimationSettings): Transform {
+      const baseValue = new Transform()
 
       animations.forEach((animation) => {
         // effects 配列から対応するエフェクトを検索
         const effect = effects.find((effect) => effect.name === animation.anim_name)
         if (effect) {
-          const effectValue = effect.applyEffect(currentFrame, baseValue, animation.anim_parameters)
+          const effectValue = effect.applyEffect(inform, baseValue, animation.anim_parameters)
           applyEffectToTransform(baseValue, effectValue)
         }
       })
@@ -142,7 +138,14 @@ export function defineSketch(project: any) {
 
       textQueue.forEach((charObject) => {
         // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
-        const effectValue = applyEffects(charObject.id, object.start, object.animations)
+        const inform = new Inform(
+          charObject.id,
+          textQueue.length,
+          object.start,
+          object.end,
+          currentFrame
+        )
+        const effectValue = applyEffects(inform, object.animations)
         if (effectValue.opacity == 0) return
         if (effectValue.scale == 0) return
 

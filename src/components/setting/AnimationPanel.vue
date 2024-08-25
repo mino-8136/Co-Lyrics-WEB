@@ -1,11 +1,11 @@
 <template>
-  <v-dialog v-model="showPanel">
+  <v-dialog v-model="showPanel" class="AnimationPanel">
     <v-card>
       <v-card-title> アニメーションエフェクトを選択 </v-card-title>
       <v-row>
-        <v-col v-for="(effect, index) in effects" :key="index" class="d-flex" cols="4">
-          <v-container>
-            <v-img :width="200" aspect-ratio="1" class="bg-grey-lighten-2" cover> </v-img>
+        <v-col v-for="(effect, index) in effects" :key="index" class="d-flex" cols="3">
+          <v-container class="items">
+            <v-img :width="200" aspect-ratio="1" class="bg-pink-lighten-4" cover> </v-img>
             <v-btn @click="handleButtonClick(effect.name, effect.params)">
               {{ effect.name }}
             </v-btn>
@@ -32,3 +32,19 @@ function handleButtonClick(effectName: string, parameters: Record<string, any>) 
   showPanel.value = false
 }
 </script>
+
+<style scoped>
+.AnimationPanel {
+  margin: auto;
+  width: 60%;
+  min-width: 400px;
+  height: 60%;
+  overflow-y: auto;
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>

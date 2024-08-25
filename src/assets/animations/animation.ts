@@ -1,6 +1,6 @@
 import { reactive } from 'vue'
 import { UIType } from '@/components/parameters/objectInfo'
-import { Transform } from '@/components/parameters/p5Info'
+import { Inform, Transform } from '@/components/parameters/p5Info'
 import gsap from 'gsap'
 
 // この形に従う
@@ -8,9 +8,10 @@ export interface Effect {
   name: string
   params: { [key: string]: any }
   description: string
+  tag?: [string]
   parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応
   applyEffect: (
-    currentFrame: number,
+    inform: Inform,
     baseObject: Transform, // readonlyなものとして扱うこと
     params: { [key: string]: any }
   ) => Transform
@@ -28,18 +29,17 @@ export const effects: Effect[] = [
       delay: { name: '遅延(f)', type: UIType.slider, min: -20, max: 20 }
     },
     applyEffect: (
-      currentFrame: number,
+      inform: Inform,
       baseObject: Transform,
       params: { [key: string]: any }
     ): Transform => {
-      const transform = new Transform(baseObject.id, baseObject.start)
+      const transform = new Transform()
       const { time, interval, delay } = params
 
-      let progress = (currentFrame - baseObject.start - baseObject.id * interval - delay) / time
+      let progress = (inform.currentFrame - inform.start - inform.id * interval - delay) / time
       if (progress >= 0) {
         progress = 1
       } // 進捗は0と1の間に正規化
-
       transform.opacity = baseObject.opacity * progress
 
       return transform
@@ -49,19 +49,20 @@ export const effects: Effect[] = [
     name: 'フェードイン',
     params: { time: 10, interval: 1 },
     description: '[時間]で指定したフレーム数で、不透明度が0→100に変化します。',
+    tag: ['in'],
     parameters: {
       time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
       interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 }
     },
     applyEffect: (
-      currentFrame: number,
+      inform: Inform,
       baseObject: Transform,
       params: { [key: string]: any }
     ): Transform => {
-      const transform = new Transform(baseObject.id, baseObject.start)
+      const transform = new Transform()
       const { time, interval } = params
 
-      const progress = (currentFrame - baseObject.start - baseObject.id * interval) / time
+      const progress = (inform.currentFrame - inform.start - inform.id * interval) / time
       transform.opacity = baseObject.opacity * progress
 
       return transform
@@ -71,23 +72,25 @@ export const effects: Effect[] = [
     name: '明滅登場',
     params: { time: 5, interval: 1 },
     description: '文字を一文字ずつ表示します',
+    tag: ['in'],
     parameters: {
       time: { name: '登場時間(f)', type: UIType.slider, min: 0, max: 90 },
       interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 }
     },
     applyEffect: (
-      currentFrame: number,
+      inform: Inform,
       baseObject: Transform,
       params: { [key: string]: any }
     ): Transform => {
-      const transform = new Transform(baseObject.id, baseObject.start)
+      const transform = new Transform()
       const { time, interval } = params
-      const progress = currentFrame - baseObject.start - baseObject.id * interval
 
+      const progress = inform.currentFrame - inform.start - inform.id * interval
       if (progress < 0) transform.opacity = 0
       else if (progress < time && Math.round(progress) % 2 === 0) {
         transform.opacity = 0
       }
+
       return transform
     }
   },
@@ -95,6 +98,7 @@ export const effects: Effect[] = [
     name: 'スライドイン',
     params: { time: 10, interval: 1, X: 50, Y: 0 },
     description: '指定した相対座標([X],[Y])からスライドインします。',
+    tag: ['in'],
     parameters: {
       time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
       interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
@@ -102,14 +106,14 @@ export const effects: Effect[] = [
       Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 }
     },
     applyEffect: (
-      currentFrame: number,
+      inform: Inform,
       baseObject: Transform,
       params: { [key: string]: any }
     ): Transform => {
-      const transform = new Transform(baseObject.id, baseObject.start)
+      const transform = new Transform()
       const { time, interval, X, Y } = params
-      const progress = currentFrame - baseObject.start - baseObject.id * interval
 
+      const progress = inform.currentFrame - inform.start - inform.id * interval
       if (progress < 0) {
         transform.X = X
         transform.Y = Y
