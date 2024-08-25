@@ -3,7 +3,6 @@
     <svg
       :width="props.panelWidth + padding.left + padding.right"
       :height="height + padding.top + padding.bottom"
-      @mousedown="onMouseDown"
     >
       <!-- グリッド線の描画 -->
       <g class="grid" :transform="`translate(${padding.left}, ${padding.top})`">
