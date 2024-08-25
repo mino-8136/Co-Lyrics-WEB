@@ -24,9 +24,10 @@ const showPanel = defineModel<boolean>('show', { required: true })
 const animations = defineModel<AnimationSettings>('animations', { required: true })
 
 function handleButtonClick(effectName: string, parameters: Record<string, any>) {
+  const deepCopiedParameters = JSON.parse(JSON.stringify(parameters))
   animations.value.push({
     anim_name: effectName,
-    anim_parameters: parameters
+    anim_parameters: deepCopiedParameters
   })
   showPanel.value = false
 }
