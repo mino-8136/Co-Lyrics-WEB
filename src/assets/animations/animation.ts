@@ -18,10 +18,10 @@ export interface Effect {
 export const effects: Effect[] = [
   {
     name: '文字送り',
-    params: reactive({ time: 30, span: 10, delay: 5 }),
+    params: reactive({ time: 0, span: 1, delay: 0 }),
     parameters: {
-      time: { name: '時間(f)', type: UIType.slider, min: 1, max: 60 },
-      span: { name: '間隔(f)', type: UIType.slider, min: 1, max: 20 },
+      time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
+      span: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
       delay: { name: '遅延(f)', type: UIType.slider, min: 0, max: 30 }
     },
     applyEffect: (
