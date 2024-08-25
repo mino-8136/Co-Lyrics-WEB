@@ -49,7 +49,7 @@ watch(
 function updateCanvasSize() {
   if (canvasContainer.value && p.value) {
     const { width, height } = canvasContainer.value.getBoundingClientRect()
-    timelineStore.canvasScale = calculateCanvasScale(width, height)
+    timelineStore.canvasScale = calculateCanvasScale(window.innerWidth / 2, height)
     p.value.updateCanvasScale()
   }
 }
