@@ -21,8 +21,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
-import { BaseObject, TextObject, ImageObject } from './objectInfo'
-import { type KeyframeSettings } from './objectInfo'
+import { BaseObject, TextObject, ImageObject } from '../parameters/objectInfo'
+import { type KeyframeSettings } from '../parameters/objectInfo'
 import { useTimelineStore } from '@/stores/objectStore'
 import gsap from 'gsap'
 

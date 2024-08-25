@@ -51,7 +51,7 @@ import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '@/components/objects/ObjectBar.vue'
 import Waveformbar from '@/components/objects/WaveformBar.vue'
-import { type BaseSettings, BaseObject, TextObject } from '@/components/objects/objectInfo'
+import { type BaseSettings, BaseObject, TextObject } from '@/components/parameters/objectInfo'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -124,7 +124,8 @@ function addObject(layerIndex: number, type: string, offsetX: number = 0) {
     id: objectStore.counter,
     start: Math.max(offset, 0),
     end: offset + 100, // TODO: ここに最大値を設定できるようにする
-    layer: layerIndex
+    layer: layerIndex,
+    type: type
   }
 
   if (type === 'text') {

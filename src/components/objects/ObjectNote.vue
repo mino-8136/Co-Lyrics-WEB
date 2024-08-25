@@ -9,9 +9,9 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
-import { BaseObject, TextObject, ImageObject } from './objectInfo'
+import { BaseObject, TextObject, ImageObject } from '../parameters/objectInfo'
 import { useTimelineStore } from '@/stores/objectStore'
-import { type KeyframeSettings } from './objectInfo'
+import { type KeyframeSettings } from '../parameters/objectInfo'
 
 const props = defineProps<{
   object: BaseObject | TextObject | ImageObject

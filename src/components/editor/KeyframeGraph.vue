@@ -84,7 +84,7 @@ import { ref, computed } from 'vue'
 import { gsap } from 'gsap'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import EasingPanel from '@/components/editor/EasingPanel.vue'
-import { type KeyframeSettings, type KeyframeSetting } from '@/components/objects/objectInfo'
+import { type KeyframeSettings, type KeyframeSetting } from '@/components/parameters/objectInfo'
 
 const displayEasingPanel = ref(false)
 const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })
@@ -147,7 +147,7 @@ const points = computed(() => {
     const endFrame = keyframes.value[i + 1].frame
     const startValue = keyframes.value[i].value
     const endValue = keyframes.value[i + 1].value
-    const easingFunc = gsap.parseEase(keyframes.value[i].animation || 'none')
+    const easingFunc = gsap.parseEase(keyframes.value[i].easeType || 'none')
 
     const numPoints = endFrame - startFrame
 

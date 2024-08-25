@@ -1,13 +1,14 @@
 // [Aviutlからの変更点]
 // "settings"をuserdataに移設
 // 数値パラメータを配列に変更
+// anim_name, anim_parametersをanimations配列に統合
 
 // キーフレームの情報管理
 export interface KeyframeSetting {
   value: number
   frame: number
   id: string
-  animation?: string
+  easeType?: string
 }
 
 export type KeyframeSettings = KeyframeSetting[]
@@ -18,6 +19,47 @@ export function isKeyframeSettings(element: any): element is KeyframeSettings {
   return Array.isArray(element)
 }
 
+export interface AnimationSetting {
+  anim_name: string
+  anim_parameters: { [key: string]: any }
+}
+
+export type AnimationSettings = AnimationSetting[]
+
+// エフェクト処理用の相対パラメータ
+export class Transform {
+  id: number
+  start: number
+  X: number
+  Y: number
+  scale: number
+  opacity: number
+  angle: number
+
+  constructor(id: number, start: number) {
+    this.id = id ?? 0
+    this.start = start ?? 0
+    this.X = 0
+    this.Y = 0
+    this.scale = 100
+    this.opacity = 100
+    this.angle = 0
+  }
+}
+
+// p5.js内で用いるのがメイン
+export class CharacterObject {
+  id: number
+  parent: TextObject
+  text: string
+
+  constructor(index: number, parent: TextObject) {
+    ;(this.id = index), (this.parent = parent), (this.text = parent.text[index])
+  }
+}
+
+//////////////////////////////////////////////////////////////
+
 export interface BaseSettings {
   id: number
   start: number
@@ -26,11 +68,6 @@ export interface BaseSettings {
   type: string
   //overlay: number
   //camera: number
-}
-
-export interface AnimationSettings {
-  anim_name: string
-  anim_parameters: {}
 }
 
 export interface StandardRenderSettings {
@@ -57,13 +94,13 @@ export class BaseObject implements BaseSettings {
     this.start = settings.start
     this.end = settings.end
     this.layer = settings.layer
-    this.type = "base"
+    this.type = 'base'
     //this.overlay = settings.overlay
     //this.camera = settings.camera
   }
 }
 
-export interface TextSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
+export interface TextSettings extends BaseSettings, StandardRenderSettings {
   //name: string
   textSize: number
   //display_speed: number
@@ -92,8 +129,7 @@ export class TextObject extends BaseObject implements TextSettings {
   scale: KeyframeSettings
   opacity: KeyframeSettings
   angle: KeyframeSettings
-  anim_name: string
-  anim_parameters: any
+  animations: AnimationSettings
   type: string
   textSize: number
   individual_object: boolean
@@ -113,8 +149,7 @@ export class TextObject extends BaseObject implements TextSettings {
     this.scale = [{ value: 100, frame: 0, id: '0' }]
     this.opacity = [{ value: 100, frame: 0, id: '0' }]
     this.angle = [{ value: 0, frame: 0, id: '0' }]
-    this.anim_name = 'サンプル'
-    this.anim_parameters = []
+    this.animations = []
     this.type = 'text'
     this.textSize = 40
     this.individual_object = false
@@ -128,30 +163,7 @@ export class TextObject extends BaseObject implements TextSettings {
   }
 }
 
-// p5.js内で用いるのがメイン
-export class CharacterObject {
-  index: number
-  parent: TextObject
-  char: string
-  animX: number
-  animY: number
-  animScale: number
-  animOpacity: number
-  animAngle: number
-
-  constructor(index: number, parent: TextObject) {
-    ;(this.index = index),
-      (this.parent = parent),
-      (this.char = parent.text[index]),
-      (this.animX = 0),
-      (this.animY = 0),
-      (this.animScale = 100),
-      (this.animOpacity = 100),
-      (this.animAngle = 0)
-  }
-}
-
-export interface ImageSettings extends BaseSettings, AnimationSettings, StandardRenderSettings {
+export interface ImageSettings extends BaseSettings, StandardRenderSettings {
   file: string
 }
 
@@ -161,9 +173,8 @@ export class ImageObject extends BaseObject implements ImageSettings {
   scale: KeyframeSettings
   opacity: KeyframeSettings
   angle: KeyframeSettings
+  animations: AnimationSettings
   file: string
-  anim_name: string
-  anim_parameters: any
 
   constructor(settings: BaseSettings) {
     super(settings)
@@ -172,8 +183,7 @@ export class ImageObject extends BaseObject implements ImageSettings {
     this.scale = [{ value: 100, frame: 0, id: '0' }]
     this.opacity = [{ value: 100, frame: 0, id: '0' }]
     this.angle = [{ value: 0, frame: 0, id: '0' }]
+    this.animations = []
     this.file = ''
-    this.anim_name = ''
-    this.anim_parameters = []
   }
 }
