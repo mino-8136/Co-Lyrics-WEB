@@ -82,11 +82,11 @@ export class BaseSettings {
   start: number
   end: number
   layer: number
-  type: string
+  type: typeString
   //overlay: number
   //camera: number
 
-  constructor(id: number, start: number, end: number, layer: number, type: string) {
+  constructor(id: number, start: number, end: number, layer: number, type: typeString) {
     this.id = id
     this.start = start
     this.end = end
@@ -212,12 +212,12 @@ export class ShapeSettings extends PropertyMethod {
 // 各オブジェクトの実装  //
 /////////////////////////
 
-export class BaseObject {
+export class BaseObject implements BaseSettings {
   id: number
   start: number
   end: number
   layer: number
-  type: string
+  type: typeString
   //overlay: number
   //camera: number
 
@@ -278,5 +278,8 @@ export class ShapeObject extends BaseObject {
   }
 }
 
-////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////
+// オブジェクトが増えたら適宜追加する  //
+//////////////////////////////////////
+export type typeString = '' | 'base' | 'text' | 'image' | 'shape'
 export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject

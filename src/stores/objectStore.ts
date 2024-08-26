@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia'
-import { BaseObject, TextObject, ImageObject } from '@/components/parameters/objectInfo'
+import { type RenderObject } from '@/components/parameters/objectInfo'
 
 export const useObjectStore = defineStore('objects', {
   state: () => ({
     counter: 0,
-    objects: [] as (TextObject | ImageObject | BaseObject)[]
+    objects: [] as RenderObject[]
   }),
   getters: {
     currentObjects: (state) => (frame: number) => {
@@ -12,7 +12,7 @@ export const useObjectStore = defineStore('objects', {
     }
   },
   actions: {
-    addObject(object: TextObject | ImageObject | BaseObject) {
+    addObject(object: RenderObject) {
       this.objects.push(object)
       this.counter++
     },
@@ -49,5 +49,5 @@ export const useTimelineStore = defineStore('timeline', {
 })
 
 /*
- /src/assets/music/demo.mp3
+ /assets/music/demo.mp3
 */
