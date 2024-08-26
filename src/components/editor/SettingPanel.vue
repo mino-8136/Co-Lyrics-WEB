@@ -4,6 +4,7 @@
       <v-tabs v-model="tab">
         <v-tab v-if="'standardRenderSettings' in selectedObject" value="basic">基本設定</v-tab>
         <v-tab v-if="'textSettings' in selectedObject" value="text">テキスト</v-tab>
+        <v-tab v-if="'shapeSettings' in selectedObject" value="shape">図形</v-tab>
         <v-tab v-if="'styleSettings' in selectedObject" value="style">スタイル</v-tab>
         <v-tab v-if="'animations' in selectedObject" value="animation">アニメーション</v-tab>
       </v-tabs>
@@ -24,6 +25,15 @@
             <SettingsTab
               v-if="'textSettings' in selectedObject"
               v-model:params="selectedObject.textSettings"
+            >
+            </SettingsTab>
+          </v-tabs-window-item>
+
+          <!-- テキスト設定タブ -->
+          <v-tabs-window-item value="shape">
+            <SettingsTab
+              v-if="'shapeSettings' in selectedObject"
+              v-model:params="selectedObject.shapeSettings"
             >
             </SettingsTab>
           </v-tabs-window-item>

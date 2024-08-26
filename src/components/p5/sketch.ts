@@ -30,6 +30,7 @@ export function defineSketch(project: any) {
       p.smooth()
       p.angleMode(p.DEGREES)
       p.colorMode(p.RGB, 255, 255, 255, 100)
+      p.rectMode(p.CENTER)
       p.frameRate(project.framerate)
 
       p.background(0)
@@ -120,25 +121,32 @@ export function defineSketch(project: any) {
     const renderShape = (object: ShapeObject) => {
       p.push()
 
+      // スタイライズエフェクトの処理(renderTextと同様)
+      const col = p.color(object.shapeSettings.fill_color)
+      col.setAlpha(lerpValue(object.standardRenderSettings.opacity, object.start))
+      p.fill(col)
+
+      // 全体的なトランスフォームの実行(renderTextと同様)
+      p.translate(
+        lerpValue(object.standardRenderSettings.X, object.start),
+        lerpValue(object.standardRenderSettings.Y, object.start)
+      )
+      p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
+      p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
+
+      // 図形のレンダリングの実行
       switch (object.shapeSettings.shape) {
         case 'background':
           p.background(object.shapeSettings.fill_color)
           break
         case 'rect':
-          p.rect(
-            object.standardRenderSettings.X[0].value,
-            object.standardRenderSettings.Y[0].value,
-            object.standardRenderSettings.scale[0].value
-          )
+          p.rect(0, 0, object.shapeSettings.width, object.shapeSettings.height)
           break
         case 'ellipse':
-          p.ellipse(
-            object.standardRenderSettings.X[0].value,
-            object.standardRenderSettings.Y[0].value,
-            object.standardRenderSettings.scale[0].value
-          )
+          p.ellipse(0, 0, object.shapeSettings.width, object.shapeSettings.height)
           break
       }
+      p.pop()
     }
 
     //////////////////////////////

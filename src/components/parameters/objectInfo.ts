@@ -187,19 +187,22 @@ export class ImageSettings extends PropertyMethod {
 }
 
 export class ShapeSettings extends PropertyMethod {
-  aspect_ratio: number
+  width: number
+  height: number
   fill_color: string
   shape: ShapeType
 
   static parameterInfo = {
-    aspect_ratio: { name: '縦横比', type: UIType.slider, min: -100, max: 100 },
+    width: { name: '幅', type: UIType.slider, min: -500, max: 500 },
+    height: { name: '高さ', type: UIType.slider, min: -500, max: 500 },
     fill_color: { name: '塗りつぶし', type: UIType.color },
     shape: { name: '図形', type: UIType.select }
   }
 
   constructor() {
     super()
-    this.aspect_ratio = 1
+    this.width = 200
+    this.height = 200
     this.fill_color = '#ffffff'
     this.shape = ShapeType.rect
   }
