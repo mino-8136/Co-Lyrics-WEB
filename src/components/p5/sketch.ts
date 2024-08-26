@@ -3,10 +3,12 @@ import type p5 from 'p5'
 import {
   type TextObject,
   type KeyframeSettings,
-  type AnimationSettings
+  type AnimationSettings,
+  type StyleSettings,
+  ShapeObject
 } from '@/components/parameters/objectInfo'
 import { Transform, Inform, CharacterObject } from '@/components/parameters/p5Info'
-import { effects } from '@/assets/animations/animation'
+import { animationList } from '@/assets/effects/animation'
 
 let renderObjects: TextObject[] = []
 let currentFrame = 0
@@ -28,6 +30,8 @@ export function defineSketch(project: any) {
       p.smooth()
       p.angleMode(p.DEGREES)
       p.colorMode(p.RGB, 255, 255, 255, 100)
+      p.strokeWeight(0)
+      p.rectMode(p.CENTER)
       p.frameRate(project.framerate)
 
       p.background(0)
@@ -54,10 +58,32 @@ export function defineSketch(project: any) {
           case 'image':
             renderImage(object)
             break
+          case 'shape':
+            renderShape(object)
+            break
         }
       })
 
       p.pop()
+    }
+    ///////////////////////
+    // スタイル処理の関数 //
+    ///////////////////////
+
+    function applyStyle(styles: StyleSettings) {
+      styles.forEach((style) => {
+        switch (style.name) {
+          case '縁取り':
+            p.strokeWeight(style.line_width)
+            break
+          case 'シャドー':
+            p.drawingContext.shadowOffsetX = 0
+            p.drawingContext.shadowOffsetY = 0
+            p.drawingContext.shadowBlur = 5
+            p.drawingContext.shadowColor = '#ffffff'
+            break
+        }
+      })
     }
 
     ////////////////////////
@@ -79,14 +105,49 @@ export function defineSketch(project: any) {
 
       animations.forEach((animation) => {
         // effects 配列から対応するエフェクトを検索
-        const effect = effects.find((effect) => effect.name === animation.anim_name)
+        const effect = animationList.find((effect) => effect.name === animation.name)
         if (effect) {
-          const effectValue = effect.applyEffect(inform, baseValue, animation.anim_parameters)
+          const effectValue = effect.applyEffect(inform, baseValue, animation.parameters)
           applyEffectToTransform(baseValue, effectValue)
         }
       })
 
       return baseValue
+    }
+
+    //////////////////////////
+    // 図形レンダリングの関数 //
+    //////////////////////////
+
+    const renderShape = (object: ShapeObject) => {
+      p.push()
+
+      // スタイライズエフェクトの処理(renderTextと同様)
+      const col = p.color(object.shapeSettings.fill_color)
+      col.setAlpha(lerpValue(object.standardRenderSettings.opacity, object.start))
+      p.fill(col)
+
+      // 全体的なトランスフォームの実行(renderTextと同様)
+      p.translate(
+        lerpValue(object.standardRenderSettings.X, object.start),
+        lerpValue(object.standardRenderSettings.Y, object.start)
+      )
+      p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
+      p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
+
+      // 図形のレンダリングの実行
+      switch (object.shapeSettings.shape) {
+        case 'background':
+          p.background(object.shapeSettings.fill_color)
+          break
+        case 'rect':
+          p.rect(0, 0, object.shapeSettings.width, object.shapeSettings.height)
+          break
+        case 'ellipse':
+          p.ellipse(0, 0, object.shapeSettings.width, object.shapeSettings.height)
+          break
+      }
+      p.pop()
     }
 
     //////////////////////////////

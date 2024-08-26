@@ -4,7 +4,8 @@
       <v-tabs v-model="tab">
         <v-tab v-if="'standardRenderSettings' in selectedObject" value="basic">基本設定</v-tab>
         <v-tab v-if="'textSettings' in selectedObject" value="text">テキスト</v-tab>
-        <v-tab value="stylize">スタイル</v-tab>
+        <v-tab v-if="'shapeSettings' in selectedObject" value="shape">図形</v-tab>
+        <v-tab v-if="'styleSettings' in selectedObject" value="style">スタイル</v-tab>
         <v-tab v-if="'animations' in selectedObject" value="animation">アニメーション</v-tab>
       </v-tabs>
 
@@ -28,18 +29,33 @@
             </SettingsTab>
           </v-tabs-window-item>
 
+          <!-- テキスト設定タブ -->
+          <v-tabs-window-item value="shape">
+            <SettingsTab
+              v-if="'shapeSettings' in selectedObject"
+              v-model:params="selectedObject.shapeSettings"
+            >
+            </SettingsTab>
+          </v-tabs-window-item>
+
           <!-- スタイライズ設定タブ -->
-          <v-tabs-window-item value="stylize">
-            <p>機能追加予定</p>
+          <v-tabs-window-item value="style">
+            <EffectTab
+              v-if="'styleSettings' in selectedObject"
+              v-model:params="selectedObject.styleSettings"
+              type="style"
+            >
+            </EffectTab>
           </v-tabs-window-item>
 
           <!-- アニメーション設定タブ -->
           <v-tabs-window-item value="animation">
-            <AnimationTab
+            <EffectTab
               v-if="'animations' in selectedObject"
               v-model:params="selectedObject.animations"
+              type="animation"
             >
-            </AnimationTab>
+            </EffectTab>
           </v-tabs-window-item>
         </v-tabs-window>
       </div>
@@ -51,7 +67,7 @@
 import { ref, computed } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import SettingsTab from '../setting/SettingsTab.vue'
-import AnimationTab from '../setting/AnimationTab.vue'
+import EffectTab from '../setting/EffectTab.vue'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()

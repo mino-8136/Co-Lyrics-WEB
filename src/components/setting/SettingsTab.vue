@@ -149,7 +149,7 @@ import {
 } from '@/components/parameters/objectInfo'
 import EasingPanel from '@/components/setting/EasingPanel.vue'
 import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
-import { fontListData } from '@/assets/fonts/fonts'
+import { fontListData } from '@/components/parameters/fonts'
 import { generateUniqueId } from '@/components/utils/common'
 
 const objectStore = useObjectStore()

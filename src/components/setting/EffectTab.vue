@@ -1,11 +1,11 @@
+// AnimationTabと統合予定
+
 <template>
-  <div v-for="(params, label) in parameters" :key="params.anim_id">
-    <transition-group name="list">
+  <transition-group name="list">
+    <div v-for="(params, label) in parameters" :key="params.id">
       <v-card variant="outlined" class="mb-2">
         <template v-slot:title>
-          <p class="text-body-1">
-            {{ parameters[label].anim_name }}
-          </p>
+          <p class="text-body-1">{{ params.name }}</p>
         </template>
         <template v-slot:prepend>
           <v-icon @click="openDescription(searchEffects(params).description)"
@@ -13,9 +13,9 @@
           </v-icon>
         </template>
         <template v-slot:append>
-          <v-icon @click="upAnimation(label)">mdi-arrow-up </v-icon>
-          <v-icon @click="downAnimation(label)">mdi-arrow-down </v-icon>
-          <v-icon @click="delateAnimation(label)">mdi-delete</v-icon>
+          <v-icon @click="upEffect(label)">mdi-arrow-up </v-icon>
+          <v-icon @click="downEffect(label)">mdi-arrow-down </v-icon>
+          <v-icon @click="deleteEffect(label)">mdi-delete</v-icon>
         </template>
 
         <div
@@ -32,37 +32,35 @@
             <!-- 数値型パラメータの場合 -->
             <template v-if="param.type == UIType.slider">
               <v-slider
-                v-model="parameters[label].anim_parameters[paramLabel]"
+                v-model="params.parameters[paramLabel]"
                 :min="param.min"
                 :max="param.max"
                 step="1"
                 hide-details
               >
                 <template v-slot:prepend>
-                  <input
-                    class="parameter-value"
-                    v-model.number="parameters[label].anim_parameters[paramLabel]"
-                  />
+                  <input class="parameter-value" v-model.number="params.parameters[paramLabel]" />
                 </template>
               </v-slider>
             </template>
 
             <!-- チェックボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.checkbox">
-              <v-checkbox v-model="parameters[label].anim_parameters[paramLabel]" hide-details />
+              <v-checkbox v-model="params.parameters[paramLabel]" hide-details />
             </template>
           </div>
         </div>
       </v-card>
-    </transition-group>
-  </div>
+    </div>
+  </transition-group>
 
-  <v-btn block variant="outlined" class="mb-2 elevation-1" @click="openAnimationDialog()">
+  <v-btn block variant="outlined" class="mb-2 elevation-1" @click="openEffectDialog()">
     <v-icon>mdi-plus</v-icon>
-    アニメーション追加
+    エフェクト追加
   </v-btn>
+
   <!-- アニメーション設定の呼び出し -->
-  <AnimationPanel v-model:show="animationPanel" v-model:animations="selectedObject.animations" />
+  <StylePanel :type="props.type" v-model:show="effectPanel" v-model:effects="parameters" />
 
   <v-dialog v-model="descriptionPanel" max-width="800px">
     <v-card>
@@ -78,46 +76,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
+import { ref } from 'vue'
 import {
   UIType,
-  type AnimationSettings,
+  type StyleSettings,
+  type StyleSetting,
   type AnimationSetting
 } from '@/components/parameters/objectInfo'
-import AnimationPanel from './AnimationPanel.vue'
-import { effects } from '@/assets/animations/animation'
+import StylePanel from './EffectPanel.vue'
+import { animationList } from '@/assets/effects/animation'
+import { styleList } from '@/assets/effects/style'
 
-const objectStore = useObjectStore()
-const timelineStore = useTimelineStore()
-const parameters = defineModel<AnimationSettings>('params', { required: true })
-
-// 選択されたオブジェクトの情報(setting panelと同じ)
-const selectedObject: Record<string, any> = computed(() => {
-  return objectStore.objects.find((obj) => obj.id === timelineStore.selectedObjectId)
-})
+const parameters = defineModel<StyleSettings>('params', { required: true })
+const props = defineProps<{
+  type: String // 'animation' or 'style'
+}>()
 
 //////////////////////////////////
 // アニメーション設定に関する記述 //
 //////////////////////////////////
-const animationPanel = ref(false)
+const effectPanel = ref(false)
 const descriptionPanel = ref(false)
 let description = ''
 
-function openAnimationDialog() {
-  animationPanel.value = true
+function openEffectDialog() {
+  effectPanel.value = true
 }
 
 // 指定されたアニメーションのパラメータを検索する関数
-function searchEffects(animation: AnimationSetting): { [key: string]: any } {
-  // effects 配列から対応するエフェクトを検索
-  const effect = effects.find((effect) => effect.name === animation.anim_name)
-  if (effect) {
-    // console.log(Object.keys(effect.parameters).map((key) => effect.parameters[key].name))
-    return effect
-  } else {
-    return {}
-  }
+function searchEffects(effect: StyleSetting | AnimationSetting): { [key: string]: any } {
+  const effectList = props.type == 'animation' ? animationList : styleList
+  return effectList.find((item) => item.name === effect.name) || {}
 }
 
 // 説明書を開く関数
@@ -126,7 +115,7 @@ function openDescription(text: string) {
   descriptionPanel.value = true
 }
 
-function upAnimation(index: number) {
+function upEffect(index: number) {
   if (index > 0) {
     const temp = parameters.value[index]
     parameters.value[index] = parameters.value[index - 1]
@@ -134,15 +123,14 @@ function upAnimation(index: number) {
   }
 }
 
-function downAnimation(index: number) {
+function downEffect(index: number) {
   if (index < parameters.value.length - 1) {
     const temp = parameters.value[index]
     parameters.value[index] = parameters.value[index + 1]
     parameters.value[index + 1] = temp
   }
 }
-
-function delateAnimation(index: number) {
+function deleteEffect(index: number) {
   parameters.value.splice(index, 1)
 }
 </script>
