@@ -30,20 +30,22 @@
 
           <!-- スタイライズ設定タブ -->
           <v-tabs-window-item value="style">
-            <StyleTab
+            <EffectTab
               v-if="'styleSettings' in selectedObject"
               v-model:params="selectedObject.styleSettings"
+              type="style"
             >
-            </StyleTab>
+            </EffectTab>
           </v-tabs-window-item>
 
           <!-- アニメーション設定タブ -->
           <v-tabs-window-item value="animation">
-            <AnimationTab
+            <EffectTab
               v-if="'animations' in selectedObject"
               v-model:params="selectedObject.animations"
+              type="animation"
             >
-            </AnimationTab>
+            </EffectTab>
           </v-tabs-window-item>
         </v-tabs-window>
       </div>
@@ -55,8 +57,7 @@
 import { ref, computed } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import SettingsTab from '../setting/SettingsTab.vue'
-import AnimationTab from '../setting/AnimationTab.vue'
-import StyleTab from '../setting/StyleTab.vue'
+import EffectTab from '../setting/EffectTab.vue'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()

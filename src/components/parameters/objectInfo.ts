@@ -24,16 +24,16 @@ export function isKeyframeSettings(element: any): element is KeyframeSettings {
 //////////////////////////////////////////////////////////////
 
 export interface AnimationSetting {
-  anim_name: string
-  anim_parameters: { [key: string]: any }
-  anim_id: string
+  name: string
+  parameters: { [key: string]: any }
+  id: string
 }
 export type AnimationSettings = AnimationSetting[]
 
 export interface StyleSetting {
-  style_name: string
-  style_parameters: { [key: string]: any }
-  style_id: string
+  name: string
+  parameters: { [key: string]: any }
+  id: string
 }
 export type StyleSettings = StyleSetting[]
 
