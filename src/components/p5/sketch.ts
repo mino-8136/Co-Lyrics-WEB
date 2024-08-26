@@ -5,12 +5,15 @@ import {
   type KeyframeSettings,
   type AnimationSettings,
   type StyleSettings,
-  ShapeObject
+  ShapeObject,
+  ImageObject,
+  BaseObject,
+  type RenderObject
 } from '@/components/parameters/objectInfo'
 import { Transform, Inform, CharacterObject } from '@/components/parameters/p5Info'
 import { animationList } from '@/assets/effects/animation'
 
-let renderObjects: TextObject[] = []
+let renderObjects: RenderObject[] = []
 let currentFrame = 0
 let fonts: p5.Font
 
@@ -53,13 +56,13 @@ export function defineSketch(project: any) {
         // テキストオブジェクトの描画
         switch (object.type) {
           case 'text':
-            renderText(object)
+            renderText(object as TextObject)
             break
           case 'image':
-            renderImage(object)
+            renderImage(object as ImageObject)
             break
           case 'shape':
-            renderShape(object)
+            renderShape(object as ShapeObject)
             break
         }
       })
@@ -74,7 +77,6 @@ export function defineSketch(project: any) {
       styles.forEach((style) => {
         switch (style.name) {
           case '縁取り':
-            p.strokeWeight(style.line_width)
             break
           case 'シャドー':
             p.drawingContext.shadowOffsetX = 0
@@ -113,6 +115,12 @@ export function defineSketch(project: any) {
       })
 
       return baseValue
+    }
+    //////////////////////////
+    // 画像レンダリングの関数 //
+    //////////////////////////
+    const renderImage = (object: ImageObject) => {
+      return null
     }
 
     //////////////////////////
@@ -331,7 +339,7 @@ export function defineSketch(project: any) {
     // 外部に公開するための関数 //
     ////////////////////////////
 
-    p.addRenderObjects = (currentObjects: TextObject[]) => {
+    p.addRenderObjects = (currentObjects: RenderObject[]) => {
       //console.log(objects)
       renderObjects = currentObjects
     }
@@ -349,7 +357,7 @@ export function defineSketch(project: any) {
 
 declare module 'p5' {
   interface p5InstanceExtensions {
-    addRenderObjects: (currentObjects: TextObject[]) => void
+    addRenderObjects: (currentObjects: RenderObject[]) => void
     updateCurrentFrame: (frame: number) => void
     updateCanvasScale: () => void
   }

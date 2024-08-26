@@ -277,3 +277,6 @@ export class ShapeObject extends BaseObject {
     this.animations = []
   }
 }
+
+////////////////////////////////////////////////////////////////////////
+export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
