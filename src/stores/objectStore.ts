@@ -10,8 +10,8 @@ export const useObjectStore = defineStore('objects', {
     currentObjects: (state) => (frame: number) => {
       return state.objects.filter((object) => object.start <= frame && object.end >= frame)
     },
-    findLastId: (state) => {
-      return Math.max(...state.objects.map((object) => object.id))
+    findLastId: (state): number => {
+      return Math.max(Math.max(...state.objects.map((object) => object.id)), -1)
     }
   },
   actions: {

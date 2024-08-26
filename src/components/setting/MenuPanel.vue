@@ -5,11 +5,15 @@
     </template>
 
     <v-list>
-      <v-list-item @click="openFile">
-        <v-list-item-title>ファイルを開く</v-list-item-title>
+      <v-list-item @click="saveFile()">
+        <v-list-item-title><v-icon>mdi-download</v-icon> ファイルを保存</v-list-item-title>
       </v-list-item>
-      <v-list-item @click="saveFile">
-        <v-list-item-title>ファイルを保存</v-list-item-title>
+      <v-divider></v-divider>
+      <v-list-item @click="openFile('open')">
+        <v-list-item-title>別のファイルを開く</v-list-item-title>
+      </v-list-item>
+      <v-list-item @click="openFile('add')">
+        <v-list-item-title>別のファイルから追加</v-list-item-title>
       </v-list-item>
     </v-list>
   </v-menu>
@@ -45,7 +49,7 @@ const saveFile = () => {
   URL.revokeObjectURL(url)
 }
 
-const openFile = () => {
+const openFile = (state: string) => {
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'application/json'
@@ -59,7 +63,15 @@ const openFile = () => {
       const jsonData = reader.result as string
       const objData = JSON.parse(jsonData)
 
-      objectStore.clearObjects()
+      if (state === 'open') {
+        // 新規に開く場合はオブジェクトを全削除
+        objectStore.clearObjects()
+      } else {
+        // 最後のインデックスを取得してその次から追加する
+        objectStore.counter = objectStore.findLastId + 1
+        console.log(objectStore.counter)
+      }
+
       objData.forEach((obj: RenderObject) => {
         let newObj = createObject(obj)
 
