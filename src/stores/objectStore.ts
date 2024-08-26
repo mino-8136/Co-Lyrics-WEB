@@ -9,6 +9,9 @@ export const useObjectStore = defineStore('objects', {
   getters: {
     currentObjects: (state) => (frame: number) => {
       return state.objects.filter((object) => object.start <= frame && object.end >= frame)
+    },
+    findLastId: (state) => {
+      return Math.max(...state.objects.map((object) => object.id))
     }
   },
   actions: {
@@ -21,6 +24,10 @@ export const useObjectStore = defineStore('objects', {
         this.objects.findIndex((object) => object.id === index),
         1
       )
+    },
+    clearObjects() {
+      this.objects.splice(0)
+      this.counter = 0
     }
   }
 })

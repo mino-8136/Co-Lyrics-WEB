@@ -299,3 +299,25 @@ export class ShapeObject extends BaseObject {
 //////////////////////////////////////
 export type typeString = '' | 'base' | 'text' | 'image' | 'shape'
 export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
+
+// 指定されたパラメータからオブジェクトを生成する(ファイル保存処理のみで使用)
+export function createObject(obj: RenderObject): any {
+  const types = {
+    text: TextObject,
+    image: ImageObject,
+    base: BaseObject,
+    shape: ShapeObject,
+    '': BaseObject
+  }
+
+  const ClassRef = types[obj.type] || BaseObject
+  const newObj = new ClassRef({
+    id: obj.id,
+    start: obj.start,
+    end: obj.end,
+    layer: obj.layer,
+    type: obj.type
+  })
+
+  return newObj
+}
