@@ -21,7 +21,7 @@ export function defineSketch(project: any) {
   // 実際はtimelineStoreを引数に取る
   return function sketch(p: p5) {
     p.preload = () => {
-      fonts = p.loadFont('src/assets/fonts/SourceHanSansJP/SourceHanSansJP-Medium.otf')
+      fonts = p.loadFont('/assets/fonts/SourceHanSansJP/SourceHanSansJP-Medium.otf')
     }
     p.setup = () => {
       const canvas = p.createCanvas(
