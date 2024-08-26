@@ -9,7 +9,7 @@
         <v-list-item-title>ファイルを開く</v-list-item-title>
       </v-list-item>
       <v-list-item @click="saveFile">
-        <v-list-item-title @click="saveFile">ファイルを保存</v-list-item-title>
+        <v-list-item-title>ファイルを保存</v-list-item-title>
       </v-list-item>
     </v-list>
   </v-menu>
