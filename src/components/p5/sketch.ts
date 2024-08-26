@@ -3,10 +3,12 @@ import type p5 from 'p5'
 import {
   type TextObject,
   type KeyframeSettings,
-  type AnimationSettings
+  type AnimationSettings,
+  type StyleSettings,
+  ShapeObject
 } from '@/components/parameters/objectInfo'
 import { Transform, Inform, CharacterObject } from '@/components/parameters/p5Info'
-import { effects } from '@/assets/animations/animation'
+import { animationList } from '@/assets/animations/animation'
 
 let renderObjects: TextObject[] = []
 let currentFrame = 0
@@ -54,10 +56,32 @@ export function defineSketch(project: any) {
           case 'image':
             renderImage(object)
             break
+          case 'shape':
+            renderShape(object)
+            break
         }
       })
 
       p.pop()
+    }
+    ///////////////////////
+    // スタイル処理の関数 //
+    ///////////////////////
+
+    function applyStyle(styles: StyleSettings) {
+      styles.forEach((style) => {
+        switch (style.name) {
+          case '縁取り':
+            p.strokeWeight(style.line_width)
+            break
+          case 'シャドー':
+            p.drawingContext.shadowOffsetX = 0
+            p.drawingContext.shadowOffsetY = 0
+            p.drawingContext.shadowBlur = 5
+            p.drawingContext.shadowColor = '#ffffff'
+            break
+        }
+      })
     }
 
     ////////////////////////
@@ -79,7 +103,7 @@ export function defineSketch(project: any) {
 
       animations.forEach((animation) => {
         // effects 配列から対応するエフェクトを検索
-        const effect = effects.find((effect) => effect.name === animation.anim_name)
+        const effect = animationList.find((effect) => effect.name === animation.anim_name)
         if (effect) {
           const effectValue = effect.applyEffect(inform, baseValue, animation.anim_parameters)
           applyEffectToTransform(baseValue, effectValue)
@@ -87,6 +111,58 @@ export function defineSketch(project: any) {
       })
 
       return baseValue
+    }
+
+    //////////////////////////
+    // 図形レンダリングの関数 //
+    //////////////////////////
+
+    const renderShape = (object: ShapeObject) => {
+      p.push()
+
+      switch (object.shapeSettings.shapeType) {
+        case 'background':
+          p.background(
+            object.shapeSettings.color.r,
+            object.shapeSettings.color.g,
+            object.shapeSettings.color.b
+          )
+          break
+        case 'rect':
+          p.rect(
+            object.shapeSettings.X,
+            object.shapeSettings.Y,
+            object.shapeSettings.width,
+            object.shapeSettings.height
+          )
+          break
+        case 'ellipse':
+          p.ellipse(
+            object.shapeSettings.X,
+            object.shapeSettings.Y,
+            object.shapeSettings.width,
+            object.shapeSettings.height
+          )
+          break
+        case 'line':
+          p.line(
+            object.shapeSettings.X,
+            object.shapeSettings.Y,
+            object.shapeSettings.endX,
+            object.shapeSettings.endY
+          )
+          break
+        case 'triangle':
+          p.triangle(
+            object.shapeSettings.X,
+            object.shapeSettings.Y,
+            object.shapeSettings.X2,
+            object.shapeSettings.Y2,
+            object.shapeSettings.X3,
+            object.shapeSettings.Y3
+          )
+          break
+      }
     }
 
     //////////////////////////////

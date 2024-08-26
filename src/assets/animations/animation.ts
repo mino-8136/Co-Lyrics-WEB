@@ -3,7 +3,7 @@ import { Inform, Transform } from '@/components/parameters/p5Info'
 import gsap from 'gsap'
 
 // この形に従う
-export interface Effect {
+export interface Animation {
   name: string
   params: { [key: string]: any }
   description: string
@@ -16,7 +16,7 @@ export interface Effect {
   ) => Transform
 }
 
-export const effects: Effect[] = [
+export const animationList: Animation[] = [
   {
     name: '文字送り',
     params: { time: 1, interval: 1, delay: 0 },

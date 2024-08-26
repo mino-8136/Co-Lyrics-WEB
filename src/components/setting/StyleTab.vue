@@ -1,10 +1,12 @@
+// AnimationTabと統合予定
+
 <template>
   <transition-group name="list">
-    <div v-for="(params, label) in parameters" :key="params.anim_id">
+    <div v-for="(params, label) in parameters" :key="params.style_id">
       <v-card variant="outlined" class="mb-2">
         <template v-slot:title>
           <p class="text-body-1">
-            {{ parameters[label].anim_name }}
+            {{ parameters[label].style_name }}
           </p>
         </template>
         <template v-slot:prepend>
@@ -32,7 +34,7 @@
             <!-- 数値型パラメータの場合 -->
             <template v-if="param.type == UIType.slider">
               <v-slider
-                v-model="parameters[label].anim_parameters[paramLabel]"
+                v-model="parameters[label].style_parameters[paramLabel]"
                 :min="param.min"
                 :max="param.max"
                 step="1"
@@ -41,7 +43,7 @@
                 <template v-slot:prepend>
                   <input
                     class="parameter-value"
-                    v-model.number="parameters[label].anim_parameters[paramLabel]"
+                    v-model.number="parameters[label].style_parameters[paramLabel]"
                   />
                 </template>
               </v-slider>
@@ -49,7 +51,7 @@
 
             <!-- チェックボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.checkbox">
-              <v-checkbox v-model="parameters[label].anim_parameters[paramLabel]" hide-details />
+              <v-checkbox v-model="parameters[label].style_parameters[paramLabel]" hide-details />
             </template>
           </div>
         </div>
@@ -62,7 +64,7 @@
     アニメーション追加
   </v-btn>
   <!-- アニメーション設定の呼び出し -->
-  <AnimationPanel v-model:show="animationPanel" v-model:animations="selectedObject.animations" />
+  <StylePanel v-model:show="animationPanel" v-model:animations="selectedObject.styleSettings" />
 
   <v-dialog v-model="descriptionPanel" max-width="800px">
     <v-card>
@@ -80,17 +82,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
-import {
-  UIType,
-  type AnimationSettings,
-  type AnimationSetting
-} from '@/components/parameters/objectInfo'
-import AnimationPanel from './AnimationPanel.vue'
-import { animationList } from '@/assets/animations/animation'
+import { UIType, type StyleSettings, type StyleSetting } from '@/components/parameters/objectInfo'
+import StylePanel from './StylePanel.vue'
+import { styleList } from '@/assets/styles/style'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
-const parameters = defineModel<AnimationSettings>('params', { required: true })
+const parameters = defineModel<StyleSettings>('params', { required: true })
 
 // 選択されたオブジェクトの情報(setting panelと同じ)
 const selectedObject: Record<string, any> = computed(() => {
@@ -109,9 +107,9 @@ function openAnimationDialog() {
 }
 
 // 指定されたアニメーションのパラメータを検索する関数
-function searchEffects(animation: AnimationSetting): { [key: string]: any } {
+function searchEffects(animation: StyleSetting): { [key: string]: any } {
   // effects 配列から対応するエフェクトを検索
-  const effect = animationList.find((effect) => effect.name === animation.anim_name)
+  const effect = styleList.find((effect) => effect.name === animation.style_name)
   if (effect) {
     // console.log(Object.keys(effect.parameters).map((key) => effect.parameters[key].name))
     return effect
@@ -170,8 +168,8 @@ function delateAnimation(index: number) {
 
 /* リストアニメーション */
 .list-move, /* 移動する要素にトランジションを適用 */
-.list-enter-active,
-.list-leave-active {
+  .list-enter-active,
+  .list-leave-active {
   transition: all 0.2s ease;
 }
 .list-enter-from,

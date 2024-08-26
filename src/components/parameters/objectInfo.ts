@@ -3,7 +3,7 @@
 // 数値パラメータを配列に変更
 // anim_name, anim_parametersをanimations配列に統合
 
-import { CharacterObject } from './p5Info'
+import { CharacterObject, ShapeType } from './p5Info'
 //////////////////////////////////////////////////////////////
 
 // キーフレームの情報管理
@@ -13,7 +13,6 @@ export interface KeyframeSetting {
   id: string
   easeType?: string
 }
-
 export type KeyframeSettings = KeyframeSetting[]
 
 // パラメータがKeyframeSettings型かを判定する関数
@@ -22,13 +21,23 @@ export function isKeyframeSettings(element: any): element is KeyframeSettings {
   return Array.isArray(element)
 }
 
+//////////////////////////////////////////////////////////////
+
 export interface AnimationSetting {
   anim_name: string
   anim_parameters: { [key: string]: any }
   anim_id: string
 }
-
 export type AnimationSettings = AnimationSetting[]
+
+export interface StyleSetting {
+  style_name: string
+  style_parameters: { [key: string]: any }
+  style_id: string
+}
+export type StyleSettings = StyleSetting[]
+
+//////////////////////////////////////////////////////////////
 
 // UIの種類の管理
 export enum UIType {
@@ -177,6 +186,25 @@ export class ImageSettings extends PropertyMethod {
   }
 }
 
+export class ShapeSettings extends PropertyMethod {
+  aspect_ratio: number
+  fill_color: string
+  shape: ShapeType
+
+  static parameterInfo = {
+    aspect_ratio: { name: '縦横比', type: UIType.slider, min: -100, max: 100 },
+    fill_color: { name: '塗りつぶし', type: UIType.color },
+    shape: { name: '図形', type: UIType.select }
+  }
+
+  constructor() {
+    super()
+    this.aspect_ratio = 1
+    this.fill_color = '#ffffff'
+    this.shape = ShapeType.rect
+  }
+}
+
 /////////////////////////
 // 各オブジェクトの実装  //
 /////////////////////////
@@ -202,6 +230,7 @@ export class BaseObject {
 export class TextObject extends BaseObject {
   standardRenderSettings: StandardRenderSettings
   textSettings: TextSettings
+  styleSettings: StyleSettings
   animations: AnimationSettings
 
   constructor(settings: BaseSettings) {
@@ -209,6 +238,7 @@ export class TextObject extends BaseObject {
     this.type = 'text'
     this.standardRenderSettings = new StandardRenderSettings()
     this.textSettings = new TextSettings()
+    this.styleSettings = []
     this.animations = []
   }
 }
@@ -216,6 +246,7 @@ export class TextObject extends BaseObject {
 export class ImageObject extends BaseObject {
   standardRenderSettings: StandardRenderSettings
   imageSettings: ImageSettings
+  styleSettings: StyleSettings
   animations: AnimationSettings
 
   constructor(settings: BaseSettings) {
@@ -223,6 +254,23 @@ export class ImageObject extends BaseObject {
     this.type = 'image'
     this.standardRenderSettings = new StandardRenderSettings()
     this.imageSettings = new ImageSettings()
+    this.styleSettings = []
+    this.animations = []
+  }
+}
+
+export class ShapeObject extends BaseObject {
+  standardRenderSettings: StandardRenderSettings
+  shapeSettings: ShapeSettings
+  styleSettings: StyleSettings
+  animations: AnimationSettings
+
+  constructor(settings: BaseSettings) {
+    super(settings)
+    this.type = 'shape'
+    this.standardRenderSettings = new StandardRenderSettings()
+    this.shapeSettings = new ShapeSettings()
+    this.styleSettings = []
     this.animations = []
   }
 }

@@ -37,6 +37,15 @@ export class Inform {
   }
 }
 
+export enum ShapeType {
+  background = 'background',
+  rect = 'rect',
+  ellipse = 'ellipse',
+  triangle = 'triangle',
+  line = 'line',
+  point = 'point'
+}
+
 // p5.js内で用いるのがメイン
 export class CharacterObject {
   id: number

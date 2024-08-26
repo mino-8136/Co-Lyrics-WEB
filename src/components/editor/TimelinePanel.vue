@@ -67,6 +67,7 @@ import {
   BaseObject,
   BaseSettings,
   ImageObject,
+  ShapeObject,
   TextObject
 } from '@/components/parameters/objectInfo'
 
@@ -96,6 +97,12 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
         label: '画像オブジェクトを追加',
         onClick: () => {
           addObject(layerIndex, 'image', event.offsetX)
+        }
+      },
+      {
+        label: '図形オブジェクトを追加',
+        onClick: () => {
+          addObject(layerIndex, 'shape', event.offsetX)
         }
       },
       {
@@ -149,6 +156,8 @@ function addObject(layerIndex: number, type: string, offsetX: number = 0) {
     objectStore.addObject(new TextObject(settings))
   } else if (type === 'image') {
     objectStore.addObject(new ImageObject(settings))
+  } else if (type === 'shape') {
+    objectStore.addObject(new ShapeObject(settings))
   } else {
     objectStore.addObject(new BaseObject(settings))
   }

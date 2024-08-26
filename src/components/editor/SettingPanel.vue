@@ -4,7 +4,7 @@
       <v-tabs v-model="tab">
         <v-tab v-if="'standardRenderSettings' in selectedObject" value="basic">基本設定</v-tab>
         <v-tab v-if="'textSettings' in selectedObject" value="text">テキスト</v-tab>
-        <v-tab value="stylize">スタイル</v-tab>
+        <v-tab v-if="'styleSettings' in selectedObject" value="style">スタイル</v-tab>
         <v-tab v-if="'animations' in selectedObject" value="animation">アニメーション</v-tab>
       </v-tabs>
 
@@ -29,8 +29,12 @@
           </v-tabs-window-item>
 
           <!-- スタイライズ設定タブ -->
-          <v-tabs-window-item value="stylize">
-            <p>機能追加予定</p>
+          <v-tabs-window-item value="style">
+            <StyleTab
+              v-if="'styleSettings' in selectedObject"
+              v-model:params="selectedObject.styleSettings"
+            >
+            </StyleTab>
           </v-tabs-window-item>
 
           <!-- アニメーション設定タブ -->
@@ -52,6 +56,7 @@ import { ref, computed } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import SettingsTab from '../setting/SettingsTab.vue'
 import AnimationTab from '../setting/AnimationTab.vue'
+import StyleTab from '../setting/StyleTab.vue'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
