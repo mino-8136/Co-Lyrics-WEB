@@ -28,6 +28,4 @@ coverage
 *.sw?
 
 # Additional directories
-/src/assets/fonts/*/
-/src/assets/music/
 *.tsbuildinfo
