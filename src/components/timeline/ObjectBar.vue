@@ -10,12 +10,10 @@
     <input v-if="baseObject instanceof TextObject" class="text" v-model="text" @mousedown.stop />
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
-    <div
-      v-for="(keyframe, index) in keyFrameList"
-      :key="index"
-      class="keyframe"
-      :style="{ left: `${keyframe.frame * scaler - 4}px` }"
-    ></div>
+
+    <div v-for="(keyframe, index) in keyFrameList" :key="index">
+      <KeyframePoint :point="keyframe" :scaler="scaler" />
+    </div>
   </div>
 </template>
 
@@ -25,6 +23,7 @@ import { BaseObject, TextObject, ImageObject } from '../parameters/objectInfo'
 import { type KeyframeSettings } from '../parameters/objectInfo'
 import { useTimelineStore } from '@/stores/objectStore'
 import gsap from 'gsap'
+import KeyframePoint from './KeyframePoint.vue'
 
 const text = defineModel('text')
 const props = defineProps<{
@@ -37,7 +36,6 @@ const baseObject = ref(props.object)
 const tempStart = ref(baseObject.value.start)
 const tempEnd = ref(baseObject.value.end)
 
-// 横幅の定義方法 : end-startで定義する
 // ドラッグ時の挙動 : 右端を掴んだらendを変更、左端を掴んだらstartを変更
 const isResizing = ref(false)
 const isMoving = ref(false)
@@ -45,6 +43,7 @@ const lastMouseX = ref(0)
 const lastMouseY = ref(0)
 const side = ref('')
 
+// 横幅の定義方法 : end-startで定義する
 const objectStyle = computed(() => ({
   left: `${Math.floor(tempStart.value) * scaler.value}px`,
   width: `${(tempEnd.value - Math.floor(tempStart.value)) * scaler.value}px`,
@@ -53,7 +52,7 @@ const objectStyle = computed(() => ({
   cursor: isMoving.value ? 'grabbing' : 'grab'
 }))
 
-// キーフレームの設定
+// キーフレームの抽出
 const keyFrameList = computed(() => {
   let keyFrameList: KeyframeSettings = []
 
@@ -159,7 +158,6 @@ onUnmounted(() => {
 <style scoped>
 .object {
   --barWidth: 5px;
-  --keysize: 8px;
 
   position: relative;
   background-color: rgb(211, 211, 211);
@@ -200,17 +198,5 @@ onUnmounted(() => {
 
 .right-handle {
   right: 0;
-}
-
-.keyframe {
-  background-color: lightgray;
-  border-radius: 100%;
-  border: 1px solid black;
-  position: absolute;
-  width: var(--keysize);
-  height: var(--keysize);
-  top: calc(85% - var(--keysize) / 2);
-  transform: rotate(45deg);
-  cursor: move;
 }
 </style>
