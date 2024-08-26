@@ -8,7 +8,7 @@ import {
   ShapeObject
 } from '@/components/parameters/objectInfo'
 import { Transform, Inform, CharacterObject } from '@/components/parameters/p5Info'
-import { animationList } from '@/assets/animations/animation'
+import { animationList } from '@/assets/effects/animation'
 
 let renderObjects: TextObject[] = []
 let currentFrame = 0

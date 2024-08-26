@@ -84,8 +84,8 @@ import {
   type AnimationSetting
 } from '@/components/parameters/objectInfo'
 import StylePanel from './EffectPanel.vue'
-import { animationList } from '@/assets/animations/animation'
-import { styleList } from '@/assets/styles/style'
+import { animationList } from '@/assets/effects/animation'
+import { styleList } from '@/assets/effects/style'
 
 const parameters = defineModel<StyleSettings>('params', { required: true })
 const props = defineProps<{

@@ -20,8 +20,8 @@
 import { computed } from 'vue'
 import { type StyleSettings, type AnimationSettings } from '../parameters/objectInfo'
 import { generateUniqueId } from '@/components/utils/common'
-import { animationList } from '@/assets/animations/animation'
-import { styleList } from '@/assets/styles/style'
+import { animationList } from '@/assets/effects/animation'
+import { styleList } from '@/assets/effects/style'
 
 const showPanel = defineModel<boolean>('show', { required: true })
 const effects = defineModel<StyleSettings | AnimationSettings>('effects', { required: true })
