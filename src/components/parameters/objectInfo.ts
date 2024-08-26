@@ -113,13 +113,19 @@ export class StandardRenderSettings extends PropertyMethod {
     angle: { name: '回転', type: UIType.keyframe, min: -360, max: 360 }
   }
 
-  constructor() {
+  constructor({
+    X = [{ value: 0, frame: 0, id: '0' }],
+    Y = [{ value: 0, frame: 0, id: '0' }],
+    scale = [{ value: 100, frame: 0, id: '0' }],
+    opacity = [{ value: 100, frame: 0, id: '0' }],
+    angle = [{ value: 0, frame: 0, id: '0' }]
+  } = {}) {
     super()
-    this.X = [{ value: 0, frame: 0, id: '0' }]
-    this.Y = [{ value: 0, frame: 0, id: '0' }]
-    this.scale = [{ value: 100, frame: 0, id: '0' }]
-    this.opacity = [{ value: 100, frame: 0, id: '0' }]
-    this.angle = [{ value: 0, frame: 0, id: '0' }]
+    this.X = X
+    this.Y = Y
+    this.scale = scale
+    this.opacity = opacity
+    this.angle = angle
   }
 }
 
@@ -145,7 +151,7 @@ export class TextSettings extends PropertyMethod {
   //precision: number
   //color2: '000000'
 
-  char_cache: CharacterObject[] // 効率的な描画のために分解したテキストを保持する(p5.jsで利用)
+  char_cache: CharacterObject[] | any // 効率的な描画のために分解したテキストを保持する(p5.jsで利用)
 
   static parameterInfo = {
     textSize: { name: 'サイズ', type: UIType.none, min: 1, max: 100 },
@@ -159,17 +165,27 @@ export class TextSettings extends PropertyMethod {
     char_cache: { name: 'キャッシュ', type: UIType.none }
   }
 
-  constructor() {
+  constructor({
+    textSize = 40,
+    individual_object = true,
+    align = 0,
+    spacing_x = 40,
+    spacing_y = 0,
+    color = '#ffffff',
+    font = 'SourceHanSansJP',
+    text = 'サンプルテキスト',
+    char_cache = []
+  } = {}) {
     super()
-    this.textSize = 40
-    this.individual_object = true
-    this.align = 0
-    this.spacing_x = 40
-    this.spacing_y = 0
-    this.color = '#ffffff'
-    this.font = 'SourceHanSansJP'
-    this.text = 'サンプルテキスト'
-    this.char_cache = []
+    this.textSize = textSize
+    this.individual_object = individual_object
+    this.align = align
+    this.spacing_x = spacing_x
+    this.spacing_y = spacing_y
+    this.color = color
+    this.font = font
+    this.text = text
+    this.char_cache = char_cache
   }
 }
 
