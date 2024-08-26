@@ -103,9 +103,9 @@ export function defineSketch(project: any) {
 
       animations.forEach((animation) => {
         // effects 配列から対応するエフェクトを検索
-        const effect = animationList.find((effect) => effect.name === animation.anim_name)
+        const effect = animationList.find((effect) => effect.name === animation.name)
         if (effect) {
-          const effectValue = effect.applyEffect(inform, baseValue, animation.anim_parameters)
+          const effectValue = effect.applyEffect(inform, baseValue, animation.parameters)
           applyEffectToTransform(baseValue, effectValue)
         }
       })
@@ -120,46 +120,22 @@ export function defineSketch(project: any) {
     const renderShape = (object: ShapeObject) => {
       p.push()
 
-      switch (object.shapeSettings.shapeType) {
+      switch (object.shapeSettings.shape) {
         case 'background':
-          p.background(
-            object.shapeSettings.color.r,
-            object.shapeSettings.color.g,
-            object.shapeSettings.color.b
-          )
+          p.background(object.shapeSettings.fill_color)
           break
         case 'rect':
           p.rect(
-            object.shapeSettings.X,
-            object.shapeSettings.Y,
-            object.shapeSettings.width,
-            object.shapeSettings.height
+            object.standardRenderSettings.X[0].value,
+            object.standardRenderSettings.Y[0].value,
+            object.standardRenderSettings.scale[0].value
           )
           break
         case 'ellipse':
           p.ellipse(
-            object.shapeSettings.X,
-            object.shapeSettings.Y,
-            object.shapeSettings.width,
-            object.shapeSettings.height
-          )
-          break
-        case 'line':
-          p.line(
-            object.shapeSettings.X,
-            object.shapeSettings.Y,
-            object.shapeSettings.endX,
-            object.shapeSettings.endY
-          )
-          break
-        case 'triangle':
-          p.triangle(
-            object.shapeSettings.X,
-            object.shapeSettings.Y,
-            object.shapeSettings.X2,
-            object.shapeSettings.Y2,
-            object.shapeSettings.X3,
-            object.shapeSettings.Y3
+            object.standardRenderSettings.X[0].value,
+            object.standardRenderSettings.Y[0].value,
+            object.standardRenderSettings.scale[0].value
           )
           break
       }
