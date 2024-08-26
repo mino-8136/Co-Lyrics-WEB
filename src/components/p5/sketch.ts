@@ -30,7 +30,7 @@ export function defineSketch(project: any) {
       p.smooth()
       p.angleMode(p.DEGREES)
       p.colorMode(p.RGB, 255, 255, 255, 100)
-      p.noStroke()
+      p.strokeWeight(0)
       p.rectMode(p.CENTER)
       p.frameRate(project.framerate)
 

@@ -193,8 +193,8 @@ export class ShapeSettings extends PropertyMethod {
   shape: ShapeType
 
   static parameterInfo = {
-    width: { name: '幅', type: UIType.slider, min: -500, max: 500 },
-    height: { name: '高さ', type: UIType.slider, min: -500, max: 500 },
+    width: { name: '幅', type: UIType.slider, min: 0, max: 2000 },
+    height: { name: '高さ', type: UIType.slider, min: 0, max: 2000 },
     fill_color: { name: '塗りつぶし', type: UIType.color },
     shape: { name: '図形', type: UIType.select }
   }
