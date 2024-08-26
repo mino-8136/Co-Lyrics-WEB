@@ -342,6 +342,7 @@ export function defineSketch(project: any) {
     p.addRenderObjects = (currentObjects: RenderObject[]) => {
       //console.log(objects)
       renderObjects = currentObjects
+      renderObjects.sort((a, b) => a.layer - b.layer)
     }
 
     p.updateCurrentFrame = (frame: number) => {

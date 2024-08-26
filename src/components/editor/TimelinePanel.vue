@@ -68,7 +68,8 @@ import {
   BaseSettings,
   ImageObject,
   ShapeObject,
-  TextObject
+  TextObject,
+  type typeString
 } from '@/components/parameters/objectInfo'
 
 const objectStore = useObjectStore()
@@ -142,7 +143,7 @@ function onObjectContextMenu(event: MouseEvent, objIndex: number) {
 }
 
 // オブジェクトの追加
-function addObject(layerIndex: number, type: string, offsetX: number = 0) {
+function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
   const offset = Math.floor((offsetX / timelineStore.pxPerSec) * timelineStore.framerate)
   const settings: BaseSettings = {
     id: objectStore.counter,
@@ -223,7 +224,7 @@ function setScrollPosition(position: number) {
   width: 2px;
   height: 100%; /* 親要素の高さに合わせる */
   background-color: #4cabe2;
-  z-index: 10; /* z-indexを高く設定して最前面に */
+  z-index: 999; /* z-indexを高く設定して最前面に */
   pointer-events: none; /* クリックイベントを無視 */
 }
 </style>
