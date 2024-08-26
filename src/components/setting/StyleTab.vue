@@ -64,7 +64,7 @@
     アニメーション追加
   </v-btn>
   <!-- アニメーション設定の呼び出し -->
-  <StylePanel v-model:show="animationPanel" v-model:animations="selectedObject.styleSettings" />
+  <StylePanel v-model:show="animationPanel" v-model:animations="selectedObject.animations" />
 
   <v-dialog v-model="descriptionPanel" max-width="800px">
     <v-card>
