@@ -14,7 +14,7 @@
       v-for="(keyframe, index) in keyFrameList"
       :key="index"
       class="keyframe"
-      :style="{ left: `${keyframe.frame * scaler - 5}px` }"
+      :style="{ left: `${keyframe.frame * scaler - 4}px` }"
     ></div>
   </div>
 </template>
@@ -49,19 +49,24 @@ const objectStyle = computed(() => ({
   left: `${Math.floor(tempStart.value) * scaler.value}px`,
   width: `${(tempEnd.value - Math.floor(tempStart.value)) * scaler.value}px`,
   position: 'absolute',
+  backgrouondColor: 'rgb(211, 211, 211)',
   cursor: isMoving.value ? 'grabbing' : 'grab'
 }))
 
 // キーフレームの設定
 const keyFrameList = computed(() => {
   let keyFrameList: KeyframeSettings = []
-  Object.entries(props.object).reduce((acc, [key, value]) => {
-    // KeyframeSettingsの配列であるかを判定
-    if (Array.isArray(value) && value.length > 1) {
-      acc.push(...value)
-    }
-    return acc
-  }, keyFrameList)
+
+  // TODO: 他のプロパティにも対応する
+  if ('standardRenderSettings' in props.object) {
+    Object.entries(props.object.standardRenderSettings).reduce((acc, [key, value]) => {
+      // KeyframeSettingsの配列であるかを判定
+      if (Array.isArray(value) && value.length > 1) {
+        acc.push(...value)
+      }
+      return acc
+    }, keyFrameList)
+  }
   return keyFrameList
 })
 
@@ -154,7 +159,7 @@ onUnmounted(() => {
 <style scoped>
 .object {
   --barWidth: 5px;
-  --keysize: 10px;
+  --keysize: 8px;
 
   position: relative;
   background-color: rgb(211, 211, 211);
@@ -199,11 +204,12 @@ onUnmounted(() => {
 
 .keyframe {
   background-color: lightgray;
+  border-radius: 100%;
   border: 1px solid black;
   position: absolute;
   width: var(--keysize);
   height: var(--keysize);
-  top: calc(50% - var(--keysize) / 2);
+  top: calc(85% - var(--keysize) / 2);
   transform: rotate(45deg);
   cursor: move;
 }
