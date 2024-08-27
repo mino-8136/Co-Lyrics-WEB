@@ -182,9 +182,8 @@ export function defineSketch(project: any) {
 
       let newLineCount = 0
       let newLineCharacterCount = 0
-      const totalIndex = object.textSettings.individual_object
-        ? object.textSettings.text.length
-        : 1
+      const totalIndex = object.textSettings.individual_object ? object.textSettings.text.length : 1
+
 
       for (let index = 0; index < totalIndex; index++) {
         // 改行の数を数える処理
@@ -196,8 +195,8 @@ export function defineSketch(project: any) {
 
         // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
         const inform = new Inform(
-          index,
-          totalIndex,
+          index - newLineCount,
+          totalIndex, // TODO: 改行などの文字数も入っている + TODO: 絵文字など複数文字に対応する
           object.start,
           object.end,
           currentFrame
@@ -229,7 +228,6 @@ export function defineSketch(project: any) {
 
         // 後処理部分
         newLineCharacterCount++
-
       }
       p.pop()
     }
