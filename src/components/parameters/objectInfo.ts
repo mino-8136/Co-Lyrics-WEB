@@ -3,7 +3,7 @@
 // 数値パラメータを配列に変更
 // anim_name, anim_parametersをanimations配列に統合
 
-import { CharacterObject, ShapeType } from './p5Info'
+import { ShapeType } from './p5Info'
 //////////////////////////////////////////////////////////////
 
 // キーフレームの情報管理
@@ -133,11 +133,12 @@ export class TextSettings extends PropertyMethod {
   text: string
   color: string
   font: string
+  individual_object: boolean
   spacing_x: number
+  spacing_y: number
   //name: string
   textSize: number
   //display_speed: number
-  individual_object: boolean
   //display_coordinates: boolean
   //auto_scroll: boolean
   //bold: boolean
@@ -147,22 +148,18 @@ export class TextSettings extends PropertyMethod {
   //monospace: boolean
   align: number
 
-  spacing_y: number
   //precision: number
-  //color2: '000000'
-
-  char_cache: CharacterObject[] | any // 効率的な描画のために分解したテキストを保持する(p5.jsで利用)
+  //color2: '000000
 
   static parameterInfo = {
     textSize: { name: 'サイズ', type: UIType.none, min: 1, max: 100 },
     individual_object: { name: 'バラバラ', type: UIType.checkbox },
     align: { name: '整列', type: UIType.none },
     spacing_x: { name: '水平間隔', type: UIType.slider, min: 0, max: 100 },
-    spacing_y: { name: '垂直間隔', type: UIType.none, min: 0, max: 100 },
+    spacing_y: { name: '垂直間隔', type: UIType.slider, min: 0, max: 100 },
     color: { name: '色', type: UIType.color },
     font: { name: 'フォント', type: UIType.select },
     text: { name: 'テキスト', type: UIType.text },
-    char_cache: { name: 'キャッシュ', type: UIType.none }
   }
 
   constructor({
@@ -170,11 +167,10 @@ export class TextSettings extends PropertyMethod {
     individual_object = true,
     align = 0,
     spacing_x = 40,
-    spacing_y = 0,
+    spacing_y = 40,
     color = '#ffffff',
     font = 'SourceHanSansJP',
     text = 'サンプルテキスト',
-    char_cache = []
   } = {}) {
     super()
     this.textSize = textSize
@@ -185,7 +181,6 @@ export class TextSettings extends PropertyMethod {
     this.color = color
     this.font = font
     this.text = text
-    this.char_cache = char_cache
   }
 }
 
