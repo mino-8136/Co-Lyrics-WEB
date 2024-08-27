@@ -10,7 +10,7 @@ import {
   BaseObject,
   type RenderObject
 } from '@/components/parameters/objectInfo'
-import { Transform, Inform, CharacterObject } from '@/components/parameters/p5Info'
+import { Transform, Inform } from '@/components/parameters/p5Info'
 import { animationList } from '@/assets/effects/animation'
 
 let renderObjects: RenderObject[] = []
@@ -162,32 +162,8 @@ export function defineSketch(project: any) {
     // テキストレンダリングの関数 //
     //////////////////////////////
 
-    // テキストオブジェクトからcharacterオブジェクトを生成する関数
-    const addCharCache = (object: TextObject): CharacterObject[] => {
-      const char_cache: CharacterObject[] = [] // キャッシュの初期化
-      for (let i = 0; i < object.textSettings.text.length; i++) {
-        const charObject: CharacterObject = {
-          id: i,
-          text: object.textSettings.text[i]
-        }
-        char_cache.push(charObject)
-      }
-      return char_cache
-    }
-
     const renderText = (object: TextObject) => {
       p.push()
-
-      // individual_objectがtrueかつ、char_cacheが未定義の場合、分解してキャッシュする
-      // (TODO: この処理はpreview.vueに移したほうがwatchとかできて良いかもしれない)
-      if (object.textSettings.individual_object && object.textSettings.char_cache.length == 0) {
-        object.textSettings.char_cache = addCharCache(object)
-      } else if (
-        !object.textSettings.individual_object &&
-        object.textSettings.char_cache.length > 0
-      ) {
-        object.textSettings.char_cache = []
-      }
 
       // スタイライズエフェクトの処理
       p.textFont(fonts)
@@ -204,24 +180,24 @@ export function defineSketch(project: any) {
 
       // p.text(object.text, 0, 0)
 
-      // 個別のトランスフォームの実行
-      let textQueue: CharacterObject[] = []
-      if (object.textSettings.char_cache.length > 0) {
-        textQueue = object.textSettings.char_cache
-      } else {
-        textQueue = [
-          {
-            id: 0,
-            text: object.textSettings.text
-          }
-        ]
-      }
+      let newLineCount = 0
+      let newLineCharacterCount = 0
+      const totalIndex = object.textSettings.individual_object
+        ? object.textSettings.text.length
+        : 1
 
-      textQueue.forEach((charObject) => {
+      for (let index = 0; index < totalIndex; index++) {
+        // 改行の数を数える処理
+        if (object.textSettings.text[index] == '\n') {
+          newLineCount++
+          newLineCharacterCount = 0
+          continue
+        }
+
         // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
         const inform = new Inform(
-          charObject.id,
-          textQueue.length,
+          index,
+          totalIndex,
           object.start,
           object.end,
           currentFrame
@@ -230,12 +206,10 @@ export function defineSketch(project: any) {
         if (effectValue.opacity == 0) return
         if (effectValue.scale == 0) return
 
-        //console.log(effectValue)
-
         p.push()
         p.translate(
-          object.textSettings.spacing_x * charObject.id + effectValue.X,
-          object.textSettings.spacing_y * charObject.id + effectValue.Y
+          object.textSettings.spacing_x * newLineCharacterCount + effectValue.X,
+          object.textSettings.spacing_y * newLineCount + effectValue.Y
         )
         p.rotate(effectValue.angle)
         p.scale(effectValue.scale / 100)
@@ -246,9 +220,17 @@ export function defineSketch(project: any) {
         )
         p.fill(col)
 
-        p.text(charObject.text, 0, 0)
+        if (object.textSettings.individual_object) {
+          p.text(object.textSettings.text[index], 0, 0)
+        } else {
+          p.text(object.textSettings.text, 0, 0)
+        }
         p.pop()
-      })
+
+        // 後処理部分
+        newLineCharacterCount++
+
+      }
       p.pop()
     }
 

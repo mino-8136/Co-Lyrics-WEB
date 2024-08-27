@@ -45,14 +45,3 @@ export enum ShapeType {
   line = 'line',
   point = 'point'
 }
-
-// p5.js内で用いるのがメイン
-export class CharacterObject {
-  id: number
-  text: string
-
-  constructor(index: number, text: string) {
-    this.id = index
-    this.text = text
-  }
-}
