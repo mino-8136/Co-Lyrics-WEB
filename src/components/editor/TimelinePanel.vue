@@ -1,5 +1,5 @@
 <template>
-  <v-container class="timeline-panel">
+  <div class="timeline-panel">
     <div class="header d-flex">
       <p>Frame:</p>
       <input :value="timelineStore.currentFrame" style="width: 60px" />
@@ -54,7 +54,7 @@
         </div>
       </div>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
