@@ -15,7 +15,6 @@
 - src\stores\objectStore.ts -> audioPath: '/assets/music/musicfile.mp3'
 
 ### フォントファイルの追加対応箇所
-- src\components\p5\sketch.ts -> fonts = p.loadFont('/assets/fonts/SourceHanSansJP/SourceHanSansJP-Medium.otf')
 - src\components\parameters\fonts.ts -> export const fontListData: FontList[]
 
 ## Z-index

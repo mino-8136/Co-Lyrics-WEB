@@ -55,12 +55,19 @@
 
                   <!-- キーフレームのフレーム数と値 -->
                   <input
+                    type="number"
                     class="parameter-value"
+                    style="margin-right: 2px; width: 50px"
                     v-model.number="keyframe.frame"
                     @change="sortKeyframe(param)"
                   />
                   <p>→</p>
-                  <input class="parameter-value" v-model.number="keyframe.value" />
+                  <input
+                    type="number"
+                    style="width: 60px"
+                    class="parameter-value"
+                    v-model.number="keyframe.value"
+                  />
                 </template>
                 <template v-slot:append>
                   <v-icon v-if="idx > 0" @click="deleteKeyframe(param, idx)">mdi-delete</v-icon>
@@ -249,6 +256,7 @@ div.ease-setting {
   width: 40px;
   text-align: center;
   color: #555;
+  text-align: right;
 }
 
 textarea {

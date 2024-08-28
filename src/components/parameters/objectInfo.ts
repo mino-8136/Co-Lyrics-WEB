@@ -163,11 +163,11 @@ export class TextSettings extends PropertyMethod {
   }
 
   constructor({
-    textSize = 40,
+    textSize = 60,
     individual_object = true,
     align = 0,
-    spacing_x = 40,
-    spacing_y = 40,
+    spacing_x = 60,
+    spacing_y = 60,
     color = '#ffffff',
     font = 'SourceHanSansJP',
     text = 'サンプルテキスト',
