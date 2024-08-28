@@ -158,7 +158,7 @@ export class TextSettings extends PropertyMethod {
     spacing_x: { name: '水平間隔', type: UIType.slider, min: 0, max: 100 },
     spacing_y: { name: '垂直間隔', type: UIType.slider, min: 0, max: 100 },
     color: { name: '色', type: UIType.color },
-    font: { name: 'フォント', type: UIType.select },
+    font: { name: 'フォント', type: UIType.none },
     text: { name: 'テキスト', type: UIType.text }
   }
 
@@ -170,7 +170,7 @@ export class TextSettings extends PropertyMethod {
     spacing_y = 60,
     color = '#ffffff',
     font = 'SourceHanSansJP',
-    text = 'サンプルテキスト'
+    text = 'サンプル'
   } = {}) {
     super()
     this.textSize = textSize
