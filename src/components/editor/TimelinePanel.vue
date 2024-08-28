@@ -115,7 +115,7 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
       //   }
       // }
       {
-        label: 'オブジェクトをコピー()',
+        label: 'オブジェクトをコピー',
         onClick: () => {
           layers.value.push({ name: 'Layer' })
         }

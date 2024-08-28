@@ -1,5 +1,5 @@
 import { gsap } from 'gsap'
-import type p5 from 'p5'
+import p5 from 'p5'
 import {
   type TextObject,
   type KeyframeSettings,
@@ -12,16 +12,22 @@ import {
 } from '@/components/parameters/objectInfo'
 import { Transform, Inform } from '@/components/parameters/p5Info'
 import { animationList } from '@/assets/effects/animation'
+import { fontListData } from '../parameters/fonts'
 
 let renderObjects: RenderObject[] = []
 let currentFrame = 0
-let fonts: p5.Font
+
+const fonts: { name: string; font: p5.Font }[] = []
 
 export function defineSketch(project: any) {
   // 実際はtimelineStoreを引数に取る
   return function sketch(p: p5) {
     p.preload = () => {
-      fonts = p.loadFont('/assets/fonts/SourceHanSansJP/SourceHanSansJP-Medium.otf')
+      // 全フォントデータの読み込みを行う(TODO:プロジェクトに読み込まれているものだけに限定する？)
+      fontListData.forEach((font) => {
+        //console.log(font.src)
+        fonts.push({ name: font.name, font: p.loadFont(font.src) })
+      })
     }
     p.setup = () => {
       const canvas = p.createCanvas(
@@ -166,7 +172,9 @@ export function defineSketch(project: any) {
       p.push()
 
       // スタイライズエフェクトの処理
-      p.textFont(fonts)
+      if (fonts != null) {
+        p.textFont(fonts.find((e) => object.textSettings.font == e.name)?.font!)
+      }
       p.textSize(object.textSettings.textSize)
       const col = p.color(object.textSettings.color)
 
@@ -183,7 +191,6 @@ export function defineSketch(project: any) {
       let newLineCount = 0
       let newLineCharacterCount = 0
       const totalIndex = object.textSettings.individual_object ? object.textSettings.text.length : 1
-
 
       for (let index = 0; index < totalIndex; index++) {
         // 改行の数を数える処理
