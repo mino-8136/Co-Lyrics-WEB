@@ -14,6 +14,11 @@
 ### 音源ファイルの追加対応箇所
 - src\stores\objectStore.ts -> audioPath: '/assets/music/musicfile.mp3',
 
+## Z-index
+- 10 選択中オブジェクト
+- 100 シークバー
+- 1000 タイムラインコンテキストメニュー
+
 ## 参考メモ
 p5js 
 https://qiita.com/mitsuya_bauhaus/items/b6f3d1aec07a9e07bb3a
