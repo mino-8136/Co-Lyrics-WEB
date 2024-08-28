@@ -16,6 +16,7 @@
 
 ### フォントファイルの追加対応箇所
 - src\components\parameters\fonts.ts -> export const fontListData: FontList[]
+- index.html
 
 ## Z-index
 - 10 選択中オブジェクト

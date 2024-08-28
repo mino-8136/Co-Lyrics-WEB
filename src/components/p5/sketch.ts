@@ -16,6 +16,7 @@ import { fontListData } from '../parameters/fonts'
 
 let renderObjects: RenderObject[] = []
 let currentFrame = 0
+const fontLimit = true // フォントファイルを読み込むかどうかのフラグ
 
 const fonts: { name: string; font: p5.Font }[] = []
 
@@ -24,10 +25,12 @@ export function defineSketch(project: any) {
   return function sketch(p: p5) {
     p.preload = () => {
       // 全フォントデータの読み込みを行う(TODO:プロジェクトに読み込まれているものだけに限定する？)
-      fontListData.forEach((font) => {
-        //console.log(font.src)
-        fonts.push({ name: font.name, font: p.loadFont(font.src) })
-      })
+      if (!fontLimit) {
+        fontListData.forEach((font) => {
+          //console.log(font.src)
+          fonts.push({ name: font.name, font: p.loadFont(font.src) })
+        })
+      }
     }
     p.setup = () => {
       const canvas = p.createCanvas(
@@ -172,9 +175,15 @@ export function defineSketch(project: any) {
       p.push()
 
       // スタイライズエフェクトの処理
-      if (fonts != null) {
-        p.textFont(fonts.find((e) => object.textSettings.font == e.name)?.font!)
+      if (fontLimit) {
+        p.textFont('Noto Sans JP')
+      } else {
+        if (fonts != null) {
+          const foundFont = fonts.find((e) => object.textSettings.font == e.name)?.font
+          p.textFont(foundFont ? foundFont : 'Arial')
+        }
       }
+
       p.textSize(object.textSettings.textSize)
       const col = p.color(object.textSettings.color)
 
