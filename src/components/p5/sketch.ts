@@ -10,7 +10,7 @@ import {
   BaseObject,
   type RenderObject
 } from '@/components/parameters/objectInfo'
-import { Transform, Inform } from '@/components/parameters/p5Info'
+import { Transform, Inform, ShapeType } from '@/components/parameters/p5Info'
 import { animationList } from '@/assets/effects/animation'
 import { fontListData } from '../parameters/fonts'
 
@@ -151,13 +151,13 @@ export function defineSketch(project: any) {
 
       // 図形のレンダリングの実行
       switch (object.shapeSettings.shape) {
-        case 'background':
+        case ShapeType.background:
           p.background(object.shapeSettings.fill_color)
           break
-        case 'rect':
+        case ShapeType.rect:
           p.rect(0, 0, object.shapeSettings.width, object.shapeSettings.height)
           break
-        case 'ellipse':
+        case ShapeType.ellipse:
           p.ellipse(0, 0, object.shapeSettings.width, object.shapeSettings.height)
           break
       }

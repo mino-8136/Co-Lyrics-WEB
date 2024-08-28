@@ -107,7 +107,11 @@
       <template
         v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.select"
       >
-        <v-select v-model="parameters[label]" :items="fontList" hide-details></v-select>
+        <select v-model="parameters[label]">
+          <option v-for="(e, index) in getOptionsList(label)" :key="index">
+            {{ e }}
+          </option>
+        </select>
       </template>
 
       <!-- カラー型パラメータの場合 -->
@@ -156,12 +160,13 @@ import {
 } from '@/components/parameters/objectInfo'
 import EasingPanel from '@/components/setting/EasingPanel.vue'
 import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
-import { fontListData } from '@/components/parameters/fonts'
 import { generateUniqueId } from '@/components/utils/common'
+
+import { fontListData } from '@/components/parameters/fonts'
+import { ShapeType } from '../parameters/p5Info'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
-const fontList = fontListData.map((font) => font.name)
 const colorMenu = ref(false)
 
 const parameters = defineModel<StandardRenderSettings | TextSettings>('params', { required: true })
@@ -170,6 +175,16 @@ const parameters = defineModel<StandardRenderSettings | TextSettings>('params', 
 const selectedObject: Record<string, any> = computed(() => {
   return objectStore.objects.find((obj) => obj.id === timelineStore.selectedObjectId)
 })
+
+// TODO: どこでも使えるようにしたほうが良いかも
+function getOptionsList(label: string): string[] {
+  if (label === 'font') {
+    return fontListData.map((font) => font.name)
+  } else if (label === 'shape') {
+    return Object.values(ShapeType)
+  }
+  return []
+}
 
 // ウィンドウの幅を求める関数
 // TODO: もう少しスマートにする
@@ -265,6 +280,13 @@ textarea {
   padding: 8px 12px;
   box-sizing: border-box;
   border: 1px solid #ccc;
+}
+
+select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  -webkit-appearance: menulist;
+  appearance: button;
 }
 
 /* リストアニメーション */
