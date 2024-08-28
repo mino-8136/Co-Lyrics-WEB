@@ -7,7 +7,12 @@
 - npm install -D @types/p5
 - npm install -save @imengyu/vue3-context-menu
 - npm install gsap
- npm install --save @types/wavesurfer.js
+- npm install --save @types/wavesurfer.js
+- npm i pinia-plugin-persistedstate
+
+## 各種変更のメモ
+### 音源ファイルの追加対応箇所
+- src\stores\objectStore.ts -> audioPath: '/assets/music/musicfile.mp3',
 
 ## 参考メモ
 p5js 

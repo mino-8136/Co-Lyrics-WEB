@@ -94,24 +94,24 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
           addObject(layerIndex, 'text', event.offsetX)
         }
       },
-      {
-        label: '画像オブジェクトを追加',
-        onClick: () => {
-          addObject(layerIndex, 'image', event.offsetX)
-        }
-      },
+      // {
+      //   label: '画像オブジェクトを追加',
+      //   onClick: () => {
+      //     addObject(layerIndex, 'image', event.offsetX)
+      //   }
+      // },
       {
         label: '図形オブジェクトを追加',
         onClick: () => {
           addObject(layerIndex, 'shape', event.offsetX)
         }
-      },
-      {
-        label: '基底オブジェクトを追加',
-        onClick: () => {
-          addObject(layerIndex, '', event.offsetX)
-        }
       }
+      // {
+      //   label: '基底オブジェクトを追加',
+      //   onClick: () => {
+      //     addObject(layerIndex, '', event.offsetX)
+      //   }
+      // }
     ]
   })
   event.stopPropagation()
