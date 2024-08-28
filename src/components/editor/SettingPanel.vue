@@ -80,17 +80,9 @@ const selectedObject: Record<string, any> = computed(() => {
 </script>
 
 <style scoped>
-.setting-panel {
-  min-width: 300px;
-  width: 100%;
-  height: 500px;
-  padding: 12px;
-  border: 1px solid #ccc;
-  overflow-y: hidden;
-}
-
 .scroll {
-  height: 435px;
+  height: 335px;
+  min-width: 500px;
   overflow-y: scroll;
 }
 </style>

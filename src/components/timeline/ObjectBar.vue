@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
-import { BaseObject, TextObject, ImageObject } from '../parameters/objectInfo'
+import { BaseObject, TextObject, ImageObject, ShapeObject } from '../parameters/objectInfo'
 import { type KeyframeSettings } from '../parameters/objectInfo'
 import { useTimelineStore } from '@/stores/objectStore'
 import gsap from 'gsap'
@@ -46,11 +46,23 @@ const side = ref('')
 // 横幅の定義方法 : end-startで定義する
 const objectStyle = computed(() => ({
   left: `${Math.floor(tempStart.value) * scaler.value}px`,
-  width: `${(tempEnd.value - Math.floor(tempStart.value)) * scaler.value}px`,
+  width: `${Math.floor(tempEnd.value - Math.floor(tempStart.value)) * scaler.value}px`,
   position: 'absolute',
-  backgrouondColor: 'rgb(211, 211, 211)',
+  backgroundColor: bgColor.value,
   cursor: isMoving.value ? 'grabbing' : 'grab'
 }))
+
+const bgColor = computed(() => {
+  if (baseObject.value instanceof TextObject) {
+    return 'rgb(217, 233, 255)'
+  } else if (baseObject.value instanceof ShapeObject) {
+    return 'rgb(120, 152, 255)'
+  } else if (baseObject.value instanceof ImageObject) {
+    return 'rgb(211, 211, 211)'
+  } else {
+    return 'rgb(211, 211, 211)'
+  }
+})
 
 // キーフレームの抽出
 const keyFrameList = computed(() => {
@@ -157,7 +169,7 @@ onUnmounted(() => {
 
 <style scoped>
 .object {
-  --barWidth: 5px;
+  --barWidth: 2px;
 
   position: relative;
   background-color: rgb(211, 211, 211);

@@ -5,7 +5,6 @@ import DebugView from '../views/DebugView.vue'
 import PlayView from '../views/PlayView.vue'
 import ConfigView from '../views/ConfigView.vue'
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

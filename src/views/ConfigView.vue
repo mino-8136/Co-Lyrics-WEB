@@ -9,15 +9,6 @@
         <v-checkbox label="デフォルトのオブジェクトフレーム数"></v-checkbox>
       </v-col>
     </v-card-actions>
-
-    <v-card-title>ゲームプレイ設定</v-card-title>
-    <v-card-actions>
-      <v-checkbox label="判定を調整する"></v-checkbox>
-    </v-card-actions>
-    <v-divider></v-divider>
-    <v-card-text>
-      このシステムは一般的な動画編集ソフトの使用感をベースに開発されている動画作成ソフトウェアとなっています。テキスト編集に特化した動画編集作業と、インタラクティブコンテンツ作成を連結する試みに挑戦しています。
-    </v-card-text>
   </v-card>
 </template>
 

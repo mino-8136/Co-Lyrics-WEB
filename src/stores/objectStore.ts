@@ -38,7 +38,7 @@ export const useTimelineStore = defineStore('timeline', {
     height: 720,
     framerate: 30,
     title: 'New Project',
-    audioPath: '/assets/music/LetterPost.wav',
+    audioPath: '/assets/music/レターポスト_192k.mp3',
     ////////
     currentFrame: 0,
     canvasScale: 1,
@@ -52,7 +52,8 @@ export const useTimelineStore = defineStore('timeline', {
     updateCanvasScale(receivedWidth: number) {
       this.canvasScale = receivedWidth / this.width
     }
-  }
+  },
+  persist: true
 })
 
 /*

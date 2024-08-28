@@ -1,11 +1,7 @@
 <template>
-  <v-container class="preview-panel">
+  <v-container class="preview-panel" style="text-align: center">
     <!-- ここでp5.jsのCanvasを表示 -->
-    <div
-      id="canvas"
-      ref="canvasContainer"
-      :style="{ height: 500 - informationHeight + 'px' }"
-    ></div>
+    <div id="canvas" ref="canvasContainer"></div>
   </v-container>
 </template>
 
@@ -17,7 +13,6 @@ import { defineSketch } from '@/components/p5/sketch'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
-const informationHeight = 80
 
 // マウント時に p5.canvas を生成
 const p = ref()
@@ -74,13 +69,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.preview-panel {
-  position: relative;
-  width: 100%;
-  height: 500px;
-  border: 1px solid #ccc;
-}
-
 #canvas {
   width: 100%;
   height: 100%; /* 親要素の高さに合わせる */

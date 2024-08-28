@@ -158,19 +158,19 @@ export class TextSettings extends PropertyMethod {
     spacing_x: { name: '水平間隔', type: UIType.slider, min: 0, max: 100 },
     spacing_y: { name: '垂直間隔', type: UIType.slider, min: 0, max: 100 },
     color: { name: '色', type: UIType.color },
-    font: { name: 'フォント', type: UIType.select },
-    text: { name: 'テキスト', type: UIType.text },
+    font: { name: 'フォント', type: UIType.none },
+    text: { name: 'テキスト', type: UIType.text }
   }
 
   constructor({
-    textSize = 40,
+    textSize = 60,
     individual_object = true,
     align = 0,
-    spacing_x = 40,
-    spacing_y = 40,
+    spacing_x = 60,
+    spacing_y = 60,
     color = '#ffffff',
     font = 'SourceHanSansJP',
-    text = 'サンプルテキスト',
+    text = 'サンプル'
   } = {}) {
     super()
     this.textSize = textSize
@@ -214,7 +214,7 @@ export class ShapeSettings extends PropertyMethod {
     super()
     this.width = 200
     this.height = 200
-    this.fill_color = '#ffffff'
+    this.fill_color = '#D3D3D3'
     this.shape = ShapeType.rect
   }
 }

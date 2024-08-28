@@ -1,7 +1,7 @@
 interface FontList {
-  name: string;
-  src: string;
-  format: string;
+  name: string
+  src: string
+  format: string
 }
 
 export const fontListData: FontList[] = [
@@ -35,4 +35,4 @@ export const fontListData: FontList[] = [
     src: '/assets/fonts/Yusei_Magic/YuseiMagic-Regular.ttf',
     format: '.ttf'
   }
-];
+]

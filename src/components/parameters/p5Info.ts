@@ -38,10 +38,7 @@ export class Inform {
 }
 
 export enum ShapeType {
-  background = 'background',
-  rect = 'rect',
-  ellipse = 'ellipse',
-  triangle = 'triangle',
-  line = 'line',
-  point = 'point'
+  background = '背景',
+  rect = '四角形',
+  ellipse = '円'
 }

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="timeline-panel">
+  <div class="timeline-panel">
     <div class="header d-flex">
       <p>Frame:</p>
       <input :value="timelineStore.currentFrame" style="width: 60px" />
@@ -54,7 +54,7 @@
         </div>
       </div>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -87,6 +87,7 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
   ContextMenu.showContextMenu({
     x: event.clientX,
     y: event.clientY,
+    zIndex: 1000,
     items: [
       {
         label: 'テキストオブジェクトを追加',
@@ -94,22 +95,35 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
           addObject(layerIndex, 'text', event.offsetX)
         }
       },
-      {
-        label: '画像オブジェクトを追加',
-        onClick: () => {
-          addObject(layerIndex, 'image', event.offsetX)
-        }
-      },
+      // {
+      //   label: '画像オブジェクトを追加',
+      //   onClick: () => {
+      //     addObject(layerIndex, 'image', event.offsetX)
+      //   }
+      // },
       {
         label: '図形オブジェクトを追加',
+        divided: true,
         onClick: () => {
           addObject(layerIndex, 'shape', event.offsetX)
         }
       },
+      // {
+      //   label: '空オブジェクトを追加',
+      //   onClick: () => {
+      //     addObject(layerIndex, '', event.offsetX)
+      //   }
+      // }
       {
-        label: '基底オブジェクトを追加',
+        label: 'オブジェクトをコピー',
         onClick: () => {
-          addObject(layerIndex, '', event.offsetX)
+          layers.value.push({ name: 'Layer' })
+        }
+      },
+      {
+        label: 'オブジェクトを貼り付け',
+        onClick: () => {
+          layers.value.push({ name: 'Layer' })
         }
       }
     ]
@@ -188,11 +202,6 @@ function setScrollPosition(position: number) {
 </script>
 
 <style scoped>
-.timeline-panel {
-  padding: 10px;
-  border: 1px solid #ccc;
-}
-
 .timeline-container {
   height: 100%;
 }
@@ -224,7 +233,7 @@ function setScrollPosition(position: number) {
   width: 2px;
   height: 100%; /* 親要素の高さに合わせる */
   background-color: #4cabe2;
-  z-index: 999; /* z-indexを高く設定して最前面に */
+  z-index: 100; /* z-indexを高く設定して最前面に */
   pointer-events: none; /* クリックイベントを無視 */
 }
 </style>
