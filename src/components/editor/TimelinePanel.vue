@@ -202,11 +202,6 @@ function setScrollPosition(position: number) {
 </script>
 
 <style scoped>
-.timeline-panel {
-  padding: 10px;
-  border: 1px solid #ccc;
-}
-
 .timeline-container {
   height: 100%;
 }

@@ -4,7 +4,7 @@
     <div
       id="canvas"
       ref="canvasContainer"
-      :style="{ height: 500 - informationHeight + 'px' }"
+      :style="{ height: 400 - informationHeight + 'px' }"
     ></div>
   </v-container>
 </template>
@@ -74,13 +74,6 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.preview-panel {
-  position: relative;
-  width: 100%;
-  height: 500px;
-  border: 1px solid #ccc;
-}
-
 #canvas {
   width: 100%;
   height: 100%; /* 親要素の高さに合わせる */

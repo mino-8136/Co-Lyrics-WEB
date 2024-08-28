@@ -214,7 +214,7 @@ export class ShapeSettings extends PropertyMethod {
     super()
     this.width = 200
     this.height = 200
-    this.fill_color = '#ffffff'
+    this.fill_color = '#D3D3D3'
     this.shape = ShapeType.rect
   }
 }
