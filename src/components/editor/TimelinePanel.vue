@@ -5,7 +5,7 @@
         size="small"
         density="comfortable"
         :icon="isPlaying ? 'mdi-pause' : 'mdi-play'"
-        class="mr-3 ma-1"
+        class="mr-3 my-1"
         @click="playPause"
       >
       </v-btn>
@@ -226,7 +226,6 @@ function setScrollPosition(position: number) {
   display: flex;
   align-items: center;
   padding: 0 10px;
-  background-color: #f0f8ff;
   border-bottom: 1px solid #ccc;
 }
 

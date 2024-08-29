@@ -48,15 +48,15 @@ const objectStyle = computed(() => ({
   left: `${Math.floor(tempStart.value) * scaler.value}px`,
   width: `${Math.floor(tempEnd.value - Math.floor(tempStart.value)) * scaler.value}px`,
   position: 'absolute',
-  backgroundColor: bgColor.value,
+  background: bgColor.value,
   cursor: isMoving.value ? 'grabbing' : 'grab'
 }))
 
 const bgColor = computed(() => {
   if (baseObject.value instanceof TextObject) {
-    return 'rgb(217, 233, 255)'
+    return 'linear-gradient(to right, rgb(217, 233, 255), rgb(255, 255, 255))'
   } else if (baseObject.value instanceof ShapeObject) {
-    return 'rgb(120, 152, 255)'
+    return 'linear-gradient(to bottom right, rgb(120, 152, 255), rgb(222, 255, 255))'
   } else if (baseObject.value instanceof ImageObject) {
     return 'rgb(211, 211, 211)'
   } else {
