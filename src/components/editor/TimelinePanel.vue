@@ -1,15 +1,30 @@
 <template>
   <div class="timeline-panel">
-    <div class="header d-flex">
+    <div class="timeline-header">
+      <v-btn
+        size="small"
+        density="comfortable"
+        :icon="isPlaying ? 'mdi-pause' : 'mdi-play'"
+        class="mr-3 ma-1"
+        @click="playPause"
+      >
+      </v-btn>
       <p>Frame:</p>
       <input :value="timelineStore.currentFrame" style="width: 60px" />
-      <input type="range" min="50" max="400" v-model="timelineStore.pxPerSec" />
+      <input
+        type="range"
+        min="50"
+        max="400"
+        v-model="timelineStore.pxPerSec"
+        style="margin-left: auto"
+      />
     </div>
 
     <div class="timeline-container">
       <Waveformbar
         @callGetWaveformWidth="setWaveformWidth"
         @callSetScrollPosition="setScrollPosition"
+        v-model:isPlaying="isPlaying"
       ></Waveformbar>
       <div class="timeline" style="overflow-y: auto; height: 200px">
         <div
@@ -80,6 +95,7 @@ const layers = ref(
   }))
 )
 const waveformWidth = ref(900)
+const isPlaying = ref(false)
 
 // タイムラインメニュー
 function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
@@ -129,6 +145,10 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
     ]
   })
   event.stopPropagation()
+}
+
+function playPause() {
+  isPlaying.value = !isPlaying.value
 }
 
 // オブジェクトクリックで選択
@@ -202,6 +222,14 @@ function setScrollPosition(position: number) {
 </script>
 
 <style scoped>
+.timeline-header {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid #ccc;
+}
+
 .timeline-container {
   height: 100%;
 }

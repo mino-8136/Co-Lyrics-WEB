@@ -12,6 +12,7 @@ const timelineStore = useTimelineStore()
 const waveform = ref(null) // DOM要素への参照を作成
 let wavesurfer: WaveSurfer // wavesurferのインスタンスを保持する変数
 
+const isPlaying = defineModel('isPlaying', { type: Boolean }) // 再生中かどうかを保持する変数
 const emits = defineEmits(['callGetWaveformWidth', 'callSetScrollPosition'])
 
 onMounted(() => {
@@ -49,10 +50,10 @@ onMounted(() => {
 
     // イベントリスナーを追加
     wavesurfer.on('click', () => {
-      wavesurfer.playPause()
+      isPlaying.value = !isPlaying.value
     })
     wavesurfer.on('dragstart', () => {
-      wavesurfer.pause()
+      isPlaying.value = false
     })
     wavesurfer.on('interaction', (newTime) => {
       timelineStore.currentFrame = Math.round(newTime * timelineStore.framerate)
@@ -71,6 +72,20 @@ onMounted(() => {
     })
   }
 })
+
+// isPlayingの変更を監視して再生・停止を管理
+watch(
+  () => isPlaying.value,
+  (newIsPlaying) => {
+    if (wavesurfer) {
+      if (newIsPlaying) {
+        wavesurfer.play()
+      } else {
+        wavesurfer.pause()
+      }
+    }
+  }
+)
 
 // pxPerSecの変更を監視
 watch(
