@@ -226,7 +226,7 @@ function setScrollPosition(position: number) {
   display: flex;
   align-items: center;
   padding: 0 10px;
-  background-color: #f5f5f5;
+  background-color: #f0f8ff;
   border-bottom: 1px solid #ccc;
 }
 

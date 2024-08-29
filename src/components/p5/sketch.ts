@@ -45,6 +45,7 @@ export function defineSketch(project: any) {
       p.strokeWeight(0)
       p.rectMode(p.CENTER)
       p.frameRate(project.framerate)
+      p.textAlign(p.CENTER, p.CENTER)
 
       p.background(0)
     }
