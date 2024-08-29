@@ -15,6 +15,10 @@
       <v-list-item @click="openFile('add')">
         <v-list-item-title>別のファイルから追加</v-list-item-title>
       </v-list-item>
+      <v-divider></v-divider>
+      <v-list-item @click="clearObjects()">
+        <v-list-item-title>オブジェクト全削除</v-list-item-title>
+      </v-list-item>
     </v-list>
   </v-menu>
 </template>
@@ -97,5 +101,10 @@ const openFile = (state: string) => {
   }
   // ファイル選択ダイアログを開く
   input.click()
+}
+
+const clearObjects = () => {
+  objectStore.clearObjects()
+  timelineStore.selectedObjectId = -1
 }
 </script>
