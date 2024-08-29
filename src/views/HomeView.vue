@@ -18,18 +18,14 @@
       <v-card-title>楽曲情報</v-card-title>
 
       <v-row>
-        <v-col cols="6">
-          <v-card variant="elevated" rounded="xl">
+        <v-col v-for="music in musicData" :key="music.title" cols="6">
+          <v-card variant="elevated" color="blue-darken-1" rounded="xl">
             <template v-slot:prepend>
-              <v-icon icon="mdi-music" color="blue-lighten-3"></v-icon>
+              <v-icon icon="mdi-music" class="mr-1"></v-icon>
             </template>
-            <template v-slot:title> レターポスト </template>
-            <template v-slot:subtitle> ??? feat.重音テト </template>
-            <v-card-text>
-              淡く刻んだ文字列が 君にはどんな風に見えてたの ああだこうだと捉えては
-              確証も無しに震えてる きらり色づく文字列は 私の頭を捩じ切らせる そうだ　幸せになる呪縛
-              いつからこんなだったっけ
-            </v-card-text>
+            <template v-slot:title> {{ music.title }} </template>
+            <template v-slot:subtitle> {{ music.artist }}</template>
+            <v-card-text> {{ music.lyrics }} </v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
               <v-btn text="この楽曲を選択" variant="text" @click="formPanel = true"></v-btn>
@@ -73,6 +69,22 @@ interface MovieObject {
 const movies = ref<MovieObject[]>([])
 const playPanel = ref(false)
 const formPanel = ref(false)
+
+// 楽曲情報(TODO: 仮データ)
+const musicData = [
+  {
+    title: 'レターポスト',
+    artist: '??? feat.重音テト',
+    lyrics: `淡く刻んだ文字列が 君にはどんな風に見えてたの ああだこうだと捉えては
+  確証も無しに震えてる きらり色づく文字列は 私の頭を捩じ切らせる そうだ　幸せになる呪縛
+  いつからこんなだったっけ`
+  },
+  {
+    title: '???',
+    artist: '???',
+    lyrics: '???'
+  }
+]
 
 // @/public/userdata/sample.jsonから、ムービーデータを取得してmoviesにセット
 onMounted(() => {
