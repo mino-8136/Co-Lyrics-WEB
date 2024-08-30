@@ -296,7 +296,7 @@ export type typeString = '' | 'base' | 'text' | 'image' | 'shape'
 export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
 
 // 指定されたパラメータからオブジェクトを生成する(ファイル保存処理・再読込で使用)
-export function createObject(obj: RenderObject): any {
+export function createObjectFromJson(obj: RenderObject): any {
   const types = {
     text: TextObject,
     image: ImageObject,

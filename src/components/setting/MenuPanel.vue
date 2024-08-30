@@ -29,7 +29,7 @@ import {
   StandardRenderSettings,
   TextSettings,
   type RenderObject,
-  createObject
+  createObjectFromJson
 } from '../parameters/objectInfo'
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -77,7 +77,7 @@ const openFile = (state: string) => {
       }
 
       objData.forEach((obj: RenderObject) => {
-        let newObj = createObject(obj)
+        let newObj = createObjectFromJson(obj)
         objectStore.addObject(newObj)
       })
       timelineStore.selectedObjectId = -1
