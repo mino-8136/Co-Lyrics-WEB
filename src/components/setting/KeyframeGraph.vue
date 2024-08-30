@@ -3,6 +3,7 @@
     <svg
       :width="props.panelWidth + padding.left + padding.right"
       :height="height + padding.top + padding.bottom"
+      @contextmenu.prevent="onGraphContextMenu"
     >
       <!-- グリッド線の描画 -->
       <g class="grid" :transform="`translate(${padding.left}, ${padding.top})`">
@@ -70,7 +71,7 @@
           r="5"
           fill="red"
           @mousedown.stop="startDrag(index, $event)"
-          @contextmenu.prevent="onKeyframeContextMenu($event, index)"
+          @contextmenu.stop.prevent="onKeyframeContextMenu($event, index)"
         />
       </g>
     </svg>
@@ -84,6 +85,7 @@ import { gsap } from 'gsap'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import EasingPanel from '@/components/setting/EasingPanel.vue'
 import { type KeyframeSettings, type KeyframeSetting } from '@/components/parameters/objectInfo'
+import { generateUniqueId } from '../utils/common'
 
 const displayEasingPanel = ref(false)
 const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })
@@ -107,6 +109,10 @@ const endFrame = computed(() => props.end)
 
 const maxDeltaX = 2 // X軸の値が1回のドラッグで変化できる最大量
 const maxDeltaY = 5 // Y軸の値が1回のドラッグで変化できる最大量
+
+/////////////////
+// グラフの描画 //
+/////////////////
 
 // xRange: frameの最小値と最大値を動的に設定
 const xRange = computed(() => {
@@ -212,9 +218,9 @@ const horizontalLines = computed(() => {
   return lines
 })
 
-/////////////////////
-// キーフレーム操作 //
-/////////////////////
+///////////////////
+// メニューの定義 //
+///////////////////
 
 // キーフレームを右クリックしたときのコンテキストメニュー
 function onKeyframeContextMenu(event: MouseEvent, index: number) {
@@ -240,6 +246,27 @@ function onKeyframeContextMenu(event: MouseEvent, index: number) {
   })
 }
 
+function onGraphContextMenu(event: MouseEvent) {
+  event.preventDefault()
+
+  ContextMenu.showContextMenu({
+    x: event.clientX,
+    y: event.clientY,
+    items: [
+      {
+        label: 'キーフレームを追加',
+        onClick: () => {
+          addKeyframe(event)
+        }
+      }
+    ]
+  })
+}
+
+/////////////////////
+// キーフレーム操作 //
+/////////////////////
+
 // イージングパネルを表示する関数
 function showEasingPanel(index: number) {
   selectedKeyframe.value = keyframes.value[index]
@@ -249,6 +276,33 @@ function showEasingPanel(index: number) {
 // キーフレームを削除する関数
 function removeKeyframe(index: number) {
   keyframes.value.splice(index, 1)
+}
+
+// キーフレームを追加する関数
+function addKeyframe(event: MouseEvent) {
+  let frame = Math.round(
+    ((event.offsetX - padding.left) / props.panelWidth) * (xRange.value[1] - xRange.value[0]) +
+      xRange.value[0]
+  )
+  const value = Math.round(
+    ((height - (event.offsetY - padding.top)) / height) * (yRange.value[1] - yRange.value[0]) +
+      yRange.value[0]
+  )
+
+  // frameを基準に挿入位置を決める
+  const frameIndex = keyframes.value.findIndex((kf) => kf.frame > frame)
+  // もしframeが1つ前のキーフレームと同じ場合はframeを+1する
+  // TODO: 他のキーフレームとも重複しないようにする
+  if (frameIndex !== -1 && keyframes.value[frameIndex - 1].frame === frame) {
+    frame++
+  }
+
+  keyframes.value.splice(frameIndex, 0, {
+    id: generateUniqueId(),
+    frame,
+    value,
+    easeType: 'none'
+  })
 }
 
 // キーフレームドラッグ用の変数
