@@ -131,14 +131,28 @@ const xRange = computed(() => {
   return [0, endFrame.value - startFrame.value]
 })
 
-// yRange: valueの範囲を動的に設定
+let initialYRange = [-100, 100]
 const yRange = computed(() => {
-  const maxAbsValue = Math.max(
+  const currentMaxAbsValue = Math.max(
     Math.abs(Math.min(...keyframes.value.map((k) => k.value))),
     Math.abs(Math.max(...keyframes.value.map((k) => k.value)))
   )
-  const adjustedMaxAbsValue = Math.max(maxAbsValue, 100)
-  return [-adjustedMaxAbsValue, adjustedMaxAbsValue]
+
+  // ドラッグ中かどうかで最大値を調整
+  const targetMaxAbsValue =
+    draggingIndex.value !== -1
+      ? Math.max(
+          currentMaxAbsValue,
+          Math.max(Math.abs(initialYRange[0]), Math.abs(initialYRange[1]))
+        )
+      : Math.max(currentMaxAbsValue, 100)
+
+  // ドラッグが終了したら新しいyRangeを設定
+  if (draggingIndex.value === -1) {
+    initialYRange = [-targetMaxAbsValue, targetMaxAbsValue]
+  }
+
+  return [-targetMaxAbsValue, targetMaxAbsValue]
 })
 
 // フレームと値から x 座標を計算する関数
@@ -337,6 +351,9 @@ let svgRect: DOMRect | null = null
 
 const startDrag = (index: number, event: MouseEvent) => {
   draggingIndex.value = index
+
+  // ドラッグ開始時の表示域を保存
+  initialYRange = yRange.value
 
   // SVG全体のオフセットを計算して保存
   svgRect = (event.currentTarget as SVGElement).getBoundingClientRect()
