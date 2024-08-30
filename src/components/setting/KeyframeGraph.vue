@@ -125,10 +125,6 @@ const endFrame = computed(() => props.end)
 const maxDeltaX = 2 // X軸の値が1回のドラッグで変化できる最大量
 const maxDeltaY = 5 // Y軸の値が1回のドラッグで変化できる最大量
 
-/////////////////
-// グラフの描画 //
-/////////////////
-
 // xRange: frameの最小値と最大値を動的に設定
 const xRange = computed(() => {
   // console.log(startFrame.value, endFrame.value)
@@ -144,6 +140,20 @@ const yRange = computed(() => {
   const adjustedMaxAbsValue = Math.max(maxAbsValue, 100)
   return [-adjustedMaxAbsValue, adjustedMaxAbsValue]
 })
+
+// フレームと値から x 座標を計算する関数
+const computeX = (frame: number) => {
+  return ((frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
+}
+
+// フレームと値から y 座標を計算する関数
+const computeY = (value: number) => {
+  return height - ((value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
+}
+
+/////////////////
+// グラフの描画 //
+/////////////////
 
 const points = computed(() => {
   const allPoints = []
@@ -202,16 +212,6 @@ const points = computed(() => {
 
   return allPoints.join(' ')
 })
-
-// フレームと値から x 座標を計算する関数
-const computeX = (frame: number) => {
-  return ((frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
-}
-
-// フレームと値から y 座標を計算する関数
-const computeY = (value: number) => {
-  return height - ((value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
-}
 
 // グリッド線を描画するための座標を計算
 const verticalLines = computed(() => {
