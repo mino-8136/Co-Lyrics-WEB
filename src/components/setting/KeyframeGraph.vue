@@ -4,6 +4,7 @@
       :width="props.panelWidth + padding.left + padding.right"
       :height="height + padding.top + padding.bottom"
       @contextmenu.prevent="onGraphContextMenu"
+      @mousedown="updateSeekbar"
     >
       <!-- グリッド線の描画 -->
       <g class="grid" :transform="`translate(${padding.left}, ${padding.top})`">
@@ -26,6 +27,18 @@
           :y2="y"
           stroke="#ccc"
           stroke-width="0.5"
+        />
+      </g>
+
+      <!-- シークバーの表示 -->
+      <g :transform="`translate(${padding.left}, ${padding.top})`">
+        <line
+          :x1="computeX(timelineStore.currentFrame - props.start)"
+          :y1="0"
+          :x2="computeX(timelineStore.currentFrame - props.start)"
+          :y2="height"
+          stroke="#666"
+          stroke-width="1"
         />
       </g>
 
@@ -86,10 +99,12 @@ import ContextMenu from '@imengyu/vue3-context-menu'
 import EasingPanel from '@/components/setting/EasingPanel.vue'
 import { type KeyframeSettings, type KeyframeSetting } from '@/components/parameters/objectInfo'
 import { generateUniqueId } from '../utils/common'
+import { useTimelineStore } from '@/stores/objectStore'
 
 const displayEasingPanel = ref(false)
 const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })
 const selectedKeyframe = ref<KeyframeSetting>({} as KeyframeSetting)
+const timelineStore = useTimelineStore()
 
 const props = defineProps<{
   start: number
@@ -263,9 +278,9 @@ function onGraphContextMenu(event: MouseEvent) {
   })
 }
 
-/////////////////////
-// キーフレーム操作 //
-/////////////////////
+///////////////////
+// キーパネル操作 //
+///////////////////
 
 // イージングパネルを表示する関数
 function showEasingPanel(index: number) {
@@ -304,6 +319,18 @@ function addKeyframe(event: MouseEvent) {
     easeType: 'none'
   })
 }
+
+const updateSeekbar = (event: MouseEvent) => {
+  timelineStore.currentFrame =
+    Math.round(
+      ((event.offsetX - padding.left) / props.panelWidth) * (xRange.value[1] - xRange.value[0]) +
+        xRange.value[0]
+    ) + props.start
+}
+
+/////////////////////
+// キーフレーム操作 //
+/////////////////////
 
 // キーフレームドラッグ用の変数
 let svgRect: DOMRect | null = null
