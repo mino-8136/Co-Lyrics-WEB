@@ -87,11 +87,13 @@ export function defineSketch(project: any) {
       styles.forEach((style) => {
         switch (style.name) {
           case '縁取り':
+            p.stroke(style.parameters.line_color)
+            p.strokeWeight(style.parameters.line_width)
             break
           case 'シャドー':
-            p.drawingContext.shadowOffsetX = 0
-            p.drawingContext.shadowOffsetY = 0
-            p.drawingContext.shadowBlur = 5
+            p.drawingContext.shadowOffsetX = style.parameters.shadow_x
+            p.drawingContext.shadowOffsetY = style.parameters.shadow_y
+            p.drawingContext.shadowBlur = style.parameters.shadow_blur
             p.drawingContext.shadowColor = '#ffffff'
             break
         }
@@ -145,6 +147,9 @@ export function defineSketch(project: any) {
       col.setAlpha(lerpValue(object.standardRenderSettings.opacity, object.start))
       p.fill(col)
 
+      // スタイルの適用
+      applyStyle(object.styleSettings)
+
       // 全体的なトランスフォームの実行(renderTextと同様)
       p.translate(
         lerpValue(object.standardRenderSettings.X, object.start),
@@ -184,9 +189,11 @@ export function defineSketch(project: any) {
           p.textFont(foundFont ? foundFont : 'Arial')
         }
       }
-
       p.textSize(object.textSettings.textSize)
       const col = p.color(object.textSettings.color)
+
+      // スタイルの適用
+      applyStyle(object.styleSettings)
 
       // 全体的なトランスフォームの実行
       p.translate(
