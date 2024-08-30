@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { type RenderObject } from '@/components/parameters/objectInfo'
+import { createObjectFromJson, type RenderObject } from '@/components/parameters/objectInfo'
 
 export const useObjectStore = defineStore('objects', {
   state: () => ({
@@ -28,6 +28,15 @@ export const useObjectStore = defineStore('objects', {
     clearObjects() {
       this.objects.splice(0)
       this.counter = 0
+    }
+  },
+  persist: {
+    afterHydrate(store) {
+      if ('objects' in store) {
+        store.objects = (store.objects as any).map((object: RenderObject) =>
+          createObjectFromJson(object)
+        )
+      }
     }
   }
 })
