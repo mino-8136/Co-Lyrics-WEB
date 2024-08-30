@@ -36,6 +36,7 @@ export const useObjectStore = defineStore('objects', {
         store.objects = (store.objects as any).map((object: RenderObject) =>
           createObjectFromJson(object)
         )
+        // カウンターはもとから保存されている
       }
     }
   }
