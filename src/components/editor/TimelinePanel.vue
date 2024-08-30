@@ -81,7 +81,9 @@ import Waveformbar from '@/components/timeline/WaveformBar.vue'
 import {
   BaseObject,
   BaseSettings,
+  createObjectFromJson,
   ImageObject,
+  type RenderObject,
   ShapeObject,
   TextObject,
   type typeString
@@ -96,6 +98,11 @@ const layers = ref(
 )
 const waveformWidth = ref(900)
 const isPlaying = ref(false)
+const copiedObject = ref<RenderObject>()
+
+///////////////////
+// メニューの定義 //
+///////////////////
 
 // タイムラインメニュー
 function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
@@ -131,30 +138,20 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
       //   }
       // }
       {
-        label: 'オブジェクトをコピー',
-        onClick: () => {
-          layers.value.push({ name: 'Layer' })
-        }
-      },
-      {
         label: 'オブジェクトを貼り付け',
+        hidden: copiedObject.value === null,
         onClick: () => {
-          layers.value.push({ name: 'Layer' })
+          if (copiedObject.value) {
+            let newObj = createObjectFromJson(copiedObject.value)
+            // 最後のIDに次々追加する
+            newObj.id = objectStore.findLastId + 1
+            objectStore.addObject(newObj)
+          }
         }
       }
     ]
   })
   event.stopPropagation()
-}
-
-function playPause() {
-  isPlaying.value = !isPlaying.value
-}
-
-// オブジェクトクリックで選択
-function selectObject(objectId: number) {
-  // クリックしたオブジェクトを選択
-  timelineStore.selectedObjectId = objectId
 }
 
 // オブジェクトを右クリックした場合のメニュー
@@ -166,6 +163,12 @@ function onObjectContextMenu(event: MouseEvent, objIndex: number) {
     y: event.clientY,
     items: [
       {
+        label: 'オブジェクトをコピー',
+        onClick: () => {
+          copiedObject.value = objectStore.objects.find((obj) => obj.id === objIndex)
+        }
+      },
+      {
         label: 'オブジェクトを削除',
         onClick: () => {
           removeObject(objIndex)
@@ -174,6 +177,20 @@ function onObjectContextMenu(event: MouseEvent, objIndex: number) {
     ]
   })
   event.stopPropagation()
+}
+
+///////////////////
+// それぞれの処理 //
+///////////////////
+
+function playPause() {
+  isPlaying.value = !isPlaying.value
+}
+
+// オブジェクトクリックで選択
+function selectObject(objectId: number) {
+  // クリックしたオブジェクトを選択
+  timelineStore.selectedObjectId = objectId
 }
 
 // オブジェクトの追加

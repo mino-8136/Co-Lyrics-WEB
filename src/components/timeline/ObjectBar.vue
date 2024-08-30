@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
-import { BaseObject, TextObject, ImageObject, ShapeObject } from '../parameters/objectInfo'
+import { BaseObject, TextObject, ImageObject, ShapeObject, type RenderObject } from '../parameters/objectInfo'
 import { type KeyframeSettings } from '../parameters/objectInfo'
 import { useTimelineStore } from '@/stores/objectStore'
 import gsap from 'gsap'
@@ -27,7 +27,7 @@ import KeyframePoint from './KeyframePoint.vue'
 
 const text = defineModel('text')
 const props = defineProps<{
-  object: TextObject | ImageObject | BaseObject
+  object: RenderObject
 }>()
 const timelineStore = useTimelineStore()
 const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
