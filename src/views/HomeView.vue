@@ -45,7 +45,7 @@
         <v-text-field label="制作メンバー"></v-text-field>
       </v-card-text>
       <v-card-actions>
-        <v-btn text @click="() => $router.push('/edit')">次へ</v-btn>
+        <v-btn @click="() => $router.push('/edit')">次へ</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
