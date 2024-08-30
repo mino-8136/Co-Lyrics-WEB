@@ -251,26 +251,35 @@ function removeKeyframe(index: number) {
   keyframes.value.splice(index, 1)
 }
 
+// キーフレームドラッグ用の変数
+let svgRect: DOMRect | null = null
+
 const startDrag = (index: number, event: MouseEvent) => {
-  //console.log('startDrag', index)
   draggingIndex.value = index
+
+  // SVG全体のオフセットを計算して保存
+  svgRect = (event.currentTarget as SVGElement).getBoundingClientRect()
+
   // 座標を動的に計算する
   const frameX = computeX(keyframes.value[index].frame)
   const valueY = computeY(keyframes.value[index].value)
-  offsetX.value = event.offsetX - frameX
-  offsetY.value = event.offsetY - valueY
+
+  offsetX.value = event.clientX - (svgRect.left + frameX)
+  offsetY.value = event.clientY - (svgRect.top + valueY)
 
   // ドラッグ中のイベントリスナーを追加
-  document.addEventListener('mousemove', onMouseMove)
-  document.addEventListener('mouseup', endDrag)
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', endDrag)
 }
+
 const onMouseMove = (event: MouseEvent) => {
-  if (draggingIndex.value !== null) {
+  if (draggingIndex.value !== -1 && svgRect) {
     const kf = keyframes.value[draggingIndex.value]
 
     // フレームの変更
     let newFrame = Math.round(
-      ((event.offsetX - offsetX.value) / props.panelWidth) * (xRange.value[1] - xRange.value[0]) +
+      ((event.clientX - svgRect.left - offsetX.value) / props.panelWidth) *
+        (xRange.value[1] - xRange.value[0]) +
         xRange.value[0]
     )
 
@@ -287,7 +296,8 @@ const onMouseMove = (event: MouseEvent) => {
 
     // 値の変更
     const newValue = Math.round(
-      ((offsetY.value - event.offsetY) / height) * (yRange.value[1] - yRange.value[0]) +
+      ((offsetY.value - (event.clientY - svgRect.top)) / height) *
+        (yRange.value[1] - yRange.value[0]) +
         yRange.value[1]
     )
 
@@ -305,9 +315,10 @@ const onMouseMove = (event: MouseEvent) => {
 }
 
 const endDrag = () => {
-  document.removeEventListener('mousemove', onMouseMove)
-  document.removeEventListener('mouseup', endDrag)
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', endDrag)
   draggingIndex.value = -1
+  svgRect = null // 終了時にクリア
 }
 </script>
 
