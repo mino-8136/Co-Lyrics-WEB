@@ -295,8 +295,7 @@ export class ShapeObject extends BaseObject {
 export type typeString = '' | 'base' | 'text' | 'image' | 'shape'
 export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
 
-// 指定されたパラメータからオブジェクトを生成する(ファイル保存処理のみで使用)
-// → ファクトリー関数としてさまざまな場面で使用する
+// 指定されたパラメータからオブジェクトを生成する(ファイル保存処理・再読込で使用)
 export function createObject(obj: RenderObject): any {
   const types = {
     text: TextObject,
@@ -307,6 +306,7 @@ export function createObject(obj: RenderObject): any {
   }
 
   const ClassRef = types[obj.type] || BaseObject
+
   const newObj = new ClassRef({
     id: obj.id,
     start: obj.start,
@@ -314,6 +314,20 @@ export function createObject(obj: RenderObject): any {
     layer: obj.layer,
     type: obj.type
   })
+
+  // 各オブジェクトの設定をコピー(typescriptの警告を回避するためas anyを使用)
+  if ('standardRenderSettings' in obj) {
+    ;(newObj as any).standardRenderSettings = new StandardRenderSettings(obj.standardRenderSettings)
+  }
+  if ('textSettings' in obj) {
+    ;(newObj as any).textSettings = new TextSettings(obj.textSettings)
+  }
+  if ('styleSettings' in obj) {
+    ;(newObj as any).styleSettings = obj.styleSettings
+  }
+  if ('animations' in obj) {
+    ;(newObj as any).animations = obj.animations
+  }
 
   return newObj
 }

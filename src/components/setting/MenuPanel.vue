@@ -78,20 +78,6 @@ const openFile = (state: string) => {
 
       objData.forEach((obj: RenderObject) => {
         let newObj = createObject(obj)
-
-        if ('standardRenderSettings' in obj) {
-          newObj.standardRenderSettings = new StandardRenderSettings(obj.standardRenderSettings)
-        }
-        if ('textSettings' in obj) {
-          newObj.textSettings = new TextSettings(obj.textSettings)
-        }
-        if ('styleSettings' in obj) {
-          newObj.styleSettings = obj.styleSettings
-        }
-        if ('animations' in obj) {
-          newObj.animations = obj.animations
-        }
-
         objectStore.addObject(newObj)
       })
       timelineStore.selectedObjectId = -1
