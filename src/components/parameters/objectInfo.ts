@@ -3,6 +3,7 @@ import { styleList } from '@/assets/effects/style'
 import { animationList } from '@/assets/effects/animation'
 import { UIType } from './uiInfo'
 import p5 from 'p5'
+import { deepCopy } from '../utils/common'
 
 //////////////////////////////////////////////////////////////
 
@@ -354,7 +355,9 @@ export function createObjectFromJson(obj: RenderObject): any {
 
   // 各オブジェクトの設定をコピー(typescriptの警告を回避するためas anyを使用)
   if ('standardRenderSettings' in obj) {
-    ;(newObj as any).standardRenderSettings = new StandardRenderSettings(obj.standardRenderSettings)
+    ;(newObj as any).standardRenderSettings = new StandardRenderSettings(
+      deepCopy(obj.standardRenderSettings)
+    )
   }
   if ('textSettings' in obj) {
     ;(newObj as any).textSettings = new TextSettings(obj.textSettings)

@@ -143,9 +143,18 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
         onClick: () => {
           if (copiedObject.value) {
             let newObj = createObjectFromJson(copiedObject.value)
+            const newObjDuration = newObj.end - newObj.start
+
             // 最後のIDに次々追加する
             newObj.id = objectStore.findLastId + 1
+            newObj.start = Math.floor(
+              (event.offsetX / timelineStore.pxPerSec) * timelineStore.framerate
+            )
+            newObj.end = newObj.start + newObjDuration
+            newObj.layer = layerIndex
+
             objectStore.addObject(newObj)
+            
           }
         }
       }
