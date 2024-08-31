@@ -6,6 +6,7 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import WaveSurfer from 'wavesurfer.js'
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js'
 import { useTimelineStore } from '@/stores/objectStore'
 const timelineStore = useTimelineStore()
 
@@ -17,6 +18,9 @@ const emits = defineEmits(['callGetWaveformWidth', 'callSetScrollPosition'])
 
 onMounted(() => {
   if (waveform.value) {
+    // マーカー用プラグインの設定
+    const regions = RegionsPlugin.create()
+
     // タイムラインプラグインの設定
     const bottomTimeline = TimelinePlugin.create({
       height: 15,
@@ -45,7 +49,7 @@ onMounted(() => {
       fillParent: false,
       normalize: true,
       hideScrollbar: false,
-      plugins: [bottomTimeline]
+      plugins: [bottomTimeline, regions]
     })
 
     // イベントリスナーを追加
@@ -69,6 +73,38 @@ onMounted(() => {
     // 再生直前の処理はここに追加
     wavesurfer.on('ready', () => {
       emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
+    })
+
+    // マーカーの追加
+    wavesurfer.on('decode', async () => {
+      // 歌詞データを読み込み
+      console
+      interface Note {
+        note: number
+        start_time: number
+        end_time: number
+        lyric?: string
+      }
+      let noteData: Note[] = []
+      try {
+        const response = await fetch('assets/lyrics/レターポスト_melody.json')
+        noteData = await response.json()
+      } catch (error) {
+        console.error('Error loading JSON:', error)
+      }
+
+      // 各ノートデータに基づいてリージョンを追加
+      noteData.forEach((note: Note) => {
+        if ('lyric' in note) {
+          regions.addRegion({
+            start: note.start_time + 2.2,
+            content: note.lyric || '', // 歌詞がある場合のみ表示
+            drag: false,
+            color: 'rgba(255, 255, 0, 0.5)'
+          })
+        }
+        console.log('regions:', regions.getRegions())
+      })
     })
   }
 })
@@ -120,5 +156,24 @@ div {
 }
 .scrollchild {
   background-color: red;
+}
+
+.waveform ::part(region-content) {
+  font-size: 16px;
+  white-space: nowrap;
+  color: rgb(255, 255, 255);
+  text-shadow:
+    1px 1px 0 #000,
+    -1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000;
+  user-select: none;
+}
+
+.waveform ::part(marker) {
+  background-color: rgba(0, 166, 255, 0.658) !important;
+  padding: 1px;
+  padding-top: 4px;
+  font-family: fantasy;
 }
 </style>
