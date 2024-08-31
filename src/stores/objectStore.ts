@@ -56,6 +56,7 @@ export const useTimelineStore = defineStore('timeline', {
     canvasScale: 1,
     pxPerSec: 90,
     selectedObjectId: 0,
+    selectedObjectIds: [] as number[], // 複数選択用
     isRedrawNeeded: false
   }),
   actions: {
