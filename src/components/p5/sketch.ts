@@ -409,7 +409,6 @@ export function defineSketch(project: any) {
     }
 
     p.updateShowCollisionBox = (show: boolean) => {
-      console.log(show)
       showCollisionBox = show
     }
 

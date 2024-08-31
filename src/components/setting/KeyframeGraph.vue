@@ -307,9 +307,9 @@ function removeKeyframe(index: number) {
   keyframes.value.splice(index, 1)
 }
 
-// キーフレームを追加する関数
 function addKeyframe(event: MouseEvent) {
-  let frame = Math.round(
+  // マウスの位置に基づいてフレームと値を計算
+  const frame = Math.round(
     ((event.offsetX - padding.left) / props.panelWidth) * (xRange.value[1] - xRange.value[0]) +
       xRange.value[0]
   )
@@ -320,18 +320,20 @@ function addKeyframe(event: MouseEvent) {
 
   // frameを基準に挿入位置を決める
   const frameIndex = keyframes.value.findIndex((kf) => kf.frame > frame)
-  // もしframeが1つ前のキーフレームと同じ場合はframeを+1する
-  // TODO: 他のキーフレームとも重複しないようにする
-  if (frameIndex !== -1 && keyframes.value[frameIndex - 1].frame === frame) {
-    frame++
-  }
 
-  keyframes.value.splice(frameIndex, 0, {
+  const newKeyframe = {
     id: generateUniqueId(),
     frame,
     value,
     easeType: 'none'
-  })
+  }
+
+  // キーフレームの最小・最大に追加する場合
+  if (frameIndex === -1) {
+    keyframes.value.push(newKeyframe)
+  } else {
+    keyframes.value.splice(frameIndex, 0, newKeyframe)
+  }
 }
 
 const updateSeekbar = (event: MouseEvent) => {
