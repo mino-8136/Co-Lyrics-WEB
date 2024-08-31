@@ -3,15 +3,12 @@ import p5 from 'p5'
 import {
   type TextObject,
   type KeyframeSettings,
-  type AnimationSettings,
-  type StyleSettings,
   ShapeObject,
   ImageObject,
   BaseObject,
   type RenderObject
 } from '@/components/parameters/objectInfo'
-import { Transform, Inform, ShapeType } from '@/components/parameters/p5Info'
-import { animationList } from '@/assets/effects/animation'
+import { Inform, ShapeType } from '@/components/parameters/p5Info'
 import { fontListData } from '../parameters/fonts'
 
 let renderObjects: RenderObject[] = []
@@ -79,40 +76,7 @@ export function defineSketch(project: any) {
 
       p.pop()
     }
-    ///////////////////////
-    // スタイル処理の関数 //
-    ///////////////////////
 
-    function applyStyle(styles: StyleSettings) {}
-
-    ////////////////////////
-    // エフェクト処理の関数 //
-    ////////////////////////
-
-    // エフェクトをトランスフォームに適用する関数
-    function applyEffectToTransform(baseValue: Transform, effectValue: Transform): void {
-      baseValue.X += effectValue.X
-      baseValue.Y += effectValue.Y
-      baseValue.angle += effectValue.angle
-      baseValue.scale *= effectValue.scale / 100
-      baseValue.opacity *= effectValue.opacity / 100
-    }
-
-    // すべてのエフェクトを適用する関数
-    function applyEffects(inform: Inform, animations: AnimationSettings): Transform {
-      const baseValue = new Transform()
-
-      animations.effects.forEach((animation) => {
-        // effects 配列から対応するエフェクトを検索
-        const effect = animationList.find((effect) => effect.name === animation.name)
-        if (effect) {
-          const effectValue = effect.applyEffect(inform, baseValue, animation.parameters)
-          applyEffectToTransform(baseValue, effectValue)
-        }
-      })
-
-      return baseValue
-    }
     //////////////////////////
     // 画像レンダリングの関数 //
     //////////////////////////
@@ -133,7 +97,7 @@ export function defineSketch(project: any) {
       p.fill(col)
 
       // スタイルの適用
-      applyStyle(object.styleSettings)
+      object.styleSettings.stylize(p)
 
       // 全体的なトランスフォームの実行(renderTextと同様)
       p.translate(
@@ -151,7 +115,7 @@ export function defineSketch(project: any) {
         object.end,
         currentFrame
       )
-      const effectValue = applyEffects(inform, object.animations)
+      const effectValue = object.animations.animate(inform, object.animations)
       if (effectValue.opacity == 0) return
       if (effectValue.scale == 0) return
 
@@ -233,7 +197,7 @@ export function defineSketch(project: any) {
           object.end,
           currentFrame
         )
-        const effectValue = applyEffects(inform, object.animations)
+        const effectValue = object.animations.animate(inform, object.animations)
         if (effectValue.opacity == 0) return
         if (effectValue.scale == 0) return
 

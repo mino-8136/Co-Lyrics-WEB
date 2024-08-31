@@ -15,6 +15,15 @@ export class Transform {
   }
 }
 
+// エフェクトをトランスフォームに適用する関数
+export function applyEffectToTransform(baseValue: Transform, effectValue: Transform): void {
+  baseValue.X += effectValue.X
+  baseValue.Y += effectValue.Y
+  baseValue.angle += effectValue.angle
+  baseValue.scale *= effectValue.scale / 100
+  baseValue.opacity *= effectValue.opacity / 100
+}
+
 export class Inform {
   id: number
   totalId: number

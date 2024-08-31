@@ -1,7 +1,9 @@
-import { ShapeType } from './p5Info'
+import { ShapeType, Transform, Inform, applyEffectToTransform } from './p5Info'
 import { styleList } from '@/assets/effects/style'
+import { animationList } from '@/assets/effects/animation'
 import { UIType } from './uiInfo'
 import p5 from 'p5'
+
 //////////////////////////////////////////////////////////////
 
 // キーフレームの情報管理
@@ -32,11 +34,19 @@ export class AnimationSettings {
     this.effects = animations
   }
 
-  animate(): void {
-    if ('animations' in this) {
-      console.log('animation')
-    }
-    console.log('animation')
+  animate(inform: Inform, animations: AnimationSettings): Transform {
+    const baseValue = new Transform()
+
+    animations.effects.forEach((animation) => {
+      // effects 配列から対応するエフェクトを検索
+      const effect = animationList.find((effect) => effect.name === animation.name)
+      if (effect) {
+        const effectValue = effect.applyEffect(inform, baseValue, animation.parameters)
+        applyEffectToTransform(baseValue, effectValue)
+      }
+    })
+
+    return baseValue
   }
 }
 export interface StyleSetting {
@@ -51,15 +61,14 @@ export class StyleSettings {
   constructor(styles: StyleSetting[] = []) {
     this.effects = styles
   }
+
   stylize(p: p5): void {
-    if ('styleSettings' in this) {
-      this.effects.forEach((style) => {
-        const effect = styleList.find((effect) => effect.name === style.name)
-        if (effect) {
-          effect.applyStyle(p, style)
-        }
-      })
-    }
+    this.effects.forEach((style) => {
+      const effect = styleList.find((effect) => effect.name === style.name)
+      if (effect) {
+        effect.applyStyle(p, style)
+      }
+    })
   }
 }
 
