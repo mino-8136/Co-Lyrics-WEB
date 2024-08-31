@@ -14,6 +14,7 @@ import type { KeyframeSetting } from '../parameters/objectInfo'
 
 const point = defineModel<KeyframeSetting>('point', { required: true })
 const props = defineProps<{ scaler: number }>()
+const emits = defineEmits(['callKeyframeSort'])
 
 const isMoving = ref(false)
 const lastMouseX = ref(0)
@@ -30,6 +31,7 @@ const startMove = (event: MouseEvent) => {
   isMoving.value = true
   lastMouseX.value = event.clientX
   lastMouseY.value = event.clientY
+  tempPoint.value = point.value.frame
   event.stopPropagation()
 
   window.addEventListener('mousemove', move)
@@ -47,9 +49,11 @@ const move = (event: MouseEvent) => {
 const stopMove = () => {
   if (isMoving.value) {
     point.value.frame = Math.floor(tempPoint.value)
+    tempPoint.value = point.value.frame
     isMoving.value = false
     window.removeEventListener('mousemove', move)
     window.removeEventListener('mouseup', stopMove)
+    emits('callKeyframeSort')
   }
 }
 

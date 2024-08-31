@@ -11,25 +11,35 @@
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
 
-    <div v-for="(keyframe, index) in keyFrameList" :key="index">
-      <KeyframePoint :point="keyframe" :scaler="scaler" />
-    </div>
+    <template v-if="configStore.isShowKeyframe">
+      <div v-for="(keyframe, index) in keyFrameList" :key="index">
+        <KeyframePoint :point="keyframe" :scaler="scaler" @callKeyframeSort="sortKeyframe" />
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
-import { BaseObject, TextObject, ImageObject, ShapeObject, type RenderObject } from '../parameters/objectInfo'
+import { useTimelineStore, useConfigStore } from '@/stores/objectStore'
+import {
+  BaseObject,
+  TextObject,
+  ImageObject,
+  ShapeObject,
+  type RenderObject
+} from '../parameters/objectInfo'
 import { type KeyframeSettings } from '../parameters/objectInfo'
-import { useTimelineStore } from '@/stores/objectStore'
-import gsap from 'gsap'
 import KeyframePoint from './KeyframePoint.vue'
+import gsap from 'gsap'
 
 const text = defineModel('text')
 const props = defineProps<{
   object: RenderObject
 }>()
+
 const timelineStore = useTimelineStore()
+const configStore = useConfigStore()
 const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
 
 const baseObject = ref(props.object)
@@ -64,11 +74,15 @@ const bgColor = computed(() => {
   }
 })
 
+//////////////////////////
+// キーフレーム操作の関数 //
+//////////////////////////
+
 // キーフレームの抽出
 const keyFrameList = computed(() => {
   let keyFrameList: KeyframeSettings = []
 
-  // TODO: 他のプロパティにも対応する
+  // TODO: standardRenderSettings以外のプロパティにも対応する
   if ('standardRenderSettings' in props.object) {
     Object.entries(props.object.standardRenderSettings).reduce((acc, [key, value]) => {
       // KeyframeSettingsの配列であるかを判定
@@ -80,6 +94,18 @@ const keyFrameList = computed(() => {
   }
   return keyFrameList
 })
+
+// props.objectのキーフレームの並び替え
+const sortKeyframe = () => {
+  if ('standardRenderSettings' in props.object) {
+    const keyframeSettings: { [key: string]: any } = props.object.standardRenderSettings
+    Object.entries(keyframeSettings).forEach(([key, value]) => {
+      if (Array.isArray(value) && value.length > 1) {
+        keyframeSettings[key] = value.sort((a, b) => a.frame - b.frame)
+      }
+    })
+  }
+}
 
 //////////////////////////
 // オブジェクト操作の関数 //
