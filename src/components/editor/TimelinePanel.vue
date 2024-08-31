@@ -139,7 +139,7 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
       // }
       {
         label: 'オブジェクトを貼り付け',
-        hidden: copiedObject.value === null,
+        disabled: copiedObject.value == null,
         onClick: () => {
           if (copiedObject.value) {
             let newObj = createObjectFromJson(copiedObject.value)
@@ -227,6 +227,7 @@ function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
 
 function removeObject(objIndex: number) {
   objectStore.removeObject(objIndex)
+  timelineStore.isRedrawNeeded = true
 }
 
 ////////////////////////////

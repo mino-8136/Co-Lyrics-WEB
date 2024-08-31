@@ -167,13 +167,13 @@ div {
     -1px 1px 0 #000,
     -1px -1px 0 #000,
     1px -1px 0 #000;
-  user-select: none;
+  pointer-events: none;
 }
 
 .waveform ::part(marker) {
   background-color: rgba(0, 166, 255, 0.658) !important;
   padding: 1px;
   padding-top: 4px;
-  font-family: fantasy;
+  pointer-events: none;
 }
 </style>
