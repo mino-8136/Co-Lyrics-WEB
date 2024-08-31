@@ -71,14 +71,13 @@ const openFile = (state: string) => {
         // 新規に開く場合はオブジェクトを全削除
         objectStore.clearObjects()
       } else {
-        // 追加ファイルの場合、最後のインデックスを取得してその次から追加する
-        objectStore.counter = objectStore.findLastId + 1
-        console.log(objectStore.counter)
+        // 追加ファイルの場合、そのまま追加する(カウンタ更新はstoreで管理する)
+        // console.log(objectStore.counter)
       }
 
       objData.forEach((obj: RenderObject) => {
         let newObj = createObjectFromJson(obj)
-        objectStore.addObject(newObj) // カウンターも更新される
+        objectStore.addNewObject(newObj) // カウンターも更新される
       })
 
       timelineStore.selectedObjectId = -1

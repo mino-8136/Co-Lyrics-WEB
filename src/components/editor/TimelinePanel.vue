@@ -146,15 +146,13 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
             const newObjDuration = newObj.end - newObj.start
 
             // 最後のIDに次々追加する
-            newObj.id = objectStore.findLastId + 1
             newObj.start = Math.floor(
               (event.offsetX / timelineStore.pxPerSec) * timelineStore.framerate
             )
             newObj.end = newObj.start + newObjDuration
             newObj.layer = layerIndex
 
-            objectStore.addObject(newObj)
-            
+            objectStore.addNewObject(newObj)
           }
         }
       }
@@ -206,21 +204,21 @@ function selectObject(objectId: number) {
 function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
   const offset = Math.floor((offsetX / timelineStore.pxPerSec) * timelineStore.framerate)
   const settings: BaseSettings = {
-    id: objectStore.counter,
+    id: objectStore.counter, // storeで上書きされるが一応
     start: Math.max(offset, 0),
-    end: offset + 60, // TODO: ここに最大値を設定できるようにする
+    end: offset + 60,
     layer: layerIndex,
     type: type
   }
 
   if (type === 'text') {
-    objectStore.addObject(new TextObject(settings))
+    objectStore.addNewObject(new TextObject(settings))
   } else if (type === 'image') {
-    objectStore.addObject(new ImageObject(settings))
+    objectStore.addNewObject(new ImageObject(settings))
   } else if (type === 'shape') {
-    objectStore.addObject(new ShapeObject(settings))
+    objectStore.addNewObject(new ShapeObject(settings))
   } else {
-    objectStore.addObject(new BaseObject(settings))
+    objectStore.addNewObject(new BaseObject(settings))
   }
   selectObject(objectStore.counter - 1)
   timelineStore.isRedrawNeeded = true

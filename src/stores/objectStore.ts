@@ -15,7 +15,9 @@ export const useObjectStore = defineStore('objects', {
     }
   },
   actions: {
-    addObject(object: RenderObject) {
+    addNewObject(object: RenderObject) {
+      this.counter = this.findLastId + 1
+      object.id = this.counter
       this.objects.push(object)
       this.counter++
     },
