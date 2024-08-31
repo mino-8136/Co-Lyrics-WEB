@@ -155,7 +155,7 @@ export class StandardRenderSettings extends PropertyMethod {
 
 export class TextSettings extends PropertyMethod {
   text: string
-  color: string
+  fill_color: string
   font: string
   individual_object: boolean
   spacing_x: number
@@ -181,7 +181,7 @@ export class TextSettings extends PropertyMethod {
     align: { name: '整列', type: UIType.none },
     spacing_x: { name: '水平間隔', type: UIType.slider, min: 0, max: 100 },
     spacing_y: { name: '垂直間隔', type: UIType.slider, min: 0, max: 100 },
-    color: { name: '色', type: UIType.color },
+    fill_color: { name: '色', type: UIType.color },
     font: { name: 'フォント', type: UIType.none },
     text: { name: 'テキスト', type: UIType.text }
   }
@@ -192,7 +192,7 @@ export class TextSettings extends PropertyMethod {
     align = 0,
     spacing_x = 60,
     spacing_y = 60,
-    color = '#ffffff',
+    fill_color = '#ffffff',
     font = 'SourceHanSansJP',
     text = 'サンプル'
   } = {}) {
@@ -202,7 +202,7 @@ export class TextSettings extends PropertyMethod {
     this.align = align
     this.spacing_x = spacing_x
     this.spacing_y = spacing_y
-    this.color = color
+    this.fill_color = fill_color
     this.font = font
     this.text = text
   }
@@ -263,6 +263,10 @@ export class BaseObject implements BaseSettings {
     this.layer = settings.layer
     this.type = 'base'
   }
+
+  draw(): void {
+    // ここに描画処理を書く
+  }
 }
 
 export class TextObject extends BaseObject {
@@ -278,6 +282,9 @@ export class TextObject extends BaseObject {
     this.textSettings = new TextSettings()
     this.styleSettings = new StyleSettings()
     this.animations = new AnimationSettings()
+  }
+  draw(): void {
+    // ここに描画処理を書く
   }
 }
 

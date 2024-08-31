@@ -162,7 +162,7 @@ export function defineSketch(project: any) {
         }
       }
       p.textSize(object.textSettings.textSize)
-      const col = p.color(object.textSettings.color)
+      const col = p.color(object.textSettings.fill_color)
 
       // スタイルの適用
       object.styleSettings.stylize(p)
