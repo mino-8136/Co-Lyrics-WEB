@@ -106,8 +106,8 @@ export class StandardRenderSettings extends PropertyMethod {
   //blend: number
 
   static parameterInfo = {
-    X: { name: 'X座標', type: UIType.keyframe, min: -1024, max: 1024 },
-    Y: { name: 'Y座標', type: UIType.keyframe, min: -1024, max: 1024 },
+    X: { name: 'X', type: UIType.keyframe, min: -1024, max: 1024 },
+    Y: { name: 'Y', type: UIType.keyframe, min: -1024, max: 1024 },
     scale: { name: '拡大率', type: UIType.keyframe, min: 0, max: 500 },
     opacity: { name: '不透明度', type: UIType.keyframe, min: 0, max: 100 },
     angle: { name: '回転', type: UIType.keyframe, min: -360, max: 360 }

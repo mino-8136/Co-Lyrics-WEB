@@ -33,9 +33,8 @@ export const animationList: Animation[] = [
       params: { [key: string]: any }
     ): Transform => {
       const transform = new Transform()
-      const { time, interval, delay } = params
 
-      let progress = (inform.currentFrame - inform.start - inform.id * interval - delay) / time
+      let progress = (inform.currentFrame - inform.start - inform.id * params.interval - params.delay) / params.time
       if (progress >= 0) {
         progress = 1
       } // 進捗は0と1の間に正規化
@@ -59,9 +58,8 @@ export const animationList: Animation[] = [
       params: { [key: string]: any }
     ): Transform => {
       const transform = new Transform()
-      const { time, interval } = params
 
-      const progress = (inform.currentFrame - inform.start - inform.id * interval) / time
+      const progress = (inform.currentFrame - inform.start - inform.id * params.interval) / params.time
       transform.opacity = baseObject.opacity * progress
 
       return transform
@@ -82,11 +80,10 @@ export const animationList: Animation[] = [
       params: { [key: string]: any }
     ): Transform => {
       const transform = new Transform()
-      const { time, interval } = params
 
-      const progress = inform.currentFrame - inform.start - inform.id * interval
+      const progress = inform.currentFrame - inform.start - inform.id * params.interval
       if (progress < 0) transform.opacity = 0
-      else if (progress < time && Math.round(progress) % 2 === 0) {
+      else if (progress < params.time && Math.round(progress) % 2 === 0) {
         transform.opacity = 0
       }
 
@@ -110,15 +107,14 @@ export const animationList: Animation[] = [
       params: { [key: string]: any }
     ): Transform => {
       const transform = new Transform()
-      const { time, interval, X, Y } = params
 
-      const progress = inform.currentFrame - inform.start - inform.id * interval
+      const progress = inform.currentFrame - inform.start - inform.id * params.interval
       if (progress < 0) {
-        transform.X = X
-        transform.Y = Y
-      } else if (progress < time) {
-        transform.X = X * (1 - progress / time)
-        transform.Y = Y * (1 - progress / time)
+        transform.X = params.X
+        transform.Y = params.Y
+      } else if (progress < params.time) {
+        transform.X = params.X * (1 - progress /params. time)
+        transform.Y = params.Y * (1 - progress / params.time)
       }
       return transform
     }
