@@ -51,3 +51,9 @@ export enum ShapeType {
   rect = '四角形',
   ellipse = '円'
 }
+
+export enum TextAlign {
+  left = '左揃え',
+  center = '中央揃え',
+  right = '右揃え'
+}

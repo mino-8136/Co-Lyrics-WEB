@@ -163,7 +163,7 @@ import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
 import { generateUniqueId } from '@/components/utils/common'
 
 import { fontListData } from '@/components/parameters/fonts'
-import { ShapeType } from '../parameters/p5Info'
+import { ShapeType, TextAlign } from '../parameters/p5Info'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -182,6 +182,8 @@ function getOptionsList(label: string): string[] {
     return fontListData.map((font) => font.name)
   } else if (label === 'shape') {
     return Object.values(ShapeType)
+  } else if (label === 'align') {
+    return Object.values(TextAlign)
   }
   return []
 }

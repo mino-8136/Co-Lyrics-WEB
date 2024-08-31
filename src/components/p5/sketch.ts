@@ -8,7 +8,7 @@ import {
   BaseObject,
   type RenderObject
 } from '@/components/parameters/objectInfo'
-import { Inform, ShapeType } from '@/components/parameters/p5Info'
+import { Inform, ShapeType, TextAlign } from '@/components/parameters/p5Info'
 import { fontListData } from '../parameters/fonts'
 
 let renderObjects: RenderObject[] = []
@@ -272,6 +272,12 @@ export function defineSketch(project: any) {
 
       let newLineCount = 0
       let newLineCharacterCount = 0
+      const eachLineCharacters = ((text) => {
+        const lines = text.split(/\r?\n/)
+        const lineLengths = lines.map((lines) => lines.length)
+        return lineLengths
+      })(object.textSettings.text)
+
       const totalIndex = object.textSettings.individual_object ? object.textSettings.text.length : 1
 
       for (let index = 0; index < totalIndex; index++) {
@@ -280,6 +286,13 @@ export function defineSketch(project: any) {
           newLineCount++
           newLineCharacterCount = 0
           continue
+        }
+        const textAnchor = () => {
+          if (object.textSettings.align == TextAlign.center)
+            return newLineCharacterCount - (eachLineCharacters[newLineCount] - 1) / 2
+          if (object.textSettings.align == TextAlign.right)
+            return newLineCharacterCount - eachLineCharacters[newLineCount] + 1
+          return newLineCharacterCount
         }
 
         // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
@@ -296,8 +309,7 @@ export function defineSketch(project: any) {
 
         p.push()
         p.translate(
-          lerpValue(object.textSettings.spacing_x, object.start) * newLineCharacterCount +
-            effectValue.X,
+          lerpValue(object.textSettings.spacing_x, object.start) * textAnchor() + effectValue.X,
           lerpValue(object.textSettings.spacing_y, object.start) * newLineCount + effectValue.Y
         )
         p.rotate(effectValue.angle)
