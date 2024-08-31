@@ -37,7 +37,62 @@ export const styleList: Style[] = [
       p.drawingContext.shadowOffsetX = style.parameters.shadow_x
       p.drawingContext.shadowOffsetY = style.parameters.shadow_y
       p.drawingContext.shadowBlur = style.parameters.shadow_blur
-      p.drawingContext.shadowColor = '#ffffff'
+      p.drawingContext.shadowColor = style.parameters.shadow_color
+    }
+  },
+  {
+    name: 'グラデーション',
+    params: { start_color: '#ff0000', end_color: '#0000ff', gradient_type: 'linear' },
+    parameters: {
+      start_color: { name: '開始色', type: UIType.color },
+      end_color: { name: '終了色', type: UIType.color },
+      gradient_type: {
+        name: 'グラデーションのタイプ',
+        type: UIType.select,
+        options: ['linear', 'radial']
+      }
+    },
+    applyStyle: (p: p5, style: StyleSetting) => {
+      let gradient
+      if (style.parameters.gradient_type === 'linear') {
+        gradient = p.drawingContext.createLinearGradient(0, 0, p.width, 0)
+      } else {
+        gradient = p.drawingContext.createRadialGradient(
+          p.width / 2,
+          p.height / 2,
+          0,
+          p.width / 2,
+          p.height / 2,
+          p.width / 2
+        )
+      }
+      gradient.addColorStop(0, style.parameters.start_color)
+      gradient.addColorStop(1, style.parameters.end_color)
+      p.drawingContext.fillStyle = gradient
+    }
+  },
+  {
+    name: 'ぼかし効果',
+    params: { blur_amount: 5 },
+    parameters: {
+      blur_amount: { name: 'ぼかし量', type: UIType.slider, min: 0, max: 100 }
+    },
+    applyStyle: (p: p5, style: StyleSetting) => {
+      p.drawingContext.filter = `blur(${style.parameters.blur_amount}px)`
+    }
+  },
+  {
+    name: '合成モード',
+    params: { blend_mode: 'multiply' },
+    parameters: {
+      blend_mode: {
+        name: '合成モード',
+        type: UIType.select,
+        options: ['source-over', 'multiply', 'screen', 'overlay', 'darken', 'lighten']
+      }
+    },
+    applyStyle: (p: p5, style: StyleSetting) => {
+      p.drawingContext.globalCompositeOperation = style.parameters.blend_mode
     }
   }
 ]
