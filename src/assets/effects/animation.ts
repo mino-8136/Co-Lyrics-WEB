@@ -1,12 +1,12 @@
-import { UIType } from '@/components/parameters/objectInfo'
 import { Inform, Transform } from '@/components/parameters/p5Info'
+import { UIType } from '@/components/parameters/uiInfo'
 import gsap from 'gsap'
 
 // この形に従う
 export interface Animation {
   name: string
   params: { [key: string]: any }
-  description: string
+  description?: string
   tag?: [string]
   parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応
   applyEffect: (
@@ -34,7 +34,9 @@ export const animationList: Animation[] = [
     ): Transform => {
       const transform = new Transform()
 
-      let progress = (inform.currentFrame - inform.start - inform.id * params.interval - params.delay) / params.time
+      let progress =
+        (inform.currentFrame - inform.start - inform.id * params.interval - params.delay) /
+        params.time
       if (progress >= 0) {
         progress = 1
       } // 進捗は0と1の間に正規化
@@ -59,7 +61,8 @@ export const animationList: Animation[] = [
     ): Transform => {
       const transform = new Transform()
 
-      const progress = (inform.currentFrame - inform.start - inform.id * params.interval) / params.time
+      const progress =
+        (inform.currentFrame - inform.start - inform.id * params.interval) / params.time
       transform.opacity = baseObject.opacity * progress
 
       return transform
@@ -113,7 +116,7 @@ export const animationList: Animation[] = [
         transform.X = params.X
         transform.Y = params.Y
       } else if (progress < params.time) {
-        transform.X = params.X * (1 - progress /params. time)
+        transform.X = params.X * (1 - progress / params.time)
         transform.Y = params.Y * (1 - progress / params.time)
       }
       return transform

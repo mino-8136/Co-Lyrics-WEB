@@ -1,8 +1,6 @@
-import { UIType, type StyleSetting, type StyleSettings } from '@/components/parameters/objectInfo'
+import { type StyleSetting } from '@/components/parameters/objectInfo'
+import { UIType } from '@/components/parameters/uiInfo'
 import p5 from 'p5'
-
-import { Inform, Transform } from '@/components/parameters/p5Info'
-import gsap from 'gsap'
 
 // この形に従う
 export interface Style {

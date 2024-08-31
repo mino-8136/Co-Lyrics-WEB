@@ -1,9 +1,7 @@
-// [Aviutlからの変更点]
-// "settings"をuserdataに移設
-// 数値パラメータを配列に変更
-// anim_name, anim_parametersをanimations配列に統合
-
 import { ShapeType } from './p5Info'
+import { styleList } from '@/assets/effects/style'
+import { UIType } from './uiInfo'
+import p5 from 'p5'
 //////////////////////////////////////////////////////////////
 
 // キーフレームの情報管理

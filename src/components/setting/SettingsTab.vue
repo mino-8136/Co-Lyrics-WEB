@@ -154,10 +154,10 @@ import {
   type KeyframeSettings,
   type KeyframeSetting,
   isKeyframeSettings,
-  UIType,
   TextSettings,
   PropertyMethod
 } from '@/components/parameters/objectInfo'
+import { UIType } from '@/components/parameters/uiInfo'
 import EasingPanel from '@/components/setting/EasingPanel.vue'
 import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
 import { generateUniqueId } from '@/components/utils/common'

@@ -1,5 +1,3 @@
-// AnimationTabと統合予定
-
 <template>
   <transition-group name="list">
     <div v-for="(params, label) in parameters" :key="params.id">
@@ -78,11 +76,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import {
-  UIType,
   type StyleSettings,
   type StyleSetting,
   type AnimationSetting
 } from '@/components/parameters/objectInfo'
+import { UIType } from '@/components/parameters/uiInfo'
 import StylePanel from './EffectPanel.vue'
 import { animationList } from '@/assets/effects/animation'
 import { styleList } from '@/assets/effects/style'
