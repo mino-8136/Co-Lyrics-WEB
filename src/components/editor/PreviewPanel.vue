@@ -31,8 +31,12 @@ onMounted(() => {
     // ウィンドウのリサイズイベントを監視
     window.addEventListener('resize', updateCanvasSize)
   }
+
+  // コンポーネントのマウント時に再描画を確実に実行
+  redrawCanvas()
 })
 
+// 動画再生用の処理
 watch(
   () => timelineStore.currentFrame,
   () => {
@@ -41,6 +45,26 @@ watch(
     p.value.updateShowCollisionBox(configStore.isShowCollisionBox)
   }
 )
+
+// 再描画を行う
+watch(
+  () => timelineStore.isRedrawNeeded,
+  (newVal) => {
+    if (newVal) {
+      redrawCanvas()
+    }
+  }
+)
+
+// 読み込み時と別のタブから戻ってきた時に再描画を行う
+function redrawCanvas() {
+  if (timelineStore.isRedrawNeeded) {
+    renderObjects()
+    p.value.updateShowCollisionBox(configStore.isShowCollisionBox)
+    p.value.redraw()
+    timelineStore.isRedrawNeeded = false
+  }
+}
 
 // canvasの大きさを取得してp5.jsに伝達
 function updateCanvasSize() {

@@ -81,8 +81,8 @@ const openFile = (state: string) => {
         objectStore.addObject(newObj) // カウンターも更新される
       })
 
-
       timelineStore.selectedObjectId = -1
+      timelineStore.isRedrawNeeded = true
     }
 
     reader.readAsText(file)
@@ -94,5 +94,6 @@ const openFile = (state: string) => {
 const clearObjects = () => {
   objectStore.clearObjects()
   timelineStore.selectedObjectId = -1
+  timelineStore.isRedrawNeeded = true
 }
 </script>

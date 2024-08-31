@@ -199,7 +199,7 @@ function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
   const settings: BaseSettings = {
     id: objectStore.counter,
     start: Math.max(offset, 0),
-    end: offset + 100, // TODO: ここに最大値を設定できるようにする
+    end: offset + 60, // TODO: ここに最大値を設定できるようにする
     layer: layerIndex,
     type: type
   }
@@ -214,6 +214,7 @@ function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
     objectStore.addObject(new BaseObject(settings))
   }
   selectObject(objectStore.counter - 1)
+  timelineStore.isRedrawNeeded = true
   // console.log(objectStore.objects)
 }
 

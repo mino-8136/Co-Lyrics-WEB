@@ -53,7 +53,8 @@ export const useTimelineStore = defineStore('timeline', {
     currentFrame: 0,
     canvasScale: 1,
     pxPerSec: 90,
-    selectedObjectId: 0
+    selectedObjectId: 0,
+    isRedrawNeeded: false
   }),
   actions: {
     setCurrentFrame(frame: number) {

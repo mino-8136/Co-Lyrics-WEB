@@ -12,6 +12,7 @@
         <v-checkbox
           label="動画編集画面でドラッグ可能領域を表示する"
           v-model="configStore.isShowCollisionBox"
+          @change="timelineStore.isRedrawNeeded = true"
         ></v-checkbox>
         <v-checkbox
           label="オブジェクト上でキーフレームを表示する"

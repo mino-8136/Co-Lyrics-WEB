@@ -171,6 +171,7 @@ const stopResize = () => {
     baseObject.value.end = Math.floor(tempEnd.value)
   }
   isResizing.value = false
+  timelineStore.isRedrawNeeded = true // TODO: stopMoveといっしょに読み込まれている
 }
 
 watch(
