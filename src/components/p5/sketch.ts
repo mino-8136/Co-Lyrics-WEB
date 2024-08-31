@@ -13,7 +13,6 @@ import {
 import { Transform, Inform, ShapeType } from '@/components/parameters/p5Info'
 import { animationList } from '@/assets/effects/animation'
 import { fontListData } from '../parameters/fonts'
-import { styleList } from '@/assets/effects/style'
 
 let renderObjects: RenderObject[] = []
 let currentFrame = 0
@@ -84,14 +83,7 @@ export function defineSketch(project: any) {
     // スタイル処理の関数 //
     ///////////////////////
 
-    function applyStyle(styles: StyleSettings) {
-      styles.forEach((style) => {
-        const effect = styleList.find((effect) => effect.name === style.name)
-        if (effect) {
-          effect.applyStyle(p, style)
-        }
-      })
-    }
+    function applyStyle(styles: StyleSettings) {}
 
     ////////////////////////
     // エフェクト処理の関数 //
@@ -110,7 +102,7 @@ export function defineSketch(project: any) {
     function applyEffects(inform: Inform, animations: AnimationSettings): Transform {
       const baseValue = new Transform()
 
-      animations.forEach((animation) => {
+      animations.effects.forEach((animation) => {
         // effects 配列から対応するエフェクトを検索
         const effect = animationList.find((effect) => effect.name === animation.name)
         if (effect) {
@@ -209,7 +201,7 @@ export function defineSketch(project: any) {
       const col = p.color(object.textSettings.color)
 
       // スタイルの適用
-      applyStyle(object.styleSettings)
+      object.styleSettings.stylize(p)
 
       // 全体的なトランスフォームの実行
       p.translate(

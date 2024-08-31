@@ -26,14 +26,42 @@ export interface AnimationSetting {
   parameters: { [key: string]: any }
   id: string
 }
-export type AnimationSettings = AnimationSetting[]
+export class AnimationSettings {
+  effects: AnimationSetting[]
+  constructor(animations: AnimationSetting[] = []) {
+    this.effects = animations
+  }
 
+  animate(): void {
+    if ('animations' in this) {
+      console.log('animation')
+    }
+    console.log('animation')
+  }
+}
 export interface StyleSetting {
   name: string
   parameters: { [key: string]: any }
   id: string
 }
-export type StyleSettings = StyleSetting[]
+
+export class StyleSettings {
+  effects: StyleSetting[]
+
+  constructor(styles: StyleSetting[] = []) {
+    this.effects = styles
+  }
+  stylize(p: p5): void {
+    if ('styleSettings' in this) {
+      this.effects.forEach((style) => {
+        const effect = styleList.find((effect) => effect.name === style.name)
+        if (effect) {
+          effect.applyStyle(p, style)
+        }
+      })
+    }
+  }
+}
 
 //////////////////////////////////////////////////////////////
 
@@ -239,8 +267,8 @@ export class TextObject extends BaseObject {
     this.type = 'text'
     this.standardRenderSettings = new StandardRenderSettings()
     this.textSettings = new TextSettings()
-    this.styleSettings = []
-    this.animations = []
+    this.styleSettings = new StyleSettings()
+    this.animations = new AnimationSettings()
   }
 }
 
@@ -255,8 +283,8 @@ export class ImageObject extends BaseObject {
     this.type = 'image'
     this.standardRenderSettings = new StandardRenderSettings()
     this.imageSettings = new ImageSettings()
-    this.styleSettings = []
-    this.animations = []
+    this.styleSettings = new StyleSettings()
+    this.animations = new AnimationSettings()
   }
 }
 
@@ -271,8 +299,8 @@ export class ShapeObject extends BaseObject {
     this.type = 'shape'
     this.standardRenderSettings = new StandardRenderSettings()
     this.shapeSettings = new ShapeSettings()
-    this.styleSettings = []
-    this.animations = []
+    this.styleSettings = new StyleSettings()
+    this.animations = new AnimationSettings()
   }
 }
 
@@ -310,10 +338,10 @@ export function createObjectFromJson(obj: RenderObject): any {
     ;(newObj as any).textSettings = new TextSettings(obj.textSettings)
   }
   if ('styleSettings' in obj) {
-    ;(newObj as any).styleSettings = obj.styleSettings
+    ;(newObj as any).styleSettings = new StyleSettings(obj.styleSettings.effects)
   }
   if ('animations' in obj) {
-    ;(newObj as any).animations = obj.animations
+    ;(newObj as any).animations = new AnimationSettings(obj.animations.effects)
   }
 
   return newObj

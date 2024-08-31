@@ -35,7 +35,7 @@ const effectList = computed(() => {
 
 function handleButtonClick(effectName: string, parameters: Record<string, any>) {
   const deepCopiedParameters = JSON.parse(JSON.stringify(parameters))
-  effects.value.push({
+  effects.value.effects.push({
     name: effectName,
     parameters: deepCopiedParameters,
     id: generateUniqueId()

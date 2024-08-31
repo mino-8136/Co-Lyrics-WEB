@@ -1,6 +1,6 @@
 <template>
   <transition-group name="list">
-    <div v-for="(params, label) in parameters" :key="params.id">
+    <div v-for="(params, label) in parameters.effects" :key="params.id">
       <v-card variant="outlined" class="mb-2">
         <template v-slot:title>
           <p class="text-body-1">{{ params.name }}</p>
@@ -115,21 +115,21 @@ function openDescription(text: string) {
 
 function upEffect(index: number) {
   if (index > 0) {
-    const temp = parameters.value[index]
-    parameters.value[index] = parameters.value[index - 1]
-    parameters.value[index - 1] = temp
+    const temp = parameters.value.effects[index]
+    parameters.value.effects[index] = parameters.value.effects[index - 1]
+    parameters.value.effects[index - 1] = temp
   }
 }
 
 function downEffect(index: number) {
-  if (index < parameters.value.length - 1) {
-    const temp = parameters.value[index]
-    parameters.value[index] = parameters.value[index + 1]
-    parameters.value[index + 1] = temp
+  if (index < parameters.value.effects.length - 1) {
+    const temp = parameters.value.effects[index]
+    parameters.value.effects[index] = parameters.value.effects[index + 1]
+    parameters.value.effects[index + 1] = temp
   }
 }
 function deleteEffect(index: number) {
-  parameters.value.splice(index, 1)
+  parameters.value.effects.splice(index, 1)
 }
 </script>
 
