@@ -66,6 +66,14 @@ export const useTimelineStore = defineStore('timeline', {
   persist: true
 })
 
+export const useConfigStore = defineStore('config', {
+  state: () => ({
+    isShowCollisionBox: false
+  }),
+  actions: {},
+  persist: true
+})
+
 /*
  /assets/music/demo.mp3
 */

@@ -124,6 +124,8 @@ export class StandardRenderSettings extends PropertyMethod {
   X: KeyframeSettings
   Y: KeyframeSettings
   //Z: KeyframeSettings
+  relativeX: number // アニメーションによる相対座標を記録
+  relativeY: number
   scale: KeyframeSettings
   opacity: KeyframeSettings
   angle: KeyframeSettings
@@ -132,6 +134,8 @@ export class StandardRenderSettings extends PropertyMethod {
   static parameterInfo = {
     X: { name: 'X', type: UIType.keyframe, min: -1024, max: 1024 },
     Y: { name: 'Y', type: UIType.keyframe, min: -1024, max: 1024 },
+    relativeX: { name: '相対X', type: UIType.none },
+    relativeY: { name: '相対Y', type: UIType.none },
     scale: { name: '拡大率', type: UIType.keyframe, min: 0, max: 500 },
     opacity: { name: '不透明度', type: UIType.keyframe, min: 0, max: 100 },
     angle: { name: '回転', type: UIType.keyframe, min: -360, max: 360 }
@@ -147,6 +151,8 @@ export class StandardRenderSettings extends PropertyMethod {
     super()
     this.X = X
     this.Y = Y
+    this.relativeX = 0
+    this.relativeY = 0
     this.scale = scale
     this.opacity = opacity
     this.angle = angle

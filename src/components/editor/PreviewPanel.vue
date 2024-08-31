@@ -7,12 +7,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, onUnmounted } from 'vue'
-import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
+import { useObjectStore, useTimelineStore, useConfigStore } from '@/stores/objectStore'
 import p5 from 'p5'
 import { defineSketch } from '@/components/p5/sketch'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
+const configStore = useConfigStore()
 
 // マウント時に p5.canvas を生成
 const p = ref()
@@ -37,6 +38,7 @@ watch(
   () => {
     renderObjects()
     p.value.updateCurrentFrame(timelineStore.currentFrame)
+    p.value.updateShowCollisionBox(configStore.isShowCollisionBox)
   }
 )
 

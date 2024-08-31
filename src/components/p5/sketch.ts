@@ -12,8 +12,16 @@ import { Inform, ShapeType } from '@/components/parameters/p5Info'
 import { fontListData } from '../parameters/fonts'
 
 let renderObjects: RenderObject[] = []
+const selectedObject = {
+  object: null as RenderObject | null,
+  startMouseX: 0,
+  startMouseY: 0,
+  startObjectX: 0,
+  startObjectY: 0
+}
 let currentFrame = 0
 const fontLimit = true // フォントファイルを読み込むかどうかのフラグ
+let showCollisionBox = true
 
 const fonts: { name: string; font: p5.Font }[] = []
 
@@ -52,7 +60,7 @@ export function defineSketch(project: any) {
 
       // デバッグ用
       p.fill(255)
-      p.ellipse(p.mouseX, p.mouseY, 50, 50)
+      p.ellipse(p.mouseX, p.mouseY, 50 * project.canvasScale)
 
       // メインの描画
       p.push()
@@ -60,7 +68,6 @@ export function defineSketch(project: any) {
       p.scale(project.canvasScale)
 
       renderObjects.forEach((object) => {
-        // テキストオブジェクトの描画
         switch (object.type) {
           case 'text':
             renderText(object as TextObject)
@@ -74,7 +81,84 @@ export function defineSketch(project: any) {
         }
       })
 
+      if (showCollisionBox) {
+        renderObjects.forEach((object) => {
+          if (!('standardRenderSettings' in object)) return
+          p.push()
+          p.strokeWeight(3)
+          p.stroke(255, 0, 0)
+          p.noFill()
+          p.rect(
+            lerpValue(object.standardRenderSettings.X, object.start),
+            lerpValue(object.standardRenderSettings.Y, object.start),
+            50,
+            50
+          )
+          p.pop()
+        })
+      }
+
       p.pop()
+    }
+
+    ////////////////////////
+    // ドラッグして位置変更 //
+    ////////////////////////
+
+    p.mousePressed = () => {
+      let nearestObject: RenderObject | null = null
+      let minDistance = Infinity
+      const mouseX = (p.mouseX - p.width / 2) / project.canvasScale
+      const mouseY = (p.mouseY - p.height / 2) / project.canvasScale
+
+      renderObjects.forEach((object) => {
+        if (!('standardRenderSettings' in object)) return
+
+        const objectX =
+          lerpValue(object.standardRenderSettings.X, object.start) +
+          object.standardRenderSettings.relativeX
+        const objectY =
+          lerpValue(object.standardRenderSettings.Y, object.start) +
+          object.standardRenderSettings.relativeY
+
+        const distance = p.dist(mouseX, mouseY, objectX, objectY)
+        if (distance < minDistance) {
+          minDistance = distance
+          nearestObject = object
+          selectedObject.startObjectX = objectX
+          selectedObject.startObjectY = objectY
+        }
+      })
+
+      if (minDistance < 50 && nearestObject) {
+        selectedObject.object = nearestObject
+        selectedObject.startMouseX = mouseX
+        selectedObject.startMouseY = mouseY
+      } else {
+        selectedObject.object = null
+      }
+    }
+
+    p.mouseDragged = () => {
+      if (selectedObject.object && 'standardRenderSettings' in selectedObject.object) {
+        const mouseX = (p.mouseX - p.width / 2) / project.canvasScale
+        const mouseY = (p.mouseY - p.height / 2) / project.canvasScale
+
+        selectedObject.object.standardRenderSettings.X.forEach((keyframe) => {
+          keyframe.value += mouseX - selectedObject.startMouseX
+        })
+        selectedObject.object.standardRenderSettings.Y.forEach((keyframe) => {
+          keyframe.value += mouseY - selectedObject.startMouseY
+        })
+
+        // マウスの現在位置を更新
+        selectedObject.startMouseX = mouseX
+        selectedObject.startMouseY = mouseY
+      }
+    }
+
+    p.mouseReleased = () => {
+      selectedObject.object = null
     }
 
     //////////////////////////
@@ -119,7 +203,6 @@ export function defineSketch(project: any) {
       if (effectValue.opacity == 0) return
       if (effectValue.scale == 0) return
 
-      p.push()
       p.translate(effectValue.X, effectValue.Y)
       p.rotate(effectValue.angle)
       p.scale(effectValue.scale / 100)
@@ -325,6 +408,11 @@ export function defineSketch(project: any) {
       currentFrame = frame
     }
 
+    p.updateShowCollisionBox = (show: boolean) => {
+      console.log(show)
+      showCollisionBox = show
+    }
+
     p.updateCanvasScale = () => {
       p.resizeCanvas(project.width * project.canvasScale, project.height * project.canvasScale)
     }
@@ -336,6 +424,7 @@ declare module 'p5' {
   interface p5InstanceExtensions {
     addRenderObjects: (currentObjects: RenderObject[]) => void
     updateCurrentFrame: (frame: number) => void
+    updateShowCollisionBox: (show: boolean) => void
     updateCanvasScale: () => void
   }
 }
