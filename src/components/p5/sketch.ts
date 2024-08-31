@@ -219,10 +219,20 @@ export function defineSketch(project: any) {
           p.background(object.shapeSettings.fill_color)
           break
         case ShapeType.rect:
-          p.rect(0, 0, object.shapeSettings.width, object.shapeSettings.height)
+          p.rect(
+            0,
+            0,
+            lerpValue(object.shapeSettings.width, object.start),
+            lerpValue(object.shapeSettings.height, object.start)
+          )
           break
         case ShapeType.ellipse:
-          p.ellipse(0, 0, object.shapeSettings.width, object.shapeSettings.height)
+          p.ellipse(
+            0,
+            0,
+            lerpValue(object.shapeSettings.width, object.start),
+            lerpValue(object.shapeSettings.height, object.start)
+          )
           break
       }
       p.pop()

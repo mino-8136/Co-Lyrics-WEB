@@ -23,8 +23,8 @@ const tempPoint = ref(point.value.frame)
 
 const objectStyle = computed(() => ({
   left: isMoving.value
-    ? `${tempPoint.value * props.scaler}px`
-    : `${point.value.frame * props.scaler}px`
+    ? `${tempPoint.value * props.scaler - 3.5}px`
+    : `${point.value.frame * props.scaler - 3.5}px`
 }))
 
 const startMove = (event: MouseEvent) => {

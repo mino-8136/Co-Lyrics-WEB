@@ -92,6 +92,15 @@ const keyFrameList = computed(() => {
       return acc
     }, keyFrameList)
   }
+  if ('shapeSettings' in props.object) {
+    Object.entries(props.object.shapeSettings).reduce((acc, [key, value]) => {
+      // KeyframeSettingsの配列であるかを判定
+      if (Array.isArray(value) && value.length > 1) {
+        acc.push(...value)
+      }
+      return acc
+    }, keyFrameList)
+  }
   return keyFrameList
 })
 

@@ -103,7 +103,6 @@ onMounted(() => {
             color: 'rgba(255, 255, 0, 0.5)'
           })
         }
-        console.log('regions:', regions.getRegions())
       })
     })
   }

@@ -229,22 +229,22 @@ export class ImageSettings extends PropertyMethod {
 }
 
 export class ShapeSettings extends PropertyMethod {
-  width: number
-  height: number
+  width: KeyframeSettings
+  height: KeyframeSettings
   fill_color: string
   shape: ShapeType
 
   static parameterInfo = {
-    width: { name: '幅', type: UIType.slider, min: 0, max: 2000 },
-    height: { name: '高さ', type: UIType.slider, min: 0, max: 2000 },
+    width: { name: '幅', type: UIType.keyframe, min: 0, max: 2000 },
+    height: { name: '高さ', type: UIType.keyframe, min: 0, max: 2000 },
     fill_color: { name: '塗りつぶし', type: UIType.color },
     shape: { name: '図形', type: UIType.select }
   }
 
   constructor() {
     super()
-    this.width = 200
-    this.height = 200
+    this.width = [{ value: 200, frame: 0, id: '0' }]
+    this.height = [{ value: 200, frame: 0, id: '0' }]
     this.fill_color = '#D3D3D3'
     this.shape = ShapeType.rect
   }
