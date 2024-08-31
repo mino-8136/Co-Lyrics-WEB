@@ -296,8 +296,9 @@ export function defineSketch(project: any) {
 
         p.push()
         p.translate(
-          object.textSettings.spacing_x * newLineCharacterCount + effectValue.X,
-          object.textSettings.spacing_y * newLineCount + effectValue.Y
+          lerpValue(object.textSettings.spacing_x, object.start) * newLineCharacterCount +
+            effectValue.X,
+          lerpValue(object.textSettings.spacing_y, object.start) * newLineCount + effectValue.Y
         )
         p.rotate(effectValue.angle)
         p.scale(effectValue.scale / 100)

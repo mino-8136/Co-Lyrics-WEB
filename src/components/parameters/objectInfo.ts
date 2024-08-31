@@ -165,8 +165,8 @@ export class TextSettings extends PropertyMethod {
   fill_color: string
   font: string
   individual_object: boolean
-  spacing_x: number
-  spacing_y: number
+  spacing_x: KeyframeSettings
+  spacing_y: KeyframeSettings
   //name: string
   textSize: number
   //display_speed: number
@@ -186,8 +186,8 @@ export class TextSettings extends PropertyMethod {
     textSize: { name: 'サイズ', type: UIType.none, min: 1, max: 100 },
     individual_object: { name: 'バラバラ', type: UIType.checkbox },
     align: { name: '整列', type: UIType.none },
-    spacing_x: { name: '水平間隔', type: UIType.slider, min: 0, max: 100 },
-    spacing_y: { name: '垂直間隔', type: UIType.slider, min: 0, max: 100 },
+    spacing_x: { name: '水平間隔', type: UIType.keyframe, min: 0, max: 500 },
+    spacing_y: { name: '垂直間隔', type: UIType.keyframe, min: 0, max: 500 },
     fill_color: { name: '色', type: UIType.color },
     font: { name: 'フォント', type: UIType.none },
     text: { name: 'テキスト', type: UIType.text }
@@ -197,8 +197,8 @@ export class TextSettings extends PropertyMethod {
     textSize = 60,
     individual_object = true,
     align = 0,
-    spacing_x = 60,
-    spacing_y = 60,
+    spacing_x = [{ value: 60, frame: 0, id: '0' }],
+    spacing_y = [{ value: 60, frame: 0, id: '0' }],
     fill_color = '#ffffff',
     font = 'SourceHanSansJP',
     text = 'サンプル'
