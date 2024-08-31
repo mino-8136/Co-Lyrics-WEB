@@ -158,6 +158,29 @@ export function defineSketch(project: any) {
       p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
       p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
 
+      // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
+      const inform = new Inform(
+        0,
+        1, // TODO: 改行などの文字数も入っている + TODO: 絵文字など複数文字に対応する
+        object.start,
+        object.end,
+        currentFrame
+      )
+      const effectValue = applyEffects(inform, object.animations)
+      if (effectValue.opacity == 0) return
+      if (effectValue.scale == 0) return
+
+      p.push()
+      p.translate(effectValue.X, effectValue.Y)
+      p.rotate(effectValue.angle)
+      p.scale(effectValue.scale / 100)
+      col.setAlpha(
+        (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
+          (effectValue.opacity / 100) *
+          100
+      )
+      p.fill(col)
+
       // 図形のレンダリングの実行
       switch (object.shapeSettings.shape) {
         case ShapeType.background:
