@@ -164,13 +164,12 @@ export class TextSettings extends PropertyMethod {
   text: string
   fill_color: string
   font: string
-  individual_object: boolean
+  isVertical: boolean
   spacing_x: KeyframeSettings
   spacing_y: KeyframeSettings
   //name: string
   textSize: number
   //display_speed: number
-  //display_coordinates: boolean
   //auto_scroll: boolean
   //bold: boolean
   //italic: boolean
@@ -178,23 +177,26 @@ export class TextSettings extends PropertyMethod {
   //soft: boolean
   //monospace: boolean
   align: TextAlign
+  individual_object: boolean
 
   //precision: number
   //color2: '000000
 
   static parameterInfo = {
     textSize: { name: 'サイズ', type: UIType.none, min: 1, max: 100 },
+    isVertical: { name: '縦書き', type: UIType.checkbox },
     individual_object: { name: 'バラバラ', type: UIType.checkbox },
-    align: { name: '整列', type: UIType.select },
     spacing_x: { name: '水平間隔', type: UIType.keyframe, min: 0, max: 500 },
     spacing_y: { name: '垂直間隔', type: UIType.keyframe, min: 0, max: 500 },
     fill_color: { name: '色', type: UIType.color },
     font: { name: 'フォント', type: UIType.none },
-    text: { name: 'テキスト', type: UIType.text }
+    text: { name: 'テキスト', type: UIType.text },
+    align: { name: '整列', type: UIType.select }
   }
 
   constructor({
     textSize = 60,
+    isVertical = false,
     individual_object = true,
     align = TextAlign.center,
     spacing_x = [{ value: 60, frame: 0, id: '0' }],
@@ -205,6 +207,7 @@ export class TextSettings extends PropertyMethod {
   } = {}) {
     super()
     this.textSize = textSize
+    this.isVertical = isVertical
     this.individual_object = individual_object
     this.align = align
     this.spacing_x = spacing_x

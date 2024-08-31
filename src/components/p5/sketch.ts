@@ -308,10 +308,18 @@ export function defineSketch(project: any) {
         if (effectValue.scale == 0) return
 
         p.push()
-        p.translate(
-          lerpValue(object.textSettings.spacing_x, object.start) * textAnchor() + effectValue.X,
-          lerpValue(object.textSettings.spacing_y, object.start) * newLineCount + effectValue.Y
-        )
+        if (object.textSettings.isVertical) {
+          p.translate(
+            -lerpValue(object.textSettings.spacing_x, object.start) * newLineCount + effectValue.Y,
+            lerpValue(object.textSettings.spacing_y, object.start) * textAnchor() + effectValue.X
+          )
+        } else {
+          p.translate(
+            lerpValue(object.textSettings.spacing_x, object.start) * textAnchor() + effectValue.X,
+            lerpValue(object.textSettings.spacing_y, object.start) * newLineCount + effectValue.Y
+          )
+        }
+
         p.rotate(effectValue.angle)
         p.scale(effectValue.scale / 100)
         col.setAlpha(
