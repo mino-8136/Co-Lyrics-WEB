@@ -13,6 +13,7 @@ import {
 import { Transform, Inform, ShapeType } from '@/components/parameters/p5Info'
 import { animationList } from '@/assets/effects/animation'
 import { fontListData } from '../parameters/fonts'
+import { styleList } from '@/assets/effects/style'
 
 let renderObjects: RenderObject[] = []
 let currentFrame = 0
@@ -85,17 +86,9 @@ export function defineSketch(project: any) {
 
     function applyStyle(styles: StyleSettings) {
       styles.forEach((style) => {
-        switch (style.name) {
-          case '縁取り':
-            p.stroke(style.parameters.line_color)
-            p.strokeWeight(style.parameters.line_width)
-            break
-          case 'シャドー':
-            p.drawingContext.shadowOffsetX = style.parameters.shadow_x
-            p.drawingContext.shadowOffsetY = style.parameters.shadow_y
-            p.drawingContext.shadowBlur = style.parameters.shadow_blur
-            p.drawingContext.shadowColor = '#ffffff'
-            break
+        const effect = styleList.find((effect) => effect.name === style.name)
+        if (effect) {
+          effect.applyStyle(p, style)
         }
       })
     }

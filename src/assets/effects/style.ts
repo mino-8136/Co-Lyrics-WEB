@@ -1,4 +1,4 @@
-import { UIType } from '@/components/parameters/objectInfo'
+import { UIType, type StyleSetting, type StyleSettings } from '@/components/parameters/objectInfo'
 import p5 from 'p5'
 
 import { Inform, Transform } from '@/components/parameters/p5Info'
@@ -10,6 +10,7 @@ export interface Style {
   params: { [key: string]: any }
   description?: string
   parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応
+  applyStyle: (p: p5, style: StyleSetting) => void
 }
 
 export const styleList: Style[] = [
@@ -19,6 +20,10 @@ export const styleList: Style[] = [
     parameters: {
       line_width: { name: '線の太さ', type: UIType.slider, min: 0, max: 100 },
       line_color: { name: '線の色', type: UIType.color }
+    },
+    applyStyle: (p: p5, style: StyleSetting) => {
+      p.stroke(style.parameters.line_color)
+      p.strokeWeight(style.parameters.line_width)
     }
   },
   {
@@ -29,6 +34,12 @@ export const styleList: Style[] = [
       shadow_y: { name: 'Y座標', type: UIType.slider, min: -100, max: 100 },
       shadow_blur: { name: '影のぼかし', type: UIType.slider, min: 0, max: 100 },
       shadow_color: { name: '影の色', type: UIType.color }
+    },
+    applyStyle: (p: p5, style: StyleSetting) => {
+      p.drawingContext.shadowOffsetX = style.parameters.shadow_x
+      p.drawingContext.shadowOffsetY = style.parameters.shadow_y
+      p.drawingContext.shadowBlur = style.parameters.shadow_blur
+      p.drawingContext.shadowColor = '#ffffff'
     }
   }
 ]
