@@ -3,6 +3,8 @@
     <svg
       :width="props.panelWidth + padding.left + padding.right"
       :height="height + padding.top + padding.bottom"
+      @contextmenu.prevent="onGraphContextMenu"
+      @mousedown="updateSeekbar"
     >
       <!-- グリッド線の描画 -->
       <g class="grid" :transform="`translate(${padding.left}, ${padding.top})`">
@@ -25,6 +27,18 @@
           :y2="y"
           stroke="#ccc"
           stroke-width="0.5"
+        />
+      </g>
+
+      <!-- シークバーの表示 -->
+      <g :transform="`translate(${padding.left}, ${padding.top})`">
+        <line
+          :x1="computeX(timelineStore.currentFrame - props.start)"
+          :y1="0"
+          :x2="computeX(timelineStore.currentFrame - props.start)"
+          :y2="height"
+          stroke="#666"
+          stroke-width="1"
         />
       </g>
 
@@ -70,7 +84,7 @@
           r="5"
           fill="red"
           @mousedown.stop="startDrag(index, $event)"
-          @contextmenu.prevent="onKeyframeContextMenu($event, index)"
+          @contextmenu.stop.prevent="onKeyframeContextMenu($event, index)"
         />
       </g>
     </svg>
@@ -84,10 +98,13 @@ import { gsap } from 'gsap'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import EasingPanel from '@/components/setting/EasingPanel.vue'
 import { type KeyframeSettings, type KeyframeSetting } from '@/components/parameters/objectInfo'
+import { generateUniqueId } from '../utils/common'
+import { useTimelineStore } from '@/stores/objectStore'
 
 const displayEasingPanel = ref(false)
 const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })
 const selectedKeyframe = ref<KeyframeSetting>({} as KeyframeSetting)
+const timelineStore = useTimelineStore()
 
 const props = defineProps<{
   start: number
@@ -114,15 +131,43 @@ const xRange = computed(() => {
   return [0, endFrame.value - startFrame.value]
 })
 
-// yRange: valueの範囲を動的に設定
+let initialYRange = [-100, 100]
 const yRange = computed(() => {
-  const maxAbsValue = Math.max(
+  const currentMaxAbsValue = Math.max(
     Math.abs(Math.min(...keyframes.value.map((k) => k.value))),
     Math.abs(Math.max(...keyframes.value.map((k) => k.value)))
   )
-  const adjustedMaxAbsValue = Math.max(maxAbsValue, 100)
-  return [-adjustedMaxAbsValue, adjustedMaxAbsValue]
+
+  // ドラッグ中かどうかで最大値を調整
+  const targetMaxAbsValue =
+    draggingIndex.value !== -1
+      ? Math.max(
+          currentMaxAbsValue,
+          Math.max(Math.abs(initialYRange[0]), Math.abs(initialYRange[1]))
+        )
+      : Math.max(currentMaxAbsValue, 100)
+
+  // ドラッグが終了したら新しいyRangeを設定
+  if (draggingIndex.value === -1) {
+    initialYRange = [-targetMaxAbsValue, targetMaxAbsValue]
+  }
+
+  return [-targetMaxAbsValue, targetMaxAbsValue]
 })
+
+// フレームと値から x 座標を計算する関数
+const computeX = (frame: number) => {
+  return ((frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
+}
+
+// フレームと値から y 座標を計算する関数
+const computeY = (value: number) => {
+  return height - ((value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
+}
+
+/////////////////
+// グラフの描画 //
+/////////////////
 
 const points = computed(() => {
   const allPoints = []
@@ -182,16 +227,6 @@ const points = computed(() => {
   return allPoints.join(' ')
 })
 
-// フレームと値から x 座標を計算する関数
-const computeX = (frame: number) => {
-  return ((frame - xRange.value[0]) / (xRange.value[1] - xRange.value[0])) * props.panelWidth
-}
-
-// フレームと値から y 座標を計算する関数
-const computeY = (value: number) => {
-  return height - ((value - yRange.value[0]) / (yRange.value[1] - yRange.value[0])) * height
-}
-
 // グリッド線を描画するための座標を計算
 const verticalLines = computed(() => {
   const lines = []
@@ -212,9 +247,9 @@ const horizontalLines = computed(() => {
   return lines
 })
 
-/////////////////////
-// キーフレーム操作 //
-/////////////////////
+///////////////////
+// メニューの定義 //
+///////////////////
 
 // キーフレームを右クリックしたときのコンテキストメニュー
 function onKeyframeContextMenu(event: MouseEvent, index: number) {
@@ -240,6 +275,27 @@ function onKeyframeContextMenu(event: MouseEvent, index: number) {
   })
 }
 
+function onGraphContextMenu(event: MouseEvent) {
+  event.preventDefault()
+
+  ContextMenu.showContextMenu({
+    x: event.clientX,
+    y: event.clientY,
+    items: [
+      {
+        label: 'キーフレームを追加',
+        onClick: () => {
+          addKeyframe(event)
+        }
+      }
+    ]
+  })
+}
+
+///////////////////
+// キーパネル操作 //
+///////////////////
+
 // イージングパネルを表示する関数
 function showEasingPanel(index: number) {
   selectedKeyframe.value = keyframes.value[index]
@@ -251,26 +307,79 @@ function removeKeyframe(index: number) {
   keyframes.value.splice(index, 1)
 }
 
+function addKeyframe(event: MouseEvent) {
+  // マウスの位置に基づいてフレームと値を計算
+  const frame = Math.round(
+    ((event.offsetX - padding.left) / props.panelWidth) * (xRange.value[1] - xRange.value[0]) +
+      xRange.value[0]
+  )
+  const value = Math.round(
+    ((height - (event.offsetY - padding.top)) / height) * (yRange.value[1] - yRange.value[0]) +
+      yRange.value[0]
+  )
+
+  // frameを基準に挿入位置を決める
+  const frameIndex = keyframes.value.findIndex((kf) => kf.frame > frame)
+
+  const newKeyframe = {
+    id: generateUniqueId(),
+    frame,
+    value,
+    easeType: 'none'
+  }
+
+  // キーフレームの最小・最大に追加する場合
+  if (frameIndex === -1) {
+    keyframes.value.push(newKeyframe)
+  } else {
+    keyframes.value.splice(frameIndex, 0, newKeyframe)
+  }
+}
+
+const updateSeekbar = (event: MouseEvent) => {
+  timelineStore.currentFrame =
+    Math.round(
+      ((event.offsetX - padding.left) / props.panelWidth) * (xRange.value[1] - xRange.value[0]) +
+        xRange.value[0]
+    ) + props.start
+}
+
+/////////////////////
+// キーフレーム操作 //
+/////////////////////
+
+// キーフレームドラッグ用の変数
+let svgRect: DOMRect | null = null
+
 const startDrag = (index: number, event: MouseEvent) => {
-  //console.log('startDrag', index)
   draggingIndex.value = index
+
+  // ドラッグ開始時の表示域を保存
+  initialYRange = yRange.value
+
+  // SVG全体のオフセットを計算して保存
+  svgRect = (event.currentTarget as SVGElement).getBoundingClientRect()
+
   // 座標を動的に計算する
   const frameX = computeX(keyframes.value[index].frame)
   const valueY = computeY(keyframes.value[index].value)
-  offsetX.value = event.offsetX - frameX
-  offsetY.value = event.offsetY - valueY
+
+  offsetX.value = event.clientX - (svgRect.left + frameX)
+  offsetY.value = event.clientY - (svgRect.top + valueY)
 
   // ドラッグ中のイベントリスナーを追加
-  document.addEventListener('mousemove', onMouseMove)
-  document.addEventListener('mouseup', endDrag)
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', endDrag)
 }
+
 const onMouseMove = (event: MouseEvent) => {
-  if (draggingIndex.value !== null) {
+  if (draggingIndex.value !== -1 && svgRect) {
     const kf = keyframes.value[draggingIndex.value]
 
     // フレームの変更
     let newFrame = Math.round(
-      ((event.offsetX - offsetX.value) / props.panelWidth) * (xRange.value[1] - xRange.value[0]) +
+      ((event.clientX - svgRect.left - offsetX.value) / props.panelWidth) *
+        (xRange.value[1] - xRange.value[0]) +
         xRange.value[0]
     )
 
@@ -287,7 +396,8 @@ const onMouseMove = (event: MouseEvent) => {
 
     // 値の変更
     const newValue = Math.round(
-      ((offsetY.value - event.offsetY) / height) * (yRange.value[1] - yRange.value[0]) +
+      ((offsetY.value - (event.clientY - svgRect.top)) / height) *
+        (yRange.value[1] - yRange.value[0]) +
         yRange.value[1]
     )
 
@@ -305,9 +415,10 @@ const onMouseMove = (event: MouseEvent) => {
 }
 
 const endDrag = () => {
-  document.removeEventListener('mousemove', onMouseMove)
-  document.removeEventListener('mouseup', endDrag)
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', endDrag)
   draggingIndex.value = -1
+  svgRect = null // 終了時にクリア
 }
 </script>
 

@@ -1,9 +1,10 @@
-// [Aviutlからの変更点]
-// "settings"をuserdataに移設
-// 数値パラメータを配列に変更
-// anim_name, anim_parametersをanimations配列に統合
+import { ShapeType, Transform, Inform, applyEffectToTransform, TextAlign } from './p5Info'
+import { styleList } from '@/assets/effects/style'
+import { animationList } from '@/assets/effects/animation'
+import { UIType } from './uiInfo'
+import p5 from 'p5'
+import { deepCopy } from '../utils/common'
 
-import { ShapeType } from './p5Info'
 //////////////////////////////////////////////////////////////
 
 // キーフレームの情報管理
@@ -28,27 +29,51 @@ export interface AnimationSetting {
   parameters: { [key: string]: any }
   id: string
 }
-export type AnimationSettings = AnimationSetting[]
+export class AnimationSettings {
+  effects: AnimationSetting[]
+  constructor(animations: AnimationSetting[] = []) {
+    this.effects = animations
+  }
 
+  animate(inform: Inform, animations: AnimationSettings): Transform {
+    const baseValue = new Transform()
+
+    animations.effects.forEach((animation) => {
+      // effects 配列から対応するエフェクトを検索
+      const effect = animationList.find((effect) => effect.name === animation.name)
+      if (effect) {
+        const effectValue = effect.applyEffect(inform, baseValue, animation.parameters)
+        applyEffectToTransform(baseValue, effectValue)
+      }
+    })
+
+    return baseValue
+  }
+}
 export interface StyleSetting {
   name: string
   parameters: { [key: string]: any }
   id: string
 }
-export type StyleSettings = StyleSetting[]
+
+export class StyleSettings {
+  effects: StyleSetting[]
+
+  constructor(styles: StyleSetting[] = []) {
+    this.effects = styles
+  }
+
+  stylize(p: p5): void {
+    this.effects.forEach((style) => {
+      const effect = styleList.find((effect) => effect.name === style.name)
+      if (effect) {
+        effect.applyStyle(p, style)
+      }
+    })
+  }
+}
 
 //////////////////////////////////////////////////////////////
-
-// UIの種類の管理
-export enum UIType {
-  none = 'none',
-  keyframe = 'keyframe', // キーフレームの設定(実質slider)
-  slider = 'slider',
-  select = 'select',
-  color = 'color',
-  checkbox = 'checkbox',
-  text = 'text'
-}
 
 export abstract class PropertyMethod {
   static parameterInfo: { [key: string]: any } = {}
@@ -100,14 +125,18 @@ export class StandardRenderSettings extends PropertyMethod {
   X: KeyframeSettings
   Y: KeyframeSettings
   //Z: KeyframeSettings
+  relativeX: number // アニメーションによる相対座標を記録
+  relativeY: number
   scale: KeyframeSettings
   opacity: KeyframeSettings
   angle: KeyframeSettings
   //blend: number
 
   static parameterInfo = {
-    X: { name: 'X座標', type: UIType.keyframe, min: -1024, max: 1024 },
-    Y: { name: 'Y座標', type: UIType.keyframe, min: -1024, max: 1024 },
+    X: { name: 'X', type: UIType.keyframe, min: -1024, max: 1024 },
+    Y: { name: 'Y', type: UIType.keyframe, min: -1024, max: 1024 },
+    relativeX: { name: '相対X', type: UIType.none },
+    relativeY: { name: '相対Y', type: UIType.none },
     scale: { name: '拡大率', type: UIType.keyframe, min: 0, max: 500 },
     opacity: { name: '不透明度', type: UIType.keyframe, min: 0, max: 100 },
     angle: { name: '回転', type: UIType.keyframe, min: -360, max: 360 }
@@ -123,6 +152,8 @@ export class StandardRenderSettings extends PropertyMethod {
     super()
     this.X = X
     this.Y = Y
+    this.relativeX = 0
+    this.relativeY = 0
     this.scale = scale
     this.opacity = opacity
     this.angle = angle
@@ -131,54 +162,57 @@ export class StandardRenderSettings extends PropertyMethod {
 
 export class TextSettings extends PropertyMethod {
   text: string
-  color: string
+  fill_color: string
   font: string
-  individual_object: boolean
-  spacing_x: number
-  spacing_y: number
+  isVertical: boolean
+  spacing_x: KeyframeSettings
+  spacing_y: KeyframeSettings
   //name: string
   textSize: number
   //display_speed: number
-  //display_coordinates: boolean
   //auto_scroll: boolean
   //bold: boolean
   //italic: boolean
   //autoadjust: boolean
   //soft: boolean
   //monospace: boolean
-  align: number
+  align: TextAlign
+  individual_object: boolean
 
   //precision: number
   //color2: '000000
 
   static parameterInfo = {
     textSize: { name: 'サイズ', type: UIType.none, min: 1, max: 100 },
+    isVertical: { name: '縦書き', type: UIType.checkbox },
     individual_object: { name: 'バラバラ', type: UIType.checkbox },
-    align: { name: '整列', type: UIType.none },
-    spacing_x: { name: '水平間隔', type: UIType.slider, min: 0, max: 100 },
-    spacing_y: { name: '垂直間隔', type: UIType.slider, min: 0, max: 100 },
-    color: { name: '色', type: UIType.color },
+    spacing_x: { name: '水平間隔', type: UIType.keyframe, min: 0, max: 500 },
+    spacing_y: { name: '垂直間隔', type: UIType.keyframe, min: 0, max: 500 },
+    fill_color: { name: '色', type: UIType.color },
     font: { name: 'フォント', type: UIType.none },
-    text: { name: 'テキスト', type: UIType.text }
+    text: { name: 'テキスト', type: UIType.text },
+    align: { name: '整列', type: UIType.select }
   }
 
   constructor({
     textSize = 60,
+    isVertical = false,
     individual_object = true,
-    align = 0,
-    spacing_x = 60,
-    spacing_y = 60,
-    color = '#ffffff',
+    align = TextAlign.center,
+    spacing_x = [{ value: 60, frame: 0, id: '0' }],
+    spacing_y = [{ value: 60, frame: 0, id: '0' }],
+    fill_color = '#ffffff',
     font = 'SourceHanSansJP',
     text = 'サンプル'
   } = {}) {
     super()
     this.textSize = textSize
+    this.isVertical = isVertical
     this.individual_object = individual_object
     this.align = align
     this.spacing_x = spacing_x
     this.spacing_y = spacing_y
-    this.color = color
+    this.fill_color = fill_color
     this.font = font
     this.text = text
   }
@@ -198,22 +232,22 @@ export class ImageSettings extends PropertyMethod {
 }
 
 export class ShapeSettings extends PropertyMethod {
-  width: number
-  height: number
+  width: KeyframeSettings
+  height: KeyframeSettings
   fill_color: string
   shape: ShapeType
 
   static parameterInfo = {
-    width: { name: '幅', type: UIType.slider, min: 0, max: 2000 },
-    height: { name: '高さ', type: UIType.slider, min: 0, max: 2000 },
+    width: { name: '幅', type: UIType.keyframe, min: 0, max: 2000 },
+    height: { name: '高さ', type: UIType.keyframe, min: 0, max: 2000 },
     fill_color: { name: '塗りつぶし', type: UIType.color },
     shape: { name: '図形', type: UIType.select }
   }
 
   constructor() {
     super()
-    this.width = 200
-    this.height = 200
+    this.width = [{ value: 200, frame: 0, id: '0' }]
+    this.height = [{ value: 200, frame: 0, id: '0' }]
     this.fill_color = '#D3D3D3'
     this.shape = ShapeType.rect
   }
@@ -239,6 +273,10 @@ export class BaseObject implements BaseSettings {
     this.layer = settings.layer
     this.type = 'base'
   }
+
+  draw(): void {
+    // ここに描画処理を書く
+  }
 }
 
 export class TextObject extends BaseObject {
@@ -252,8 +290,11 @@ export class TextObject extends BaseObject {
     this.type = 'text'
     this.standardRenderSettings = new StandardRenderSettings()
     this.textSettings = new TextSettings()
-    this.styleSettings = []
-    this.animations = []
+    this.styleSettings = new StyleSettings()
+    this.animations = new AnimationSettings()
+  }
+  draw(): void {
+    // ここに描画処理を書く
   }
 }
 
@@ -268,8 +309,8 @@ export class ImageObject extends BaseObject {
     this.type = 'image'
     this.standardRenderSettings = new StandardRenderSettings()
     this.imageSettings = new ImageSettings()
-    this.styleSettings = []
-    this.animations = []
+    this.styleSettings = new StyleSettings()
+    this.animations = new AnimationSettings()
   }
 }
 
@@ -284,8 +325,8 @@ export class ShapeObject extends BaseObject {
     this.type = 'shape'
     this.standardRenderSettings = new StandardRenderSettings()
     this.shapeSettings = new ShapeSettings()
-    this.styleSettings = []
-    this.animations = []
+    this.styleSettings = new StyleSettings()
+    this.animations = new AnimationSettings()
   }
 }
 
@@ -295,8 +336,8 @@ export class ShapeObject extends BaseObject {
 export type typeString = '' | 'base' | 'text' | 'image' | 'shape'
 export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
 
-// 指定されたパラメータからオブジェクトを生成する(ファイル保存処理のみで使用)
-export function createObject(obj: RenderObject): any {
+// 指定されたパラメータからオブジェクトを生成する(ファイル保存処理・再読込で使用)
+export function createObjectFromJson(obj: RenderObject): any {
   const types = {
     text: TextObject,
     image: ImageObject,
@@ -306,6 +347,7 @@ export function createObject(obj: RenderObject): any {
   }
 
   const ClassRef = types[obj.type] || BaseObject
+
   const newObj = new ClassRef({
     id: obj.id,
     start: obj.start,
@@ -313,6 +355,22 @@ export function createObject(obj: RenderObject): any {
     layer: obj.layer,
     type: obj.type
   })
+
+  // 各オブジェクトの設定をコピー(typescriptの警告を回避するためas anyを使用)
+  if ('standardRenderSettings' in obj) {
+    ;(newObj as any).standardRenderSettings = new StandardRenderSettings(
+      deepCopy(obj.standardRenderSettings)
+    )
+  }
+  if ('textSettings' in obj) {
+    ;(newObj as any).textSettings = new TextSettings(obj.textSettings)
+  }
+  if ('styleSettings' in obj) {
+    ;(newObj as any).styleSettings = new StyleSettings(obj.styleSettings.effects)
+  }
+  if ('animations' in obj) {
+    ;(newObj as any).animations = new AnimationSettings(obj.animations.effects)
+  }
 
   return newObj
 }

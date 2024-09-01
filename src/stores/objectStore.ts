@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { type RenderObject } from '@/components/parameters/objectInfo'
+import { createObjectFromJson, type RenderObject } from '@/components/parameters/objectInfo'
 
 export const useObjectStore = defineStore('objects', {
   state: () => ({
@@ -15,7 +15,9 @@ export const useObjectStore = defineStore('objects', {
     }
   },
   actions: {
-    addObject(object: RenderObject) {
+    addNewObject(object: RenderObject) {
+      this.counter = this.findLastId + 1
+      object.id = this.counter
       this.objects.push(object)
       this.counter++
     },
@@ -28,6 +30,16 @@ export const useObjectStore = defineStore('objects', {
     clearObjects() {
       this.objects.splice(0)
       this.counter = 0
+    }
+  },
+  persist: {
+    afterHydrate(store) {
+      if ('objects' in store) {
+        store.objects = (store.objects as any).map((object: RenderObject) =>
+          createObjectFromJson(object)
+        )
+        // カウンターはもとから保存されている
+      }
     }
   }
 })
@@ -43,7 +55,9 @@ export const useTimelineStore = defineStore('timeline', {
     currentFrame: 0,
     canvasScale: 1,
     pxPerSec: 90,
-    selectedObjectId: 0
+    selectedObjectId: 0,
+    selectedObjectIds: [] as number[], // 複数選択用
+    isRedrawNeeded: false
   }),
   actions: {
     setCurrentFrame(frame: number) {
@@ -53,6 +67,15 @@ export const useTimelineStore = defineStore('timeline', {
       this.canvasScale = receivedWidth / this.width
     }
   },
+  persist: true
+})
+
+export const useConfigStore = defineStore('config', {
+  state: () => ({
+    isShowCollisionBox: false,
+    isShowKeyframe: true
+  }),
+  actions: {},
   persist: true
 })
 

@@ -11,25 +11,35 @@
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
 
-    <div v-for="(keyframe, index) in keyFrameList" :key="index">
-      <KeyframePoint :point="keyframe" :scaler="scaler" />
-    </div>
+    <template v-if="configStore.isShowKeyframe">
+      <div v-for="(keyframe, index) in keyFrameList" :key="index">
+        <KeyframePoint :point="keyframe" :scaler="scaler" @callKeyframeSort="sortKeyframe" />
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, onUnmounted } from 'vue'
-import { BaseObject, TextObject, ImageObject, ShapeObject } from '../parameters/objectInfo'
+import { useTimelineStore, useConfigStore } from '@/stores/objectStore'
+import {
+  BaseObject,
+  TextObject,
+  ImageObject,
+  ShapeObject,
+  type RenderObject
+} from '../parameters/objectInfo'
 import { type KeyframeSettings } from '../parameters/objectInfo'
-import { useTimelineStore } from '@/stores/objectStore'
-import gsap from 'gsap'
 import KeyframePoint from './KeyframePoint.vue'
+import gsap from 'gsap'
 
 const text = defineModel('text')
 const props = defineProps<{
-  object: TextObject | ImageObject | BaseObject
+  object: RenderObject
 }>()
+
 const timelineStore = useTimelineStore()
+const configStore = useConfigStore()
 const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
 
 const baseObject = ref(props.object)
@@ -48,15 +58,15 @@ const objectStyle = computed(() => ({
   left: `${Math.floor(tempStart.value) * scaler.value}px`,
   width: `${Math.floor(tempEnd.value - Math.floor(tempStart.value)) * scaler.value}px`,
   position: 'absolute',
-  backgroundColor: bgColor.value,
+  background: bgColor.value,
   cursor: isMoving.value ? 'grabbing' : 'grab'
 }))
 
 const bgColor = computed(() => {
   if (baseObject.value instanceof TextObject) {
-    return 'rgb(217, 233, 255)'
+    return 'linear-gradient(to right, rgb(217, 233, 255), rgb(255, 255, 255))'
   } else if (baseObject.value instanceof ShapeObject) {
-    return 'rgb(120, 152, 255)'
+    return 'linear-gradient(to bottom right, rgb(120, 152, 255), rgb(222, 255, 255))'
   } else if (baseObject.value instanceof ImageObject) {
     return 'rgb(211, 211, 211)'
   } else {
@@ -64,11 +74,15 @@ const bgColor = computed(() => {
   }
 })
 
+//////////////////////////
+// キーフレーム操作の関数 //
+//////////////////////////
+
 // キーフレームの抽出
 const keyFrameList = computed(() => {
   let keyFrameList: KeyframeSettings = []
 
-  // TODO: 他のプロパティにも対応する
+  // TODO: standardRenderSettings以外のプロパティにも対応する
   if ('standardRenderSettings' in props.object) {
     Object.entries(props.object.standardRenderSettings).reduce((acc, [key, value]) => {
       // KeyframeSettingsの配列であるかを判定
@@ -78,8 +92,29 @@ const keyFrameList = computed(() => {
       return acc
     }, keyFrameList)
   }
+  if ('shapeSettings' in props.object) {
+    Object.entries(props.object.shapeSettings).reduce((acc, [key, value]) => {
+      // KeyframeSettingsの配列であるかを判定
+      if (Array.isArray(value) && value.length > 1) {
+        acc.push(...value)
+      }
+      return acc
+    }, keyFrameList)
+  }
   return keyFrameList
 })
+
+// props.objectのキーフレームの並び替え
+const sortKeyframe = () => {
+  if ('standardRenderSettings' in props.object) {
+    const keyframeSettings: { [key: string]: any } = props.object.standardRenderSettings
+    Object.entries(keyframeSettings).forEach(([key, value]) => {
+      if (Array.isArray(value) && value.length > 1) {
+        keyframeSettings[key] = value.sort((a, b) => a.frame - b.frame)
+      }
+    })
+  }
+}
 
 //////////////////////////
 // オブジェクト操作の関数 //
@@ -145,6 +180,7 @@ const stopResize = () => {
     baseObject.value.end = Math.floor(tempEnd.value)
   }
   isResizing.value = false
+  timelineStore.isRedrawNeeded = true // TODO: stopMoveといっしょに読み込まれている
 }
 
 watch(

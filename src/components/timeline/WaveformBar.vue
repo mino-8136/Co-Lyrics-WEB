@@ -6,16 +6,21 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import WaveSurfer from 'wavesurfer.js'
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
+import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js'
 import { useTimelineStore } from '@/stores/objectStore'
 const timelineStore = useTimelineStore()
 
 const waveform = ref(null) // DOM要素への参照を作成
 let wavesurfer: WaveSurfer // wavesurferのインスタンスを保持する変数
 
+const isPlaying = defineModel('isPlaying', { type: Boolean }) // 再生中かどうかを保持する変数
 const emits = defineEmits(['callGetWaveformWidth', 'callSetScrollPosition'])
 
 onMounted(() => {
   if (waveform.value) {
+    // マーカー用プラグインの設定
+    const regions = RegionsPlugin.create()
+
     // タイムラインプラグインの設定
     const bottomTimeline = TimelinePlugin.create({
       height: 15,
@@ -44,15 +49,15 @@ onMounted(() => {
       fillParent: false,
       normalize: true,
       hideScrollbar: false,
-      plugins: [bottomTimeline]
+      plugins: [bottomTimeline, regions]
     })
 
     // イベントリスナーを追加
     wavesurfer.on('click', () => {
-      wavesurfer.playPause()
+      isPlaying.value = !isPlaying.value
     })
     wavesurfer.on('dragstart', () => {
-      wavesurfer.pause()
+      isPlaying.value = false
     })
     wavesurfer.on('interaction', (newTime) => {
       timelineStore.currentFrame = Math.round(newTime * timelineStore.framerate)
@@ -69,8 +74,53 @@ onMounted(() => {
     wavesurfer.on('ready', () => {
       emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
     })
+
+    // マーカーの追加
+    wavesurfer.on('decode', async () => {
+      // 歌詞データを読み込み
+      console
+      interface Note {
+        note: number
+        start_time: number
+        end_time: number
+        lyric?: string
+      }
+      let noteData: Note[] = []
+      try {
+        const response = await fetch('assets/lyrics/レターポスト_melody.json')
+        noteData = await response.json()
+      } catch (error) {
+        console.error('Error loading JSON:', error)
+      }
+
+      // 各ノートデータに基づいてリージョンを追加
+      noteData.forEach((note: Note) => {
+        if ('lyric' in note) {
+          regions.addRegion({
+            start: note.start_time + 2.2,
+            content: note.lyric || '', // 歌詞がある場合のみ表示
+            drag: false,
+            color: 'rgba(255, 255, 0, 0.5)'
+          })
+        }
+      })
+    })
   }
 })
+
+// isPlayingの変更を監視して再生・停止を管理
+watch(
+  () => isPlaying.value,
+  (newIsPlaying) => {
+    if (wavesurfer) {
+      if (newIsPlaying) {
+        wavesurfer.play()
+      } else {
+        wavesurfer.pause()
+      }
+    }
+  }
+)
 
 // pxPerSecの変更を監視
 watch(
@@ -105,5 +155,24 @@ div {
 }
 .scrollchild {
   background-color: red;
+}
+
+.waveform ::part(region-content) {
+  font-size: 16px;
+  white-space: nowrap;
+  color: rgb(255, 255, 255);
+  text-shadow:
+    1px 1px 0 #000,
+    -1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000;
+  pointer-events: none;
+}
+
+.waveform ::part(marker) {
+  background-color: rgba(0, 166, 255, 0.658) !important;
+  padding: 1px;
+  padding-top: 4px;
+  pointer-events: none;
 }
 </style>

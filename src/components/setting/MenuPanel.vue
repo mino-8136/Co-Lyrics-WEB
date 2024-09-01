@@ -15,6 +15,10 @@
       <v-list-item @click="openFile('add')">
         <v-list-item-title>別のファイルから追加</v-list-item-title>
       </v-list-item>
+      <v-divider></v-divider>
+      <v-list-item @click="clearObjects()">
+        <v-list-item-title>オブジェクト全削除</v-list-item-title>
+      </v-list-item>
     </v-list>
   </v-menu>
 </template>
@@ -25,7 +29,7 @@ import {
   StandardRenderSettings,
   TextSettings,
   type RenderObject,
-  createObject
+  createObjectFromJson
 } from '../parameters/objectInfo'
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -67,35 +71,28 @@ const openFile = (state: string) => {
         // 新規に開く場合はオブジェクトを全削除
         objectStore.clearObjects()
       } else {
-        // 最後のインデックスを取得してその次から追加する
-        objectStore.counter = objectStore.findLastId + 1
-        console.log(objectStore.counter)
+        // 追加ファイルの場合、そのまま追加する(カウンタ更新はstoreで管理する)
+        // console.log(objectStore.counter)
       }
 
       objData.forEach((obj: RenderObject) => {
-        let newObj = createObject(obj)
-
-        if ('standardRenderSettings' in obj) {
-          newObj.standardRenderSettings = new StandardRenderSettings(obj.standardRenderSettings)
-        }
-        if ('textSettings' in obj) {
-          newObj.textSettings = new TextSettings(obj.textSettings)
-        }
-        if ('styleSettings' in obj) {
-          newObj.styleSettings = obj.styleSettings
-        }
-        if ('animations' in obj) {
-          newObj.animations = obj.animations
-        }
-
-        objectStore.addObject(newObj)
+        let newObj = createObjectFromJson(obj)
+        objectStore.addNewObject(newObj) // カウンターも更新される
       })
+
       timelineStore.selectedObjectId = -1
+      timelineStore.isRedrawNeeded = true
     }
 
     reader.readAsText(file)
   }
   // ファイル選択ダイアログを開く
   input.click()
+}
+
+const clearObjects = () => {
+  objectStore.clearObjects()
+  timelineStore.selectedObjectId = -1
+  timelineStore.isRedrawNeeded = true
 }
 </script>

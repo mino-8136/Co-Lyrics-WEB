@@ -1,15 +1,30 @@
 <template>
   <div class="timeline-panel">
-    <div class="header d-flex">
+    <div class="timeline-header">
+      <v-btn
+        size="small"
+        density="comfortable"
+        :icon="isPlaying ? 'mdi-pause' : 'mdi-play'"
+        class="mr-3 my-1"
+        @click="playPause"
+      >
+      </v-btn>
       <p>Frame:</p>
       <input :value="timelineStore.currentFrame" style="width: 60px" />
-      <input type="range" min="50" max="400" v-model="timelineStore.pxPerSec" />
+      <input
+        type="range"
+        min="50"
+        max="400"
+        v-model="timelineStore.pxPerSec"
+        style="margin-left: auto"
+      />
     </div>
 
     <div class="timeline-container">
       <Waveformbar
         @callGetWaveformWidth="setWaveformWidth"
         @callSetScrollPosition="setScrollPosition"
+        v-model:isPlaying="isPlaying"
       ></Waveformbar>
       <div class="timeline" style="overflow-y: auto; height: 200px">
         <div
@@ -66,7 +81,9 @@ import Waveformbar from '@/components/timeline/WaveformBar.vue'
 import {
   BaseObject,
   BaseSettings,
+  createObjectFromJson,
   ImageObject,
+  type RenderObject,
   ShapeObject,
   TextObject,
   type typeString
@@ -80,6 +97,12 @@ const layers = ref(
   }))
 )
 const waveformWidth = ref(900)
+const isPlaying = ref(false)
+const copiedObject = ref<RenderObject>()
+
+///////////////////
+// メニューの定義 //
+///////////////////
 
 // タイムラインメニュー
 function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
@@ -115,26 +138,27 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
       //   }
       // }
       {
-        label: 'オブジェクトをコピー',
-        onClick: () => {
-          layers.value.push({ name: 'Layer' })
-        }
-      },
-      {
         label: 'オブジェクトを貼り付け',
+        disabled: copiedObject.value == null,
         onClick: () => {
-          layers.value.push({ name: 'Layer' })
+          if (copiedObject.value) {
+            let newObj = createObjectFromJson(copiedObject.value)
+            const newObjDuration = newObj.end - newObj.start
+
+            // 最後のIDに次々追加する
+            newObj.start = Math.floor(
+              (event.offsetX / timelineStore.pxPerSec) * timelineStore.framerate
+            )
+            newObj.end = newObj.start + newObjDuration
+            newObj.layer = layerIndex
+
+            objectStore.addNewObject(newObj)
+          }
         }
       }
     ]
   })
   event.stopPropagation()
-}
-
-// オブジェクトクリックで選択
-function selectObject(objectId: number) {
-  // クリックしたオブジェクトを選択
-  timelineStore.selectedObjectId = objectId
 }
 
 // オブジェクトを右クリックした場合のメニュー
@@ -146,6 +170,12 @@ function onObjectContextMenu(event: MouseEvent, objIndex: number) {
     y: event.clientY,
     items: [
       {
+        label: 'オブジェクトをコピー',
+        onClick: () => {
+          copiedObject.value = objectStore.objects.find((obj) => obj.id === objIndex)
+        }
+      },
+      {
         label: 'オブジェクトを削除',
         onClick: () => {
           removeObject(objIndex)
@@ -156,32 +186,48 @@ function onObjectContextMenu(event: MouseEvent, objIndex: number) {
   event.stopPropagation()
 }
 
+///////////////////
+// それぞれの処理 //
+///////////////////
+
+function playPause() {
+  isPlaying.value = !isPlaying.value
+}
+
+// オブジェクトクリックで選択
+function selectObject(objectId: number) {
+  // クリックしたオブジェクトを選択
+  timelineStore.selectedObjectId = objectId
+}
+
 // オブジェクトの追加
 function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
   const offset = Math.floor((offsetX / timelineStore.pxPerSec) * timelineStore.framerate)
   const settings: BaseSettings = {
-    id: objectStore.counter,
+    id: objectStore.counter, // storeで上書きされるが一応
     start: Math.max(offset, 0),
-    end: offset + 100, // TODO: ここに最大値を設定できるようにする
+    end: offset + 60,
     layer: layerIndex,
     type: type
   }
 
   if (type === 'text') {
-    objectStore.addObject(new TextObject(settings))
+    objectStore.addNewObject(new TextObject(settings))
   } else if (type === 'image') {
-    objectStore.addObject(new ImageObject(settings))
+    objectStore.addNewObject(new ImageObject(settings))
   } else if (type === 'shape') {
-    objectStore.addObject(new ShapeObject(settings))
+    objectStore.addNewObject(new ShapeObject(settings))
   } else {
-    objectStore.addObject(new BaseObject(settings))
+    objectStore.addNewObject(new BaseObject(settings))
   }
   selectObject(objectStore.counter - 1)
+  timelineStore.isRedrawNeeded = true
   // console.log(objectStore.objects)
 }
 
 function removeObject(objIndex: number) {
   objectStore.removeObject(objIndex)
+  timelineStore.isRedrawNeeded = true
 }
 
 ////////////////////////////
@@ -202,6 +248,13 @@ function setScrollPosition(position: number) {
 </script>
 
 <style scoped>
+.timeline-header {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border-bottom: 1px solid #ccc;
+}
+
 .timeline-container {
   height: 100%;
 }

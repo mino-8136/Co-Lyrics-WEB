@@ -7,12 +7,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, onUnmounted } from 'vue'
-import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
+import { useObjectStore, useTimelineStore, useConfigStore } from '@/stores/objectStore'
 import p5 from 'p5'
 import { defineSketch } from '@/components/p5/sketch'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
+const configStore = useConfigStore()
 
 // マウント時に p5.canvas を生成
 const p = ref()
@@ -30,15 +31,40 @@ onMounted(() => {
     // ウィンドウのリサイズイベントを監視
     window.addEventListener('resize', updateCanvasSize)
   }
+
+  // コンポーネントのマウント時に再描画を確実に実行
+  redrawCanvas()
 })
 
+// 動画再生用の処理
 watch(
   () => timelineStore.currentFrame,
   () => {
     renderObjects()
     p.value.updateCurrentFrame(timelineStore.currentFrame)
+    p.value.updateShowCollisionBox(configStore.isShowCollisionBox)
   }
 )
+
+// 再描画を行う
+watch(
+  () => timelineStore.isRedrawNeeded,
+  (newVal) => {
+    if (newVal) {
+      redrawCanvas()
+    }
+  }
+)
+
+// 読み込み時と別のタブから戻ってきた時に再描画を行う
+function redrawCanvas() {
+  if (timelineStore.isRedrawNeeded) {
+    renderObjects()
+    p.value.updateShowCollisionBox(configStore.isShowCollisionBox)
+    p.value.redraw()
+    timelineStore.isRedrawNeeded = false
+  }
+}
 
 // canvasの大きさを取得してp5.jsに伝達
 function updateCanvasSize() {

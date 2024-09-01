@@ -15,6 +15,15 @@ export class Transform {
   }
 }
 
+// エフェクトをトランスフォームに適用する関数
+export function applyEffectToTransform(baseValue: Transform, effectValue: Transform): void {
+  baseValue.X += effectValue.X
+  baseValue.Y += effectValue.Y
+  baseValue.angle += effectValue.angle
+  baseValue.scale *= effectValue.scale / 100
+  baseValue.opacity *= effectValue.opacity / 100
+}
+
 export class Inform {
   id: number
   totalId: number
@@ -41,4 +50,10 @@ export enum ShapeType {
   background = '背景',
   rect = '四角形',
   ellipse = '円'
+}
+
+export enum TextAlign {
+  left = '左揃え',
+  center = '中央揃え',
+  right = '右揃え'
 }

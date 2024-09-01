@@ -3,20 +3,25 @@ import p5 from 'p5'
 import {
   type TextObject,
   type KeyframeSettings,
-  type AnimationSettings,
-  type StyleSettings,
   ShapeObject,
   ImageObject,
   BaseObject,
   type RenderObject
 } from '@/components/parameters/objectInfo'
-import { Transform, Inform, ShapeType } from '@/components/parameters/p5Info'
-import { animationList } from '@/assets/effects/animation'
+import { Inform, ShapeType, TextAlign } from '@/components/parameters/p5Info'
 import { fontListData } from '../parameters/fonts'
 
 let renderObjects: RenderObject[] = []
+const selectedObject = {
+  object: null as RenderObject | null,
+  startMouseX: 0,
+  startMouseY: 0,
+  startObjectX: 0,
+  startObjectY: 0
+}
 let currentFrame = 0
 const fontLimit = true // フォントファイルを読み込むかどうかのフラグ
+let showCollisionBox = true
 
 const fonts: { name: string; font: p5.Font }[] = []
 
@@ -45,16 +50,17 @@ export function defineSketch(project: any) {
       p.strokeWeight(0)
       p.rectMode(p.CENTER)
       p.frameRate(project.framerate)
+      p.textAlign(p.CENTER, p.CENTER)
 
       p.background(0)
     }
 
     p.draw = () => {
-      p.background(0)
+      p.background(80)
 
       // デバッグ用
       p.fill(255)
-      p.ellipse(p.mouseX, p.mouseY, 50, 50)
+      p.ellipse(p.mouseX, p.mouseY, 50 * project.canvasScale)
 
       // メインの描画
       p.push()
@@ -62,7 +68,6 @@ export function defineSketch(project: any) {
       p.scale(project.canvasScale)
 
       renderObjects.forEach((object) => {
-        // テキストオブジェクトの描画
         switch (object.type) {
           case 'text':
             renderText(object as TextObject)
@@ -76,55 +81,86 @@ export function defineSketch(project: any) {
         }
       })
 
+      if (showCollisionBox) {
+        renderObjects.forEach((object) => {
+          if (!('standardRenderSettings' in object)) return
+          p.push()
+          p.strokeWeight(3)
+          p.stroke(255, 0, 0)
+          p.noFill()
+          p.rect(
+            lerpValue(object.standardRenderSettings.X, object.start),
+            lerpValue(object.standardRenderSettings.Y, object.start),
+            50,
+            50
+          )
+          p.pop()
+        })
+      }
+
       p.pop()
     }
-    ///////////////////////
-    // スタイル処理の関数 //
-    ///////////////////////
-
-    function applyStyle(styles: StyleSettings) {
-      styles.forEach((style) => {
-        switch (style.name) {
-          case '縁取り':
-            break
-          case 'シャドー':
-            p.drawingContext.shadowOffsetX = 0
-            p.drawingContext.shadowOffsetY = 0
-            p.drawingContext.shadowBlur = 5
-            p.drawingContext.shadowColor = '#ffffff'
-            break
-        }
-      })
-    }
 
     ////////////////////////
-    // エフェクト処理の関数 //
+    // ドラッグして位置変更 //
     ////////////////////////
 
-    // エフェクトをトランスフォームに適用する関数
-    function applyEffectToTransform(baseValue: Transform, effectValue: Transform): void {
-      baseValue.X += effectValue.X
-      baseValue.Y += effectValue.Y
-      baseValue.angle += effectValue.angle
-      baseValue.scale *= effectValue.scale / 100
-      baseValue.opacity *= effectValue.opacity / 100
-    }
+    p.mousePressed = () => {
+      let nearestObject: RenderObject | null = null
+      let minDistance = Infinity
+      const mouseX = (p.mouseX - p.width / 2) / project.canvasScale
+      const mouseY = (p.mouseY - p.height / 2) / project.canvasScale
 
-    // すべてのエフェクトを適用する関数
-    function applyEffects(inform: Inform, animations: AnimationSettings): Transform {
-      const baseValue = new Transform()
+      renderObjects.forEach((object) => {
+        if (!('standardRenderSettings' in object)) return
 
-      animations.forEach((animation) => {
-        // effects 配列から対応するエフェクトを検索
-        const effect = animationList.find((effect) => effect.name === animation.name)
-        if (effect) {
-          const effectValue = effect.applyEffect(inform, baseValue, animation.parameters)
-          applyEffectToTransform(baseValue, effectValue)
+        const objectX =
+          lerpValue(object.standardRenderSettings.X, object.start) +
+          object.standardRenderSettings.relativeX
+        const objectY =
+          lerpValue(object.standardRenderSettings.Y, object.start) +
+          object.standardRenderSettings.relativeY
+
+        const distance = p.dist(mouseX, mouseY, objectX, objectY)
+        if (distance < minDistance) {
+          minDistance = distance
+          nearestObject = object
+          selectedObject.startObjectX = objectX
+          selectedObject.startObjectY = objectY
         }
       })
 
-      return baseValue
+      if (minDistance < 50 && nearestObject) {
+        selectedObject.object = nearestObject
+        selectedObject.startMouseX = mouseX
+        selectedObject.startMouseY = mouseY
+      } else {
+        selectedObject.object = null
+      }
     }
+
+    p.mouseDragged = () => {
+      if (selectedObject.object && 'standardRenderSettings' in selectedObject.object) {
+        const mouseX = (p.mouseX - p.width / 2) / project.canvasScale
+        const mouseY = (p.mouseY - p.height / 2) / project.canvasScale
+
+        selectedObject.object.standardRenderSettings.X.forEach((keyframe) => {
+          keyframe.value += mouseX - selectedObject.startMouseX
+        })
+        selectedObject.object.standardRenderSettings.Y.forEach((keyframe) => {
+          keyframe.value += mouseY - selectedObject.startMouseY
+        })
+
+        // マウスの現在位置を更新
+        selectedObject.startMouseX = mouseX
+        selectedObject.startMouseY = mouseY
+      }
+    }
+
+    p.mouseReleased = () => {
+      selectedObject.object = null
+    }
+
     //////////////////////////
     // 画像レンダリングの関数 //
     //////////////////////////
@@ -144,6 +180,9 @@ export function defineSketch(project: any) {
       col.setAlpha(lerpValue(object.standardRenderSettings.opacity, object.start))
       p.fill(col)
 
+      // スタイルの適用
+      object.styleSettings.stylize(p)
+
       // 全体的なトランスフォームの実行(renderTextと同様)
       p.translate(
         lerpValue(object.standardRenderSettings.X, object.start),
@@ -152,16 +191,48 @@ export function defineSketch(project: any) {
       p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
       p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
 
+      // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
+      const inform = new Inform(
+        0,
+        1, // TODO: 改行などの文字数も入っている + TODO: 絵文字など複数文字に対応する
+        object.start,
+        object.end,
+        currentFrame
+      )
+      const effectValue = object.animations.animate(inform, object.animations)
+      if (effectValue.opacity == 0) return
+      if (effectValue.scale == 0) return
+
+      p.translate(effectValue.X, effectValue.Y)
+      p.rotate(effectValue.angle)
+      p.scale(effectValue.scale / 100)
+      col.setAlpha(
+        (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
+          (effectValue.opacity / 100) *
+          100
+      )
+      p.fill(col)
+
       // 図形のレンダリングの実行
       switch (object.shapeSettings.shape) {
         case ShapeType.background:
           p.background(object.shapeSettings.fill_color)
           break
         case ShapeType.rect:
-          p.rect(0, 0, object.shapeSettings.width, object.shapeSettings.height)
+          p.rect(
+            0,
+            0,
+            lerpValue(object.shapeSettings.width, object.start),
+            lerpValue(object.shapeSettings.height, object.start)
+          )
           break
         case ShapeType.ellipse:
-          p.ellipse(0, 0, object.shapeSettings.width, object.shapeSettings.height)
+          p.ellipse(
+            0,
+            0,
+            lerpValue(object.shapeSettings.width, object.start),
+            lerpValue(object.shapeSettings.height, object.start)
+          )
           break
       }
       p.pop()
@@ -183,9 +254,11 @@ export function defineSketch(project: any) {
           p.textFont(foundFont ? foundFont : 'Arial')
         }
       }
-
       p.textSize(object.textSettings.textSize)
-      const col = p.color(object.textSettings.color)
+      const col = p.color(object.textSettings.fill_color)
+
+      // スタイルの適用
+      object.styleSettings.stylize(p)
 
       // 全体的なトランスフォームの実行
       p.translate(
@@ -199,6 +272,12 @@ export function defineSketch(project: any) {
 
       let newLineCount = 0
       let newLineCharacterCount = 0
+      const eachLineCharacters = ((text) => {
+        const lines = text.split(/\r?\n/)
+        const lineLengths = lines.map((lines) => lines.length)
+        return lineLengths
+      })(object.textSettings.text)
+
       const totalIndex = object.textSettings.individual_object ? object.textSettings.text.length : 1
 
       for (let index = 0; index < totalIndex; index++) {
@@ -207,6 +286,13 @@ export function defineSketch(project: any) {
           newLineCount++
           newLineCharacterCount = 0
           continue
+        }
+        const textAnchor = () => {
+          if (object.textSettings.align == TextAlign.center)
+            return newLineCharacterCount - (eachLineCharacters[newLineCount] - 1) / 2
+          if (object.textSettings.align == TextAlign.right)
+            return newLineCharacterCount - eachLineCharacters[newLineCount] + 1
+          return newLineCharacterCount
         }
 
         // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
@@ -217,15 +303,23 @@ export function defineSketch(project: any) {
           object.end,
           currentFrame
         )
-        const effectValue = applyEffects(inform, object.animations)
+        const effectValue = object.animations.animate(inform, object.animations)
         if (effectValue.opacity == 0) return
         if (effectValue.scale == 0) return
 
         p.push()
-        p.translate(
-          object.textSettings.spacing_x * newLineCharacterCount + effectValue.X,
-          object.textSettings.spacing_y * newLineCount + effectValue.Y
-        )
+        if (object.textSettings.isVertical) {
+          p.translate(
+            -lerpValue(object.textSettings.spacing_x, object.start) * newLineCount + effectValue.Y,
+            lerpValue(object.textSettings.spacing_y, object.start) * textAnchor() + effectValue.X
+          )
+        } else {
+          p.translate(
+            lerpValue(object.textSettings.spacing_x, object.start) * textAnchor() + effectValue.X,
+            lerpValue(object.textSettings.spacing_y, object.start) * newLineCount + effectValue.Y
+          )
+        }
+
         p.rotate(effectValue.angle)
         p.scale(effectValue.scale / 100)
         col.setAlpha(
@@ -345,6 +439,10 @@ export function defineSketch(project: any) {
       currentFrame = frame
     }
 
+    p.updateShowCollisionBox = (show: boolean) => {
+      showCollisionBox = show
+    }
+
     p.updateCanvasScale = () => {
       p.resizeCanvas(project.width * project.canvasScale, project.height * project.canvasScale)
     }
@@ -356,6 +454,7 @@ declare module 'p5' {
   interface p5InstanceExtensions {
     addRenderObjects: (currentObjects: RenderObject[]) => void
     updateCurrentFrame: (frame: number) => void
+    updateShowCollisionBox: (show: boolean) => void
     updateCanvasScale: () => void
   }
 }
