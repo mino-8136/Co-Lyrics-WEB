@@ -41,37 +41,6 @@ export const styleList: Style[] = [
     }
   },
   {
-    name: 'グラデーション',
-    params: { start_color: '#ff0000', end_color: '#0000ff', gradient_type: 'linear' },
-    parameters: {
-      start_color: { name: '開始色', type: UIType.color },
-      end_color: { name: '終了色', type: UIType.color },
-      gradient_type: {
-        name: 'グラデーションのタイプ',
-        type: UIType.select,
-        options: ['linear', 'radial']
-      }
-    },
-    applyStyle: (p: p5, style: StyleSetting) => {
-      let gradient
-      if (style.parameters.gradient_type === 'linear') {
-        gradient = p.drawingContext.createLinearGradient(0, 0, p.width, 0)
-      } else {
-        gradient = p.drawingContext.createRadialGradient(
-          p.width / 2,
-          p.height / 2,
-          0,
-          p.width / 2,
-          p.height / 2,
-          p.width / 2
-        )
-      }
-      gradient.addColorStop(0, style.parameters.start_color)
-      gradient.addColorStop(1, style.parameters.end_color)
-      p.drawingContext.fillStyle = gradient
-    }
-  },
-  {
     name: 'ぼかし効果',
     params: { blur_amount: 5 },
     parameters: {

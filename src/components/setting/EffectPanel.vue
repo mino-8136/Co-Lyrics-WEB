@@ -6,7 +6,10 @@
         <v-col v-for="(effect, index) in effectList" :key="index" class="d-flex" cols="3">
           <v-container class="items">
             <v-img :width="200" aspect-ratio="1" class="bg-pink-lighten-4" cover> </v-img>
-            <v-btn @click="handleButtonClick(effect.name, effect.params)">
+            <v-btn
+              @click="handleButtonClick(effect.name, effect.params)"
+              :disabled="isEffectAlreadySelected(effect.name)"
+            >
               {{ effect.name }}
             </v-btn>
           </v-container>
@@ -41,6 +44,13 @@ function handleButtonClick(effectName: string, parameters: Record<string, any>) 
     id: generateUniqueId()
   })
   showPanel.value = false
+}
+
+function isEffectAlreadySelected(effectName: string): boolean {
+  if (props.type === 'style') {
+    return effects.value.effects.some((effect) => effect.name === effectName)
+  }
+  return false
 }
 </script>
 

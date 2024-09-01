@@ -42,6 +42,33 @@
               </v-slider>
             </template>
 
+            <!-- カラー型パラメータの場合 -->
+            <template v-if="param.type == UIType.color">
+              <div class="text-center">
+                <v-menu
+                  v-model="colorMenus[paramLabel]"
+                  :close-on-content-click="false"
+                  location="end"
+                >
+                  <template v-slot:activator="{ props }">
+                    <v-btn :color="params.parameters[paramLabel]" v-bind="props" width="100px">
+                      {{ params.parameters[paramLabel] }}
+                    </v-btn>
+                  </template>
+                  <v-color-picker v-model="params.parameters[paramLabel]" :modes="['hexa']" flat />
+                </v-menu>
+              </div>
+            </template>
+
+            <!-- セレクトボックス型パラメータの場合 -->
+            <template v-if="param.type === UIType.select">
+              <select v-model="params.parameters[paramLabel]" hide-details>
+                <option v-for="(e, index) in param.options" :key="index">{{ e }}</option>
+              </select>
+            </template>
+
+            <!-- カラー-->
+
             <!-- チェックボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.checkbox">
               <v-checkbox v-model="params.parameters[paramLabel]" hide-details />
@@ -58,7 +85,7 @@
   </v-btn>
 
   <!-- アニメーション設定の呼び出し -->
-  <StylePanel :type="props.type" v-model:show="effectPanel" v-model:effects="parameters" />
+  <EffectPanel :type="props.type" v-model:show="effectPanel" v-model:effects="parameters" />
 
   <v-dialog v-model="descriptionPanel" max-width="800px">
     <v-card>
@@ -74,14 +101,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import {
   type StyleSettings,
   type StyleSetting,
   type AnimationSetting
 } from '@/components/parameters/objectInfo'
 import { UIType } from '@/components/parameters/uiInfo'
-import StylePanel from './EffectPanel.vue'
+import EffectPanel from './EffectPanel.vue'
 import { animationList } from '@/assets/effects/animation'
 import { styleList } from '@/assets/effects/style'
 
@@ -89,6 +116,7 @@ const parameters = defineModel<StyleSettings>('params', { required: true })
 const props = defineProps<{
   type: String // 'animation' or 'style'
 }>()
+const colorMenus = ref<{ [key: string]: boolean }>({}) // 各パラメータごとのカラーメニューの表示フラグ
 
 //////////////////////////////////
 // アニメーション設定に関する記述 //
@@ -131,6 +159,12 @@ function downEffect(index: number) {
 function deleteEffect(index: number) {
   parameters.value.effects.splice(index, 1)
 }
+
+onMounted(() => {
+  Object.keys(parameters.value.effects).forEach((label) => {
+    colorMenus.value[label] = false
+  })
+})
 </script>
 
 <style scoped>
@@ -152,6 +186,13 @@ function deleteEffect(index: number) {
   width: 40px;
   text-align: center;
   color: #555;
+}
+
+select {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  -webkit-appearance: menulist;
+  appearance: button;
 }
 
 /* リストアニメーション */
