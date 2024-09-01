@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card class="ma-4">
-      <v-card-title>ソフトウェア概要 v0.9.0</v-card-title>
+      <v-card-title>ソフトウェア概要 v0.9.2</v-card-title>
       <v-divider></v-divider>
       <v-card-text>
         <p>
@@ -27,12 +27,30 @@
             <template v-slot:subtitle> {{ music.artist }}</template>
             <v-card-text> {{ music.lyrics }} </v-card-text>
             <v-divider></v-divider>
-            <v-card-actions>
-              <v-btn text="この楽曲を選択" variant="text" @click="formPanel = true"></v-btn>
-            </v-card-actions>
+            <!--
+              <v-card-actions>
+                <v-btn text="この楽曲を選択" variant="text" @click="formPanel = true"></v-btn>
+              </v-card-actions>
+              -->
           </v-card>
         </v-col>
       </v-row>
+    </v-card>
+
+    <v-card class="ma-4 pa-4">
+      <v-card-title>作成検討中の処理</v-card-title>
+      <v-divider></v-divider>
+      <v-card-text>
+        <v-list>
+          <v-list-item> WEBフォントを用いたフォント切り替え機能(優先度高) </v-list-item>
+          <v-list-item> タイムライン上での複数選択機能 </v-list-item>
+          <v-list-item> Ctrl+Zでのやり直し機能 </v-list-item>
+          <v-list-item> 編集画面の各パネルの枠を変更する機能 </v-list-item>
+          <v-list-item> テキスト新規作成時に最も近い位置の歌詞を取得する </v-list-item>
+          <v-list-item> 2曲目の追加および1曲目との切り替え </v-list-item>
+          <v-list-item> 複数人で同じオブジェクトを編集した際に設定を統合する機能 </v-list-item>
+        </v-list>
+      </v-card-text>
     </v-card>
   </v-container>
 
