@@ -56,7 +56,7 @@ export function defineSketch(project: any) {
     }
 
     p.draw = () => {
-      p.background(0)
+      p.background(80)
 
       // デバッグ用
       p.fill(255)
