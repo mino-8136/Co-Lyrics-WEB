@@ -176,10 +176,10 @@ export function defineSketch(project: any) {
     const renderShape = (object: ShapeObject) => {
       p.push()
 
-      // スタイルの適用
+      // 1. スタイルの適用
       object.styleSettings.stylize(p)
 
-      // 全体的なトランスフォームの実行(renderTextと同様)
+      // 2. 全体的なトランスフォームの実行(renderTextと同様)
       p.translate(
         lerpValue(object.standardRenderSettings.X, object.start),
         lerpValue(object.standardRenderSettings.Y, object.start)
@@ -187,10 +187,10 @@ export function defineSketch(project: any) {
       p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
       p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
 
-      // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
+      // 3. エフェクト値の計算
       const inform = new Inform(
         0,
-        1, // TODO: 改行などの文字数も入っている + TODO: 絵文字など複数文字に対応する
+        1, // TODO: 改行などの文字数も入っている
         object.start,
         object.end,
         currentFrame
@@ -199,11 +199,12 @@ export function defineSketch(project: any) {
       //if (effectValue.opacity == 0) return
       //if (effectValue.scale == 0) return
 
+      // 4. エフェクトの影響の適用
       p.translate(effectValue.X, effectValue.Y)
       p.rotate(effectValue.angle)
       p.scale(effectValue.scale / 100)
 
-      // スタイライズエフェクトの処理(renderTextと同様)
+      // 5. 色の設定
       const col = p.color(object.shapeSettings.fill_color)
       col.setAlpha(
         (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
@@ -212,7 +213,7 @@ export function defineSketch(project: any) {
       )
       p.fill(col)
 
-      // 図形のレンダリングの実行
+      // S1. 図形のレンダリングの実行
       switch (object.shapeSettings.shape) {
         case ShapeType.background:
           p.background(object.shapeSettings.fill_color)
@@ -244,7 +245,18 @@ export function defineSketch(project: any) {
     const renderText = (object: TextObject) => {
       p.push()
 
-      // スタイライズエフェクトの処理
+      // 1️. スタイルの適用
+      object.styleSettings.stylize(p)
+
+      // 2. 全体的なトランスフォームの実行
+      p.translate(
+        lerpValue(object.standardRenderSettings.X, object.start),
+        lerpValue(object.standardRenderSettings.Y, object.start)
+      )
+      p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
+      p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
+
+      // T1. フォントの設定
       if (fontLimit) {
         p.textFont('Noto Sans JP')
       } else {
@@ -255,18 +267,7 @@ export function defineSketch(project: any) {
       }
       p.textSize(object.textSettings.textSize)
 
-      // スタイルの適用
-      object.styleSettings.stylize(p)
-
-      // 全体的なトランスフォームの実行
-      p.translate(
-        lerpValue(object.standardRenderSettings.X, object.start),
-        lerpValue(object.standardRenderSettings.Y, object.start)
-      )
-      p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
-      p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
-
-      // 文字のカウントの開始
+      // T2. 文字のカウントの開始
       const characters = Array.from(object.textSettings.text)
       const eachLineCharacters = ((text) => {
         const lines = text.split(/\r?\n/)
@@ -279,7 +280,10 @@ export function defineSketch(project: any) {
       let newLineCount = 0
       let newLineCharacterCount = 0
 
+      // T3. 各文字の描画
       for (let index = 0; index < totalIndex; index++) {
+        p.push()
+
         // 改行の数を数える処理
         if (characters[index] == '\n') {
           newLineCount++
@@ -294,7 +298,7 @@ export function defineSketch(project: any) {
           return newLineCharacterCount
         }
 
-        // 各文字のエフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
+        // 3. エフェクト値の計算
         const inform = new Inform(
           index - newLineCount,
           totalIndex, // TODO: 改行などの文字数も入っている + TODO: 絵文字など複数文字に対応する
@@ -306,7 +310,7 @@ export function defineSketch(project: any) {
         //if (effectValue.opacity == 0) return
         //if (effectValue.scale == 0) return
 
-        p.push()
+        // 4. エフェクトの影響の適用
         if (object.textSettings.isVertical) {
           p.translate(
             -lerpValue(object.textSettings.spacing_x, object.start) * newLineCount + effectValue.Y,
@@ -321,9 +325,10 @@ export function defineSketch(project: any) {
             lerpValue(object.textSettings.spacing_y, object.start) * newLineCount + effectValue.Y
           )
         }
-
         p.rotate(effectValue.angle)
         p.scale(effectValue.scale / 100)
+
+        // 5. 色の設定
         const col = p.color(object.textSettings.fill_color)
         col.setAlpha(
           (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
@@ -332,6 +337,7 @@ export function defineSketch(project: any) {
         )
         p.fill(col)
 
+        // 6. テキストの描画
         if (object.textSettings.individual_object) {
           p.text(characters[index], 0, 0)
         } else {
