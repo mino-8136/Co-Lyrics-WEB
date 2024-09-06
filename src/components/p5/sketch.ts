@@ -22,6 +22,7 @@ const selectedObject = {
 let currentFrame = 0
 const fontLimit = true // フォントファイルを読み込むかどうかのフラグ
 let showCollisionBox = true
+const verticalCharacter = ['ー', '−', '～', '~'] // 縦書きにする文字のリスト
 
 const fonts: { name: string; font: p5.Font }[] = []
 
@@ -311,6 +312,9 @@ export function defineSketch(project: any) {
             -lerpValue(object.textSettings.spacing_x, object.start) * newLineCount + effectValue.Y,
             lerpValue(object.textSettings.spacing_y, object.start) * textAnchor() + effectValue.X
           )
+          if (verticalCharacter.includes(characters[index])) {
+            p.rotate(90)
+          }
         } else {
           p.translate(
             lerpValue(object.textSettings.spacing_x, object.start) * textAnchor() + effectValue.X,
