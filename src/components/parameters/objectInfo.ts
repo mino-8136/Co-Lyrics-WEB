@@ -162,11 +162,11 @@ export class StandardRenderSettings extends PropertyMethod {
 
 export class TextSettings extends PropertyMethod {
   text: string
+  spacing_x: KeyframeSettings
+  spacing_y: KeyframeSettings
   fill_color: string
   font: string
   isVertical: boolean
-  spacing_x: KeyframeSettings
-  spacing_y: KeyframeSettings
   //name: string
   textSize: number
   //display_speed: number

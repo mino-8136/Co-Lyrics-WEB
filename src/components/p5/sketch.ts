@@ -299,7 +299,6 @@ export function defineSketch(project: any) {
           //if (effectValue.scale == 0) return
 
           // 4. エフェクトの影響の適用
-          console.log(textAnchor(), lineIndex)
           if (object.textSettings.isVertical) {
             p.translate(
               -lerpValue(object.textSettings.spacing_x, object.start) * lineIndex + effectValue.Y,

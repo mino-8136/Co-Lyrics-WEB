@@ -1,21 +1,24 @@
 <template>
-  <div v-for="(param, label) in parameters" :key="label">
-    <div
-      v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) != UIType.none"
-      class="parameter-row"
-    >
+  <v-row align="center" class="pt-2">
+    <template v-for="(param, label) in parameters" :key="label">
       <!-- パラメータ名の表示 -->
-      <v-chip
-        class="parameter-name"
-        variant="outlined"
-        size="small"
-        label
-        @click="toggleKeyframeGraph(label)"
-        >{{ (parameters.constructor as typeof PropertyMethod).getParameterName(label) }}</v-chip
+      <v-col
+        cols="2"
+        v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) != UIType.none"
       >
+        <v-chip
+          class="parameter-name"
+          variant="outlined"
+          size="small"
+          label
+          @click="toggleKeyframeGraph(label)"
+          >{{ (parameters.constructor as typeof PropertyMethod).getParameterName(label) }}</v-chip
+        >
+      </v-col>
 
       <!-- キーフレーム対応の場合 -->
-      <template
+      <v-col
+        cols="10"
         v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.keyframe"
       >
         <v-row v-if="isKeyframeSettings(param)">
@@ -24,7 +27,7 @@
             v-if="showKeyframes.includes(label)"
             :start="selectedObject.start"
             :end="selectedObject.end"
-            :panelWidth="getBoundingClientRect() * 0.75"
+            :panelWidth="getBoundingClientRect() * 0.7"
             v-model:keyframes="parameters[label]"
           />
 
@@ -32,7 +35,7 @@
             <v-col
               v-for="(keyframe, idx) in param as KeyframeSettings"
               :key="keyframe.id"
-              cols="12"
+              class="pt-1 pb-2"
             >
               <v-slider
                 v-model="keyframe.value"
@@ -77,10 +80,11 @@
             </v-col>
           </transition-group>
         </v-row>
-      </template>
+      </v-col>
 
       <!-- 数値型パラメータの場合 -->
-      <template
+      <v-col
+        cols="10"
         v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.slider"
       >
         <v-slider
@@ -94,17 +98,19 @@
             <input class="parameter-value" v-model.number="parameters[label]" />
           </template>
         </v-slider>
-      </template>
+      </v-col>
 
       <!-- テキスト型パラメータの場合 -->
-      <template
+      <v-col
+        cols="10"
         v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.text"
       >
         <textarea :id="label" v-model="parameters[label]" type="text" />
-      </template>
+      </v-col>
 
       <!-- セレクト型パラメータの場合 -->
-      <template
+      <v-col
+        cols="4"
         v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.select"
       >
         <select v-model="parameters[label]">
@@ -112,13 +118,14 @@
             {{ e }}
           </option>
         </select>
-      </template>
+      </v-col>
 
       <!-- カラー型パラメータの場合 -->
-      <template
+      <v-col
+        cols="4"
         v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.color"
       >
-        <div class="text-center">
+        <div>
           <v-menu v-model="colorMenu" :close-on-content-click="false" location="end">
             <template v-slot:activator="{ props }">
               <v-btn :color="parameters[label]" v-bind="props" width="100px">
@@ -128,19 +135,20 @@
             <v-color-picker v-model="parameters[label]" :modes="['hexa']" flat />
           </v-menu>
         </div>
-      </template>
+      </v-col>
 
       <!-- チェックボックス型パラメータの場合 -->
-      <template
+      <v-col
+        cols="4"
         v-if="
           (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.checkbox
         "
       >
         <v-checkbox v-model="parameters[label]" hide-details />
-      </template>
-    </div>
-    <v-divider></v-divider>
-  </div>
+      </v-col>
+      <v-divider></v-divider>
+    </template>
+  </v-row>
 
   <!-- イージング設定の呼び出し -->
   <EasingPanel v-model:show="showEasingPanel" v-model:easing="currentKeyframe" />
@@ -255,12 +263,6 @@ div.ease-setting {
   background-color: #09b7f6;
 }
 
-.parameter-row {
-  display: flex;
-  align-items: center;
-  margin: 8px 1px;
-}
-
 .parameter-name {
   width: 80px;
   font-weight: bold;
@@ -278,14 +280,14 @@ div.ease-setting {
 
 textarea {
   width: 100%;
-  height: 120px;
-  padding: 8px 12px;
+  height: 100px;
+  padding: 4px 12px;
   box-sizing: border-box;
   border: 1px solid #ccc;
 }
 
 select {
-  padding: 8px 12px;
+  padding: 4px 12px;
   border: 1px solid #ccc;
   -webkit-appearance: menulist;
   appearance: button;
