@@ -292,7 +292,8 @@ export function defineSketch(project: any) {
             characters.length,
             object.start,
             object.end,
-            currentFrame
+            currentFrame,
+            p
           )
           const effectValue = object.animationSettings.animate(inform, object.animationSettings)
           //if (effectValue.opacity == 0) return
