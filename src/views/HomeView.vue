@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card class="ma-4">
-      <v-card-title>ソフトウェア概要 v0.9.2</v-card-title>
+      <v-card-title>ソフトウェア概要 v0.9.3</v-card-title>
       <v-divider></v-divider>
       <v-card-text>
         <p>
@@ -49,6 +49,29 @@
           <v-list-item> テキスト新規作成時に最も近い位置の歌詞を取得する </v-list-item>
           <v-list-item> 2曲目の追加および1曲目との切り替え </v-list-item>
           <v-list-item> 複数人で同じオブジェクトを編集した際に設定を統合する機能 </v-list-item>
+        </v-list>
+      </v-card-text>
+    </v-card>
+
+    <v-card class="ma-4 pa-4">
+      <v-card-title>アップデート情報</v-card-title>
+      <v-divider></v-divider>
+      <v-card-subtitle>0.9.2 → 0.9.3 (2024/09/07)</v-card-subtitle>
+      <v-card-text>
+        <v-list>
+          <v-list-item> 表示できるレイヤー数を10から20に増加</v-list-item>
+          <v-list-item> シークバー縦棒がタイムラインの下部まで届くように修正</v-list-item>
+          <v-list-item> タイムライン番号の表示</v-list-item>
+          <v-list-item> 設定パネルの横並び表示対応</v-list-item>
+          <v-list-item> バラバラがついていない状態でも文字間隔を変更できるようにした</v-list-item>
+          <v-list-item
+            >ファイル読み込み・貼り付け時にshape settings/text
+            settingsを等復帰できるように修正</v-list-item
+          >
+          <v-list-item>
+            テキストレイヤーでぼかし・拡大率などの設定が次のオブジェクトまで影響を及ぼしている問題の修正</v-list-item
+          >
+          <v-list-item>絵文字・記号の出力への対応</v-list-item>
         </v-list>
       </v-card-text>
     </v-card>
