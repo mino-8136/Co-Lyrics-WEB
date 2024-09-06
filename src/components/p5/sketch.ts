@@ -265,21 +265,22 @@ export function defineSketch(project: any) {
       p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
       p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
 
-      // p.text(object.text, 0, 0)
-
-      let newLineCount = 0
-      let newLineCharacterCount = 0
+      // 文字のカウントの開始
+      const characters = Array.from(object.textSettings.text)
       const eachLineCharacters = ((text) => {
         const lines = text.split(/\r?\n/)
-        const lineLengths = lines.map((lines) => lines.length)
+        const lineLengths = lines.map((line) => {
+          return Array.from(line).length
+        })
         return lineLengths
       })(object.textSettings.text)
-
-      const totalIndex = object.textSettings.individual_object ? object.textSettings.text.length : 1
+      const totalIndex = object.textSettings.individual_object ? characters.length : 1
+      let newLineCount = 0
+      let newLineCharacterCount = 0
 
       for (let index = 0; index < totalIndex; index++) {
         // 改行の数を数える処理
-        if (object.textSettings.text[index] == '\n') {
+        if (characters[index] == '\n') {
           newLineCount++
           newLineCharacterCount = 0
           continue
@@ -292,7 +293,7 @@ export function defineSketch(project: any) {
           return newLineCharacterCount
         }
 
-        // エフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
+        // 各文字のエフェクト値の計算(インデックス、開始時点、エフェクトリストを渡せば十分)
         const inform = new Inform(
           index - newLineCount,
           totalIndex, // TODO: 改行などの文字数も入っている + TODO: 絵文字など複数文字に対応する
@@ -328,7 +329,7 @@ export function defineSketch(project: any) {
         p.fill(col)
 
         if (object.textSettings.individual_object) {
-          p.text(object.textSettings.text[index], 0, 0)
+          p.text(characters[index], 0, 0)
         } else {
           p.text(object.textSettings.text, 0, 0)
         }
