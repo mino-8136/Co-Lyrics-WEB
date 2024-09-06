@@ -26,7 +26,7 @@
         @callSetScrollPosition="setScrollPosition"
         v-model:isPlaying="isPlaying"
       ></Waveformbar>
-      <div class="timeline" style="overflow-y: auto; height: 200px">
+      <div class="timeline" style="overflow-y: auto">
         <div
           class="seekbar"
           :style="{
@@ -65,6 +65,7 @@
                 @click="selectObject(object.id)"
               />
             </template>
+            <p class="layerindex">{{ layerIndex }}</p>
           </div>
         </div>
       </div>
@@ -92,7 +93,7 @@ import {
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
 const layers = ref(
-  Array.from({ length: 10 }, () => ({
+  Array.from({ length: 20 }, () => ({
     name: 'Layer'
   }))
 )
@@ -264,6 +265,7 @@ function setScrollPosition(position: number) {
   overflow-x: hidden;
   overflow-y: hidden;
   width: 100%;
+  height: 400px;
 }
 
 .layer {
@@ -280,11 +282,29 @@ function setScrollPosition(position: number) {
   width: 100%; /* widthを100%に設定して親要素に合わせる */
 }
 
+.layerindex {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 100%;
+  border-right: 1px solid #000000;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  user-select: none;
+  pointer-events: none;
+
+  z-index: 100;
+}
+
 .seekbar {
   position: absolute; /* 絶対位置を指定 */
   top: 0;
   width: 2px;
-  height: 100%; /* 親要素の高さに合わせる */
+  height: 78vh; /* 親要素の高さに合わせる */
   background-color: #4cabe2;
   z-index: 100; /* z-indexを高く設定して最前面に */
   pointer-events: none; /* クリックイベントを無視 */

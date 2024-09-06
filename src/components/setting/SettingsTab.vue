@@ -1,146 +1,179 @@
 <template>
-  <div v-for="(param, label) in parameters" :key="label">
-    <div
-      v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) != UIType.none"
-      class="parameter-row"
-    >
-      <!-- パラメータ名の表示 -->
-      <v-chip
-        class="parameter-name"
-        variant="outlined"
-        size="small"
-        label
-        @click="toggleKeyframeGraph(label)"
-        >{{ (parameters.constructor as typeof PropertyMethod).getParameterName(label) }}</v-chip
+  <v-row align="center" class="pt-2 mb-3">
+    <template v-for="(param, label) in parameters" :key="label">
+      <!-- パラメータ名とDOMの幅を動的に設定 -->
+      <v-col
+        :cols="getColSpan((parameters.constructor as typeof PropertyMethod).getUIType(label))"
+        v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) != UIType.none"
+        style="border: 0.3px #ccc solid"
       >
-
-      <!-- キーフレーム対応の場合 -->
-      <template
-        v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.keyframe"
-      >
-        <v-row v-if="isKeyframeSettings(param)">
-          <!-- キーフレームビューの表示 -->
-          <KeyframeGraph
-            v-if="showKeyframes.includes(label)"
-            :start="selectedObject.start"
-            :end="selectedObject.end"
-            :panelWidth="getBoundingClientRect() * 0.75"
-            v-model:keyframes="parameters[label]"
-          />
-
-          <transition-group v-else name="list" tag="div" style="width: 100%">
-            <v-col
-              v-for="(keyframe, idx) in param as KeyframeSettings"
-              :key="keyframe.id"
-              cols="12"
+        <v-row align="center">
+          <v-col
+            :cols="
+              (12 /
+                getColSpan((parameters.constructor as typeof PropertyMethod).getUIType(label))) *
+              2
+            "
+          >
+            <!-- パラメータ名の表示 -->
+            <v-chip
+              class="parameter-name"
+              variant="outlined"
+              size="small"
+              label
+              @click="toggleKeyframeGraph(label)"
+              >{{
+                (parameters.constructor as typeof PropertyMethod).getParameterName(label)
+              }}</v-chip
             >
-              <v-slider
-                v-model="keyframe.value"
-                :min="(parameters.constructor as typeof PropertyMethod).getMinValue(label)"
-                :max="(parameters.constructor as typeof PropertyMethod).getMaxValue(label)"
-                step="1"
-                append-icon="mdi-plus"
-                @click:append="addKeyframe(param, idx)"
-                hide-details
-              >
-                <template v-slot:prepend>
-                  <!-- イージング設定 -->
-                  <div
-                    class="ease-setting"
-                    :style="{
-                      backgroundColor: keyframe.easeType ? '#09b7f6' : '#ccc'
-                    }"
-                    @click="openEasingDialog(keyframe)"
-                  ></div>
+          </v-col>
 
-                  <!-- キーフレームのフレーム数と値 -->
-                  <input
-                    type="number"
-                    class="parameter-value"
-                    style="margin-right: 2px; width: 50px"
-                    v-model.number="keyframe.frame"
-                    @change="sortKeyframe(param)"
-                  />
-                  <p>→</p>
-                  <input
-                    type="number"
-                    style="width: 60px"
-                    class="parameter-value"
-                    v-model.number="keyframe.value"
-                  />
+          <!-- キーフレーム対応の場合 -->
+          <v-col
+            cols="10"
+            v-if="
+              (parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.keyframe
+            "
+          >
+            <v-row v-if="isKeyframeSettings(param)">
+              <!-- キーフレームビューの表示 -->
+              <KeyframeGraph
+                v-if="showKeyframes.includes(label)"
+                :start="selectedObject.start"
+                :end="selectedObject.end"
+                :panelWidth="getBoundingClientRect() * 0.7"
+                v-model:keyframes="parameters[label]"
+              />
+
+              <transition-group v-else name="list" tag="div" style="width: 100%">
+                <v-col
+                  v-for="(keyframe, idx) in param as KeyframeSettings"
+                  :key="keyframe.id"
+                  class="pt-1 pb-2"
+                >
+                  <v-slider
+                    v-model="keyframe.value"
+                    :min="(parameters.constructor as typeof PropertyMethod).getMinValue(label)"
+                    :max="(parameters.constructor as typeof PropertyMethod).getMaxValue(label)"
+                    step="1"
+                    append-icon="mdi-plus"
+                    @click:append="addKeyframe(param, idx)"
+                    hide-details
+                  >
+                    <template v-slot:prepend>
+                      <!-- イージング設定 -->
+                      <div
+                        class="ease-setting"
+                        :style="{
+                          backgroundColor: keyframe.easeType ? '#09b7f6' : '#ccc'
+                        }"
+                        @click="openEasingDialog(keyframe)"
+                      ></div>
+
+                      <!-- キーフレームのフレーム数と値 -->
+                      <input
+                        type="number"
+                        class="parameter-value"
+                        style="margin-right: 2px; width: 50px"
+                        v-model.number="keyframe.frame"
+                        @change="sortKeyframe(param)"
+                      />
+                      <p>→</p>
+                      <input
+                        type="number"
+                        style="width: 60px"
+                        class="parameter-value"
+                        v-model.number="keyframe.value"
+                      />
+                    </template>
+                    <template v-slot:append>
+                      <v-icon v-if="idx > 0" @click="deleteKeyframe(param, idx)">mdi-delete</v-icon>
+                      <v-icon v-else></v-icon>
+                    </template>
+                  </v-slider>
+                </v-col>
+              </transition-group>
+            </v-row>
+          </v-col>
+
+          <!-- 数値型パラメータの場合 -->
+          <v-col
+            cols="10"
+            v-if="
+              (parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.slider
+            "
+          >
+            <v-slider
+              v-model="parameters[label]"
+              :min="(parameters.constructor as typeof PropertyMethod).getMinValue(label)"
+              :max="(parameters.constructor as typeof PropertyMethod).getMaxValue(label)"
+              step="1"
+              hide-details
+            >
+              <template v-slot:prepend>
+                <input class="parameter-value" v-model.number="parameters[label]" />
+              </template>
+            </v-slider>
+          </v-col>
+
+          <!-- テキスト型パラメータの場合 -->
+          <v-col
+            cols="10"
+            class="pb-0"
+            v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.text"
+          >
+            <textarea :id="label" v-model="parameters[label]" type="text" />
+          </v-col>
+
+          <!-- セレクト型パラメータの場合 -->
+          <v-col
+            cols="8"
+            class="py-0"
+            v-if="
+              (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.select
+            "
+          >
+            <select v-model="parameters[label]">
+              <option v-for="(e, index) in getOptionsList(label)" :key="index">
+                {{ e }}
+              </option>
+            </select>
+          </v-col>
+
+          <!-- カラー型パラメータの場合 -->
+          <v-col
+            cols="8"
+            class="py-0"
+            v-if="
+              (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.color
+            "
+          >
+            <div>
+              <v-menu v-model="colorMenu" :close-on-content-click="false" location="end">
+                <template v-slot:activator="{ props }">
+                  <v-btn :color="parameters[label]" v-bind="props" width="110px" class="border">
+                    {{ parameters[label] }}
+                  </v-btn>
                 </template>
-                <template v-slot:append>
-                  <v-icon v-if="idx > 0" @click="deleteKeyframe(param, idx)">mdi-delete</v-icon>
-                  <v-icon v-else></v-icon>
-                </template>
-              </v-slider>
-            </v-col>
-          </transition-group>
+                <v-color-picker v-model="parameters[label]" :modes="['hexa']" flat />
+              </v-menu>
+            </div>
+          </v-col>
+
+          <!-- チェックボックス型パラメータの場合 -->
+          <v-col
+            cols="8"
+            class="py-0"
+            v-if="
+              (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.checkbox
+            "
+          >
+            <v-checkbox-btn v-model="parameters[label]" hide-details />
+          </v-col>
         </v-row>
-      </template>
-
-      <!-- 数値型パラメータの場合 -->
-      <template
-        v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.slider"
-      >
-        <v-slider
-          v-model="parameters[label]"
-          :min="(parameters.constructor as typeof PropertyMethod).getMinValue(label)"
-          :max="(parameters.constructor as typeof PropertyMethod).getMaxValue(label)"
-          step="1"
-          hide-details
-        >
-          <template v-slot:prepend>
-            <input class="parameter-value" v-model.number="parameters[label]" />
-          </template>
-        </v-slider>
-      </template>
-
-      <!-- テキスト型パラメータの場合 -->
-      <template
-        v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.text"
-      >
-        <textarea :id="label" v-model="parameters[label]" type="text" />
-      </template>
-
-      <!-- セレクト型パラメータの場合 -->
-      <template
-        v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.select"
-      >
-        <select v-model="parameters[label]">
-          <option v-for="(e, index) in getOptionsList(label)" :key="index">
-            {{ e }}
-          </option>
-        </select>
-      </template>
-
-      <!-- カラー型パラメータの場合 -->
-      <template
-        v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.color"
-      >
-        <div class="text-center">
-          <v-menu v-model="colorMenu" :close-on-content-click="false" location="end">
-            <template v-slot:activator="{ props }">
-              <v-btn :color="parameters[label]" v-bind="props" width="100px">
-                {{ parameters[label] }}
-              </v-btn>
-            </template>
-            <v-color-picker v-model="parameters[label]" :modes="['hexa']" flat />
-          </v-menu>
-        </div>
-      </template>
-
-      <!-- チェックボックス型パラメータの場合 -->
-      <template
-        v-if="
-          (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.checkbox
-        "
-      >
-        <v-checkbox v-model="parameters[label]" hide-details />
-      </template>
-    </div>
-    <v-divider></v-divider>
-  </div>
+      </v-col>
+    </template>
+  </v-row>
 
   <!-- イージング設定の呼び出し -->
   <EasingPanel v-model:show="showEasingPanel" v-model:easing="currentKeyframe" />
@@ -186,6 +219,15 @@ function getOptionsList(label: string): string[] {
     return Object.values(TextAlign)
   }
   return []
+}
+
+function getColSpan(uiType: UIType) {
+  if (uiType === UIType.keyframe) {
+    return 12
+  } else if (uiType === UIType.color || uiType === UIType.checkbox || uiType === UIType.select) {
+    return 6
+  }
+  return 12 // デフォルトはフル幅
 }
 
 // ウィンドウの幅を求める関数
@@ -255,12 +297,6 @@ div.ease-setting {
   background-color: #09b7f6;
 }
 
-.parameter-row {
-  display: flex;
-  align-items: center;
-  margin: 8px 1px;
-}
-
 .parameter-name {
   width: 80px;
   font-weight: bold;
@@ -278,15 +314,15 @@ div.ease-setting {
 
 textarea {
   width: 100%;
-  height: 120px;
-  padding: 8px 12px;
+  height: 100px;
+  padding: 4px 12px;
   box-sizing: border-box;
   border: 1px solid #ccc;
 }
 
 select {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
+  padding: 4px 12px;
+  border: 1px solid #000000;
   -webkit-appearance: menulist;
   appearance: button;
 }

@@ -6,8 +6,9 @@
         <v-tab v-if="'textSettings' in selectedObject" value="text">テキスト</v-tab>
         <v-tab v-if="'shapeSettings' in selectedObject" value="shape">図形</v-tab>
         <v-tab v-if="'styleSettings' in selectedObject" value="style">スタイル</v-tab>
-        <v-tab v-if="'animations' in selectedObject" value="animation">アニメーション</v-tab>
+        <v-tab v-if="'animationSettings' in selectedObject" value="animation">アニメーション</v-tab>
       </v-tabs>
+
 
       <div class="scroll">
         <v-tabs-window v-model="tab">
@@ -51,8 +52,8 @@
           <!-- アニメーション設定タブ -->
           <v-tabs-window-item value="animation">
             <EffectTab
-              v-if="'animations' in selectedObject"
-              v-model:params="selectedObject.animations"
+              v-if="'animationSettings' in selectedObject"
+              v-model:params="selectedObject.animationSettings"
               type="animation"
             >
             </EffectTab>

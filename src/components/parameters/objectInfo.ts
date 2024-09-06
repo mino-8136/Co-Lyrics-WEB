@@ -162,11 +162,11 @@ export class StandardRenderSettings extends PropertyMethod {
 
 export class TextSettings extends PropertyMethod {
   text: string
+  spacing_x: KeyframeSettings
+  spacing_y: KeyframeSettings
   fill_color: string
   font: string
   isVertical: boolean
-  spacing_x: KeyframeSettings
-  spacing_y: KeyframeSettings
   //name: string
   textSize: number
   //display_speed: number
@@ -218,19 +218,6 @@ export class TextSettings extends PropertyMethod {
   }
 }
 
-export class ImageSettings extends PropertyMethod {
-  file: string
-
-  static parameterInfo = {
-    file: { name: 'ファイル', type: UIType.text }
-  }
-
-  constructor() {
-    super()
-    this.file = ''
-  }
-}
-
 export class ShapeSettings extends PropertyMethod {
   width: KeyframeSettings
   height: KeyframeSettings
@@ -244,12 +231,30 @@ export class ShapeSettings extends PropertyMethod {
     shape: { name: '図形', type: UIType.select }
   }
 
-  constructor() {
+  constructor({
+    width = [{ value: 200, frame: 0, id: '0' }],
+    height = [{ value: 200, frame: 0, id: '0' }],
+    fill_color = '#D3D3D3',
+    shape = ShapeType.rect
+  } = {}) {
     super()
-    this.width = [{ value: 200, frame: 0, id: '0' }]
-    this.height = [{ value: 200, frame: 0, id: '0' }]
-    this.fill_color = '#D3D3D3'
-    this.shape = ShapeType.rect
+    this.width = width
+    this.height = height
+    this.fill_color = fill_color
+    this.shape = shape
+  }
+}
+
+export class ImageSettings extends PropertyMethod {
+  file: string
+
+  static parameterInfo = {
+    file: { name: 'ファイル', type: UIType.text }
+  }
+
+  constructor({ file = '' } = {}) {
+    super()
+    this.file = file
   }
 }
 
@@ -283,7 +288,7 @@ export class TextObject extends BaseObject {
   standardRenderSettings: StandardRenderSettings
   textSettings: TextSettings
   styleSettings: StyleSettings
-  animations: AnimationSettings
+  animationSettings: AnimationSettings
 
   constructor(settings: BaseSettings) {
     super(settings)
@@ -291,7 +296,7 @@ export class TextObject extends BaseObject {
     this.standardRenderSettings = new StandardRenderSettings()
     this.textSettings = new TextSettings()
     this.styleSettings = new StyleSettings()
-    this.animations = new AnimationSettings()
+    this.animationSettings = new AnimationSettings()
   }
   draw(): void {
     // ここに描画処理を書く
@@ -302,7 +307,7 @@ export class ImageObject extends BaseObject {
   standardRenderSettings: StandardRenderSettings
   imageSettings: ImageSettings
   styleSettings: StyleSettings
-  animations: AnimationSettings
+  animationSettings: AnimationSettings
 
   constructor(settings: BaseSettings) {
     super(settings)
@@ -310,7 +315,7 @@ export class ImageObject extends BaseObject {
     this.standardRenderSettings = new StandardRenderSettings()
     this.imageSettings = new ImageSettings()
     this.styleSettings = new StyleSettings()
-    this.animations = new AnimationSettings()
+    this.animationSettings = new AnimationSettings()
   }
 }
 
@@ -318,7 +323,7 @@ export class ShapeObject extends BaseObject {
   standardRenderSettings: StandardRenderSettings
   shapeSettings: ShapeSettings
   styleSettings: StyleSettings
-  animations: AnimationSettings
+  animationSettings: AnimationSettings
 
   constructor(settings: BaseSettings) {
     super(settings)
@@ -326,7 +331,7 @@ export class ShapeObject extends BaseObject {
     this.standardRenderSettings = new StandardRenderSettings()
     this.shapeSettings = new ShapeSettings()
     this.styleSettings = new StyleSettings()
-    this.animations = new AnimationSettings()
+    this.animationSettings = new AnimationSettings()
   }
 }
 
@@ -340,9 +345,9 @@ export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
 export function createObjectFromJson(obj: RenderObject): any {
   const types = {
     text: TextObject,
-    image: ImageObject,
     base: BaseObject,
     shape: ShapeObject,
+    image: ImageObject,
     '': BaseObject
   }
 
@@ -363,13 +368,18 @@ export function createObjectFromJson(obj: RenderObject): any {
     )
   }
   if ('textSettings' in obj) {
-    ;(newObj as any).textSettings = new TextSettings(obj.textSettings)
+    ;(newObj as any).textSettings = new TextSettings(deepCopy(obj.textSettings))
+  }
+  if ('shapeSettings' in obj) {
+    ;(newObj as any).shapeSettings = new ShapeSettings(deepCopy(obj.shapeSettings))
   }
   if ('styleSettings' in obj) {
-    ;(newObj as any).styleSettings = new StyleSettings(obj.styleSettings.effects)
+    ;(newObj as any).styleSettings = new StyleSettings(deepCopy(obj.styleSettings.effects))
   }
-  if ('animations' in obj) {
-    ;(newObj as any).animations = new AnimationSettings(obj.animations.effects)
+  if ('animationSettings' in obj) {
+    ;(newObj as any).animationSettings = new AnimationSettings(
+      deepCopy(obj.animationSettings.effects)
+    )
   }
 
   return newObj

@@ -5,10 +5,10 @@ import { RouterView } from 'vue-router'
 <template>
   <v-app>
     <v-toolbar app color="primary" class="mb-4">
-      <v-toolbar-title>研究用リリック</v-toolbar-title>
+      <v-toolbar-title>Co-Lyrics-WEB</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn @click="() => $router.push('/')">Home</v-btn>
 
+      <v-btn @click="() => $router.push('/')">Home</v-btn>
       <v-btn @click="() => $router.push('/edit')">Edit</v-btn>
       <v-btn @click="() => $router.push('/play')">Play</v-btn>
       <v-btn @click="() => $router.push('/config')">Config</v-btn>
