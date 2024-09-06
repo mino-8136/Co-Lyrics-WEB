@@ -199,7 +199,7 @@ export function defineSketch(project: any) {
         object.end,
         currentFrame
       )
-      const effectValue = object.animations.animate(inform, object.animations)
+      const effectValue = object.animationSettings.animate(inform, object.animationSettings)
       if (effectValue.opacity == 0) return
       if (effectValue.scale == 0) return
 
@@ -303,7 +303,7 @@ export function defineSketch(project: any) {
           object.end,
           currentFrame
         )
-        const effectValue = object.animations.animate(inform, object.animations)
+        const effectValue = object.animationSettings.animate(inform, object.animationSettings)
         if (effectValue.opacity == 0) return
         if (effectValue.scale == 0) return
 
