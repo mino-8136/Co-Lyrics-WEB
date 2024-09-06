@@ -175,11 +175,6 @@ export function defineSketch(project: any) {
     const renderShape = (object: ShapeObject) => {
       p.push()
 
-      // スタイライズエフェクトの処理(renderTextと同様)
-      const col = p.color(object.shapeSettings.fill_color)
-      col.setAlpha(lerpValue(object.standardRenderSettings.opacity, object.start))
-      p.fill(col)
-
       // スタイルの適用
       object.styleSettings.stylize(p)
 
@@ -206,10 +201,13 @@ export function defineSketch(project: any) {
       p.translate(effectValue.X, effectValue.Y)
       p.rotate(effectValue.angle)
       p.scale(effectValue.scale / 100)
+
+      // スタイライズエフェクトの処理(renderTextと同様)
+      const col = p.color(object.shapeSettings.fill_color)
       col.setAlpha(
         (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
           (effectValue.opacity / 100) *
-          100
+          p.alpha(col)
       )
       p.fill(col)
 
@@ -255,7 +253,6 @@ export function defineSketch(project: any) {
         }
       }
       p.textSize(object.textSettings.textSize)
-      const col = p.color(object.textSettings.fill_color)
 
       // スタイルの適用
       object.styleSettings.stylize(p)
@@ -322,10 +319,11 @@ export function defineSketch(project: any) {
 
         p.rotate(effectValue.angle)
         p.scale(effectValue.scale / 100)
+        const col = p.color(object.textSettings.fill_color)
         col.setAlpha(
           (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
             (effectValue.opacity / 100) *
-            100
+            p.alpha(col)
         )
         p.fill(col)
 
