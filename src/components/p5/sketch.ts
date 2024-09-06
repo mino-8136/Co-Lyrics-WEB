@@ -267,87 +267,78 @@ export function defineSketch(project: any) {
       }
       p.textSize(object.textSettings.textSize)
 
-      // T2. 文字のカウントの開始
-      const characters = Array.from(object.textSettings.text)
-      const eachLineCharacters = ((text) => {
+      // T2. 文字の二重配列化(再生途中で変わることはない…)
+      const characters = ((text) => {
+        if (!object.textSettings.individual_object) return [[text]]
         const lines = text.split(/\r?\n/)
-        const lineLengths = lines.map((line) => {
-          return Array.from(line).length
-        })
-        return lineLengths
+        const lineCharacters = lines.map((line) => Array.from(line))
+        return lineCharacters
       })(object.textSettings.text)
-      const totalIndex = object.textSettings.individual_object ? characters.length : 1
-      let newLineCount = 0
-      let newLineCharacterCount = 0
 
-      // T3. 各文字の描画
-      for (let index = 0; index < totalIndex; index++) {
-        p.push()
-
-        // 改行の数を数える処理
-        if (characters[index] == '\n') {
-          newLineCount++
-          newLineCharacterCount = 0
-          continue
-        }
+      // T3. 文字ごとの描画開始
+      characters.forEach((characters, lineIndex) => {
         const textAnchor = () => {
-          if (object.textSettings.align == TextAlign.center)
-            return newLineCharacterCount - (eachLineCharacters[newLineCount] - 1) / 2
-          if (object.textSettings.align == TextAlign.right)
-            return newLineCharacterCount - eachLineCharacters[newLineCount] + 1
-          return newLineCharacterCount
+          if (object.textSettings.align == TextAlign.center) return (characters.length - 1) / 2
+          if (object.textSettings.align == TextAlign.right) return characters.length - 1
+          return 0
         }
 
-        // 3. エフェクト値の計算
-        const inform = new Inform(
-          index - newLineCount,
-          totalIndex, // TODO: 改行などの文字数も入っている + TODO: 絵文字など複数文字に対応する
-          object.start,
-          object.end,
-          currentFrame
-        )
-        const effectValue = object.animationSettings.animate(inform, object.animationSettings)
-        //if (effectValue.opacity == 0) return
-        //if (effectValue.scale == 0) return
+        characters.forEach((character, characterIndex) => {
+          p.push()
 
-        // 4. エフェクトの影響の適用
-        if (object.textSettings.isVertical) {
-          p.translate(
-            -lerpValue(object.textSettings.spacing_x, object.start) * newLineCount + effectValue.Y,
-            lerpValue(object.textSettings.spacing_y, object.start) * textAnchor() + effectValue.X
+          // 3. エフェクト値の計算
+          const inform = new Inform(
+            characterIndex,
+            characters.length,
+            object.start,
+            object.end,
+            currentFrame
           )
-          if (verticalCharacter.includes(characters[index])) {
-            p.rotate(90)
+          const effectValue = object.animationSettings.animate(inform, object.animationSettings)
+          //if (effectValue.opacity == 0) return
+          //if (effectValue.scale == 0) return
+
+          // 4. エフェクトの影響の適用
+          console.log(textAnchor(), lineIndex)
+          if (object.textSettings.isVertical) {
+            p.translate(
+              -lerpValue(object.textSettings.spacing_x, object.start) * lineIndex + effectValue.Y,
+              lerpValue(object.textSettings.spacing_y, object.start) *
+                (characterIndex - textAnchor()) +
+                effectValue.X
+            )
+            if (verticalCharacter.includes(character)) {
+              p.rotate(90)
+            }
+          } else {
+            p.translate(
+              lerpValue(object.textSettings.spacing_x, object.start) *
+                (characterIndex - textAnchor()) +
+                effectValue.X,
+              lerpValue(object.textSettings.spacing_y, object.start) * lineIndex + effectValue.Y
+            )
           }
-        } else {
-          p.translate(
-            lerpValue(object.textSettings.spacing_x, object.start) * textAnchor() + effectValue.X,
-            lerpValue(object.textSettings.spacing_y, object.start) * newLineCount + effectValue.Y
+          p.rotate(effectValue.angle)
+          p.scale(effectValue.scale / 100)
+
+          // 5. 色の設定
+          const col = p.color(object.textSettings.fill_color)
+          col.setAlpha(
+            (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
+              (effectValue.opacity / 100) *
+              p.alpha(col)
           )
-        }
-        p.rotate(effectValue.angle)
-        p.scale(effectValue.scale / 100)
+          p.fill(col)
 
-        // 5. 色の設定
-        const col = p.color(object.textSettings.fill_color)
-        col.setAlpha(
-          (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
-            (effectValue.opacity / 100) *
-            p.alpha(col)
-        )
-        p.fill(col)
-
-        // 6. テキストの描画
-        if (object.textSettings.individual_object) {
-          p.text(characters[index], 0, 0)
-        } else {
-          p.text(object.textSettings.text, 0, 0)
-        }
-        p.pop()
-
-        // 後処理部分
-        newLineCharacterCount++
-      }
+          // 6. テキストの描画
+          if (object.textSettings.individual_object) {
+            p.text(character, 0, 0)
+          } else {
+            p.text(object.textSettings.text, 0, 0)
+          }
+          p.pop()
+        })
+      })
       p.pop()
     }
 
