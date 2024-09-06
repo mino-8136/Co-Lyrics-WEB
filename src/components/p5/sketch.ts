@@ -334,6 +334,11 @@ export function defineSketch(project: any) {
           if (object.textSettings.individual_object) {
             p.text(character, 0, 0)
           } else {
+            // バラバラじゃない場合
+            const textWidth = p.drawingContext.measureText('あ').width
+            p.drawingContext.letterSpacing =
+              lerpValue(object.textSettings.spacing_x, object.start) - textWidth + 'px'
+            p.textLeading(lerpValue(object.textSettings.spacing_y, object.start))
             p.text(object.textSettings.text, 0, 0)
           }
           p.pop()
