@@ -195,8 +195,8 @@ export function defineSketch(project: any) {
         currentFrame
       )
       const effectValue = object.animationSettings.animate(inform, object.animationSettings)
-      if (effectValue.opacity == 0) return
-      if (effectValue.scale == 0) return
+      //if (effectValue.opacity == 0) return
+      //if (effectValue.scale == 0) return
 
       p.translate(effectValue.X, effectValue.Y)
       p.rotate(effectValue.angle)
@@ -301,8 +301,8 @@ export function defineSketch(project: any) {
           currentFrame
         )
         const effectValue = object.animationSettings.animate(inform, object.animationSettings)
-        if (effectValue.opacity == 0) return
-        if (effectValue.scale == 0) return
+        //if (effectValue.opacity == 0) return
+        //if (effectValue.scale == 0) return
 
         p.push()
         if (object.textSettings.isVertical) {
