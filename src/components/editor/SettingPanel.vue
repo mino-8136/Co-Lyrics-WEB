@@ -9,6 +9,7 @@
         <v-tab v-if="'animationSettings' in selectedObject" value="animation">アニメーション</v-tab>
       </v-tabs>
 
+
       <div class="scroll">
         <v-tabs-window v-model="tab">
           <!-- 基本設定タブ -->
