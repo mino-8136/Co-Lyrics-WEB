@@ -1,110 +1,204 @@
 export type fontGroup = '' | 'ゴシック体' | '明朝体' | '毛筆・硬筆体' | 'デザイン書体' | 'その他'
 
-interface FontWeight {
-  description: string
-  value: number
-}
-
 interface Font {
   name: string
   displayName: string
   group: fontGroup
-  weights: FontWeight[]
-  localSrc?: string
+  weightDescription: string  // ウェイトの説明 (例: Light, Bold)
+  weight: number             // ウェイトの数値 (例: 300, 700)
+  webSrc?: string            // Webフォントのソース
+  localSrc?: string          // ローカルフォントのソース
 }
 
 export const fontListData: Font[] = [
   {
     name: 'Noto Sans JP',
-    displayName: 'Noto Sans JP',
+    displayName: 'Noto Sans JP Light',
     group: 'ゴシック体',
-    weights: [
-      { description: 'Light', value: 300 },
-      { description: 'Medium', value: 500 },
-      { description: 'Bold', value: 700 },
-      { description: 'Black', value: 900 }
-    ]
+    weightDescription: 'Light',
+    weight: 300,
+    webSrc: '',
+    localSrc: ''
+  },
+  {
+    name: 'Noto Sans JP',
+    displayName: 'Noto Sans JP Medium',
+    group: 'ゴシック体',
+    weightDescription: 'Medium',
+    weight: 500,
+    webSrc: '',
+    localSrc: ''
+  },
+  {
+    name: 'Noto Sans JP',
+    displayName: 'Noto Sans JP Bold',
+    group: 'ゴシック体',
+    weightDescription: 'Bold',
+    weight: 700,
+    webSrc: '',
+    localSrc: ''
+  },
+  {
+    name: 'Noto Sans JP',
+    displayName: 'Noto Sans JP Black',
+    group: 'ゴシック体',
+    weightDescription: 'Black',
+    weight: 900,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Zen Maru Gothic',
-    displayName: 'ZEN丸ゴシック',
+    displayName: 'ZEN丸ゴシック Light',
     group: 'ゴシック体',
-    weights: [
-      { description: 'Light', value: 300 },
-      { description: 'Medium', value: 500 },
-      { description: 'Black', value: 900 }
-    ]
+    weightDescription: 'Light',
+    weight: 300,
+    webSrc: '',
+    localSrc: ''
+  },
+  {
+    name: 'Zen Maru Gothic',
+    displayName: 'ZEN丸ゴシック Medium',
+    group: 'ゴシック体',
+    weightDescription: 'Medium',
+    weight: 500,
+    webSrc: '',
+    localSrc: ''
+  },
+  {
+    name: 'Zen Maru Gothic',
+    displayName: 'ZEN丸ゴシック Black',
+    group: 'ゴシック体',
+    weightDescription: 'Black',
+    weight: 900,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Noto Serif JP',
-    displayName: 'Noto Serif JP',
+    displayName: 'Noto Serif JP Light',
     group: '明朝体',
-    weights: [
-      { description: 'Light', value: 300 },
-      { description: 'Medium', value: 500 },
-      { description: 'Bold', value: 700 },
-      { description: 'Black', value: 900 }
-    ]
+    weightDescription: 'Light',
+    weight: 300,
+    webSrc: '',
+    localSrc: ''
+  },
+  {
+    name: 'Noto Serif JP',
+    displayName: 'Noto Serif JP Medium',
+    group: '明朝体',
+    weightDescription: 'Medium',
+    weight: 500,
+    webSrc: '',
+    localSrc: ''
+  },
+  {
+    name: 'Noto Serif JP',
+    displayName: 'Noto Serif JP Bold',
+    group: '明朝体',
+    weightDescription: 'Bold',
+    weight: 700,
+    webSrc: '',
+    localSrc: ''
+  },
+  {
+    name: 'Noto Serif JP',
+    displayName: 'Noto Serif JP Black',
+    group: '明朝体',
+    weightDescription: 'Black',
+    weight: 900,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Hina Mincho',
-    displayName: 'ひな明朝',
+    displayName: 'ひな明朝 Regular',
     group: '明朝体',
-    weights: [{ description: 'Regular', value: 400 }]
+    weightDescription: 'Regular',
+    weight: 400,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'New Tegomin',
-    displayName: 'ニューテゴミン',
+    displayName: 'ニューテゴミン Regular',
     group: '明朝体',
-    weights: [{ description: 'Regular', value: 400 }]
+    weightDescription: 'Regular',
+    weight: 400,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Klee One',
-    displayName: 'クレー One',
+    displayName: 'クレー One SemiBold',
     group: '毛筆・硬筆体',
-    weights: [{ description: 'SemiBold', value: 600 }]
+    weightDescription: 'SemiBold',
+    weight: 600,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Zen Kurenaido',
-    displayName: 'ZEN紅道',
+    displayName: 'ZEN紅道 Regular',
     group: '毛筆・硬筆体',
-    weights: [{ description: 'Regular', value: 400 }]
+    weightDescription: 'Regular',
+    weight: 400,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Yuji Syuku',
-    displayName: 'Yuji Syuku',
+    displayName: 'Yuji Syuku Regular',
     group: '毛筆・硬筆体',
-    weights: [{ description: 'Regular', value: 400 }]
+    weightDescription: 'Regular',
+    weight: 400,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Kaisei Decol',
-    displayName: '解星デコール',
+    displayName: '解星デコール Regular',
     group: 'デザイン書体',
-    weights: [{ description: 'Regular', value: 400 }]
+    weightDescription: 'Regular',
+    weight: 400,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'DotGothic16',
-    displayName: 'ドットゴシック16',
+    displayName: 'ドットゴシック16 Regular',
     group: 'デザイン書体',
-    weights: [{ description: 'Regular', value: 400 }]
+    weightDescription: 'Regular',
+    weight: 400,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Hachi Maru Pop',
-    displayName: 'はちまるポップ',
+    displayName: 'はちまるポップ Regular',
     group: 'デザイン書体',
-    weights: [{ description: 'Regular', value: 400 }]
+    weightDescription: 'Regular',
+    weight: 400,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Stick',
-    displayName: 'ステッキ',
+    displayName: 'ステッキ Regular',
     group: 'デザイン書体',
-    weights: [{ description: 'Regular', value: 400 }]
+    weightDescription: 'Regular',
+    weight: 400,
+    webSrc: '',
+    localSrc: ''
   },
   {
     name: 'Reggae One',
-    displayName: 'レゲエ One',
+    displayName: 'レゲエ One Regular',
     group: 'デザイン書体',
-    weights: [{ description: 'Regular', value: 400 }]
+    weightDescription: 'Regular',
+    weight: 400,
+    webSrc: '',
+    localSrc: ''
   }
 ]
 

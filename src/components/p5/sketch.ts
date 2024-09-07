@@ -249,7 +249,7 @@ export function defineSketch(project: any) {
       p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
 
       // T1. フォントの設定
-      const foundFont = fontListData.find((e) => object.textSettings.font == e.name)?.name
+      const foundFont = fontListData.find((e) => object.textSettings.font == e.displayName)?.name
       console.log(foundFont)
       p.textFont(foundFont ?? 'Arial')
 

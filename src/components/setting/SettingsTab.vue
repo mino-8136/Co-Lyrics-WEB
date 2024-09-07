@@ -212,7 +212,7 @@ const selectedObject: Record<string, any> = computed(() => {
 // TODO: どこでも使えるようにしたほうが良いかも
 function getOptionsList(label: string): string[] {
   if (label === 'font') {
-    return fontListData.map((font) => font.name)
+    return fontListData.map((font) => font.displayName)
   } else if (label === 'shape') {
     return Object.values(ShapeType)
   } else if (label === 'align') {

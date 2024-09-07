@@ -202,7 +202,7 @@ export class TextSettings extends PropertyMethod {
     spacing_x = [{ value: 80, frame: 0, id: '0' }],
     spacing_y = [{ value: 80, frame: 0, id: '0' }],
     fill_color = '#ffffff',
-    font = 'Noto Sans JP',
+    font = 'Noto Sans JP Bold',
     text = 'サンプル'
   } = {}) {
     super()
