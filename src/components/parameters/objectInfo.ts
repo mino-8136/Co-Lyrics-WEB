@@ -162,10 +162,10 @@ export class StandardRenderSettings extends PropertyMethod {
 
 export class TextSettings extends PropertyMethod {
   text: string
+  font: string
   spacing_x: KeyframeSettings
   spacing_y: KeyframeSettings
   fill_color: string
-  font: string
   isVertical: boolean
   //name: string
   textSize: number
@@ -189,20 +189,20 @@ export class TextSettings extends PropertyMethod {
     spacing_x: { name: '水平間隔', type: UIType.keyframe, min: 0, max: 500 },
     spacing_y: { name: '垂直間隔', type: UIType.keyframe, min: 0, max: 500 },
     fill_color: { name: '色', type: UIType.color },
-    font: { name: 'フォント', type: UIType.none },
+    font: { name: 'フォント', type: UIType.select },
     text: { name: 'テキスト', type: UIType.text },
     align: { name: '整列', type: UIType.select }
   }
 
   constructor({
-    textSize = 60,
+    textSize = 80,
     isVertical = false,
     individual_object = true,
     align = TextAlign.center,
-    spacing_x = [{ value: 60, frame: 0, id: '0' }],
-    spacing_y = [{ value: 60, frame: 0, id: '0' }],
+    spacing_x = [{ value: 80, frame: 0, id: '0' }],
+    spacing_y = [{ value: 80, frame: 0, id: '0' }],
     fill_color = '#ffffff',
-    font = 'SourceHanSansJP',
+    font = 'Noto Sans JP',
     text = 'サンプル'
   } = {}) {
     super()

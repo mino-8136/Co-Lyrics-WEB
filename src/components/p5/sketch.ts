@@ -24,19 +24,11 @@ const fontLimit = true // フォントファイルを読み込むかどうかの
 let showCollisionBox = true
 const verticalCharacter = ['ー', '−', '～', '~'] // 縦書きにする文字のリスト
 
-const fonts: { name: string; font: p5.Font }[] = []
-
 export function defineSketch(project: any) {
   // 実際はtimelineStoreを引数に取る
   return function sketch(p: p5) {
     p.preload = () => {
       // 全フォントデータの読み込みを行う(TODO:プロジェクトに読み込まれているものだけに限定する？)
-      if (!fontLimit) {
-        fontListData.forEach((font) => {
-          //console.log(font.src)
-          fonts.push({ name: font.name, font: p.loadFont(font.src) })
-        })
-      }
     }
     p.setup = () => {
       const canvas = p.createCanvas(
@@ -257,14 +249,10 @@ export function defineSketch(project: any) {
       p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
 
       // T1. フォントの設定
-      if (fontLimit) {
-        p.textFont('Noto Sans JP')
-      } else {
-        if (fonts != null) {
-          const foundFont = fonts.find((e) => object.textSettings.font == e.name)?.font
-          p.textFont(foundFont ? foundFont : 'Arial')
-        }
-      }
+      const foundFont = fontListData.find((e) => object.textSettings.font == e.name)?.name
+      console.log(foundFont)
+      p.textFont(foundFont ?? 'Arial')
+
       p.textSize(object.textSettings.textSize)
 
       // T2. 文字の二重配列化(再生途中で変わることはない…)

@@ -27,5 +27,8 @@ coverage
 *.sln
 *.sw?
 
+# フォントを上げるのを保留
+public/assets/fonts/GoogleFonts
+
 # Additional directories
 *.tsbuildinfo
