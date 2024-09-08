@@ -15,6 +15,7 @@ const textList =
   'サンプル'
 
 // Googleフォントの動的読み込み (https://style01.net/3037/)
+const cacheTTL = 1000 * 60 * 60 * 24 * 60 // 60日間のキャッシュ有効期間
 export const setFonts = async (
   fontFamilyList: {
     name: string
@@ -23,34 +24,54 @@ export const setFonts = async (
   }[]
 ) => {
   for (let i = 0; i < fontFamilyList.length; i++) {
-    // URLでは空白を+に置き換える
-    const urlFamilyName = fontFamilyList[i].name.replace(/ /g, '+')
+    const fontCacheKey = `font_${fontFamilyList[i].name}_${fontFamilyList[i].weight}`;
+    const cacheTimeKey = `${fontCacheKey}_timestamp`;
+    const now = new Date().getTime();
 
-    // Google Fonts APIのURL
-    const googleApiUrl = `https://fonts.googleapis.com/css2?family=${urlFamilyName}:wght@${fontFamilyList[i].weight}&text=${encodeURIComponent(textList)}`
+    // キャッシュが存在し、期限内かどうかチェック
+    const cachedFont = localStorage.getItem(fontCacheKey);
+    const cacheTimestamp = localStorage.getItem(cacheTimeKey);
 
-    const response = await fetch(googleApiUrl)
-
-    if (response.ok) {
-      // url()の中身のURLだけ抽出
-      const cssFontFace = await response.text()
-      const matchUrls = cssFontFace.match(/url\(.+?\)/g)
-      if (!matchUrls) throw new Error('フォントが見つかりませんでした')
-
-      for (const url of matchUrls) {
-        // FontFaceを追加
-        const font = new FontFace(fontFamilyList[i].displayName, url)
-        await font.load()
-        const documentFonts = document.fonts as any
-        documentFonts.add(font) // フォントの追加
+    if (cachedFont && cacheTimestamp && now - parseInt(cacheTimestamp, 10) < cacheTTL) {
+      console.log(fontFamilyList[i].displayName + 'はキャッシュされています');
+      const fontUrls = JSON.parse(cachedFont); // 複数のフォントURLを配列として取得
+      for (const url of fontUrls) {
+        const font = new FontFace(fontFamilyList[i].displayName, url);
+        await font.load();
+        (document.fonts as any).add(font);
       }
     } else {
-      throw new Error(response.statusText)
+      // フォントをGoogle Fonts APIから取得し、キャッシュに保存
+      const urlFamilyName = fontFamilyList[i].name.replace(/ /g, '+');
+      const googleApiUrl = `https://fonts.googleapis.com/css2?family=${urlFamilyName}:wght@${fontFamilyList[i].weight}&subset=japanese`;
+
+      const response = await fetch(googleApiUrl);
+
+      if (response.ok) {
+        const cssFontFace = await response.text();
+        const matchUrls = cssFontFace.match(/url\(.+?\)/g);
+        if (!matchUrls) throw new Error('フォントが見つかりませんでした');
+
+        const fontUrls = []; // 複数のフォントURLを保存する配列
+
+        for (const url of matchUrls) {
+          fontUrls.push(url); // 取得したURLを配列に追加
+          const font = new FontFace(fontFamilyList[i].displayName, url);
+          await font.load();
+          (document.fonts as any).add(font);
+        }
+
+        // キャッシュに保存し、タイムスタンプを更新
+        localStorage.setItem(fontCacheKey, JSON.stringify(fontUrls)); // 複数のURLを保存
+        localStorage.setItem(cacheTimeKey, now.toString());
+        console.log(fontFamilyList[i].displayName + 'をキャッシュしました');
+      } else {
+        throw new Error(response.statusText);
+      }
     }
   }
-  return 'done'
+  return 'done';
 }
-
 export const fontListData: Font[] = [
   {
     name: 'Noto Sans JP',
