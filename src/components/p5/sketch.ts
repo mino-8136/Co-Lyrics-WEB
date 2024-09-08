@@ -9,7 +9,7 @@ import {
   type RenderObject
 } from '@/components/parameters/objectInfo'
 import { Inform, ShapeType, TextAlign } from '@/components/parameters/p5Info'
-import { fontListData } from '../parameters/fonts'
+import { fontListData, setFonts } from '../parameters/fonts'
 
 let renderObjects: RenderObject[] = []
 const selectedObject = {
@@ -20,6 +20,7 @@ const selectedObject = {
   startObjectY: 0
 }
 let currentFrame = 0
+let isFontLoaded = false
 const fontLimit = true // フォントファイルを読み込むかどうかのフラグ
 let showCollisionBox = true
 const verticalCharacter = ['ー', '−', '～', '~'] // 縦書きにする文字のリスト
@@ -29,6 +30,16 @@ export function defineSketch(project: any) {
   return function sketch(p: p5) {
     p.preload = () => {
       // 全フォントデータの読み込みを行う(TODO:プロジェクトに読み込まれているものだけに限定する？)
+      isFontLoaded = false
+      const asyncFunc = async () => {
+        const fetchDone = await setFonts(
+          fontListData.map((e) => ({ name: e.name, displayName: e.displayName, weight: e.weight }))
+        )
+        if (fetchDone) {
+          isFontLoaded = true
+        }
+      }
+      asyncFunc()
     }
     p.setup = () => {
       const canvas = p.createCanvas(
@@ -91,6 +102,10 @@ export function defineSketch(project: any) {
         })
       }
 
+      if (!isFontLoaded) {
+        p.textSize(32)
+        p.text('フォントファイルの読み込み中です', 0, p.height)
+      }
       p.pop()
     }
 
@@ -249,8 +264,10 @@ export function defineSketch(project: any) {
       p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
 
       // T1. フォントの設定
-      const foundFont = fontListData.find((e) => object.textSettings.font == e.displayName)?.name
-      console.log(foundFont)
+      const foundFont = fontListData.find(
+        (e) => object.textSettings.font == e.displayName
+      )?.displayName
+      //console.log(foundFont)
       p.textFont(foundFont ?? 'Arial')
 
       p.textSize(object.textSettings.textSize)

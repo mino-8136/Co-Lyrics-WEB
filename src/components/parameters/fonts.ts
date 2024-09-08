@@ -4,10 +4,51 @@ interface Font {
   name: string
   displayName: string
   group: fontGroup
-  weightDescription: string  // ウェイトの説明 (例: Light, Bold)
-  weight: number             // ウェイトの数値 (例: 300, 700)
-  webSrc?: string            // Webフォントのソース
-  localSrc?: string          // ローカルフォントのソース
+  weightDescription: string // ウェイトの説明 (例: Light, Bold)
+  weight: number // ウェイトの数値 (例: 300, 700)
+  webSrc?: string // Webフォントのソース
+  localSrc?: string // ローカルフォントのソース
+}
+
+const textList =
+  'あいうえかがきくけこしじせそただっつづてとどなにのはもらりるをん切列刻君呪字幸捉捩文淡無確私縛色見証震頭風' +
+  'サンプル'
+
+// Googleフォントの動的読み込み (https://style01.net/3037/)
+export const setFonts = async (
+  fontFamilyList: {
+    name: string
+    displayName: string
+    weight: number
+  }[]
+) => {
+  for (let i = 0; i < fontFamilyList.length; i++) {
+    // URLでは空白を+に置き換える
+    const urlFamilyName = fontFamilyList[i].name.replace(/ /g, '+')
+
+    // Google Fonts APIのURL
+    const googleApiUrl = `https://fonts.googleapis.com/css2?family=${urlFamilyName}:wght@${fontFamilyList[i].weight}&text=${encodeURIComponent(textList)}`
+
+    const response = await fetch(googleApiUrl)
+
+    if (response.ok) {
+      // url()の中身のURLだけ抽出
+      const cssFontFace = await response.text()
+      const matchUrls = cssFontFace.match(/url\(.+?\)/g)
+      if (!matchUrls) throw new Error('フォントが見つかりませんでした')
+
+      for (const url of matchUrls) {
+        // FontFaceを追加
+        const font = new FontFace(fontFamilyList[i].displayName, url)
+        await font.load()
+        const documentFonts = document.fonts as any
+        documentFonts.add(font) // フォントの追加
+      }
+    } else {
+      throw new Error(response.statusText)
+    }
+  }
+  return 'done'
 }
 
 export const fontListData: Font[] = [
