@@ -32,11 +32,20 @@ export function defineSketch(project: any) {
       // 全フォントデータの読み込みを行う(TODO:プロジェクトに読み込まれているものだけに限定する？)
       isFontLoaded = false
       const asyncFunc = async () => {
-        const fetchDone = await setFonts(
-          fontListData.map((e) => ({ name: e.name, displayName: e.displayName, weight: e.weight }))
-        )
-        if (fetchDone) {
-          isFontLoaded = true
+        try {
+          const fetchDone = await setFonts(
+            fontListData.map((e) => ({
+              name: e.name,
+              displayName: e.displayName,
+              weight: e.weight
+            }))
+          )
+          if (fetchDone) {
+            isFontLoaded = true
+          }
+        } catch (error) {
+          console.error('フォントの読み込みに失敗しました:', error)
+          // 必要に応じて、エラーメッセージを表示したり、フォールバック処理を行う
         }
       }
       asyncFunc()
@@ -65,6 +74,11 @@ export function defineSketch(project: any) {
       // デバッグ用
       p.fill(255)
       p.ellipse(p.mouseX, p.mouseY, 50 * project.canvasScale)
+
+      if (!isFontLoaded) {
+        p.textSize(10)
+        p.text('フォントファイルの読み込み中です', p.width / 2, 10)
+      }
 
       // メインの描画
       p.push()
@@ -100,11 +114,6 @@ export function defineSketch(project: any) {
           )
           p.pop()
         })
-      }
-
-      if (!isFontLoaded) {
-        p.textSize(32)
-        p.text('フォントファイルの読み込み中です', 0, p.height)
       }
       p.pop()
     }
