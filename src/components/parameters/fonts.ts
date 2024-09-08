@@ -89,7 +89,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Light',
     weight: 300,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Noto_Sans_JP/static/NotoSansJP-Light.ttf'
   },
   {
     name: 'Noto Sans JP',
@@ -98,7 +98,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Medium',
     weight: 500,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Noto_Sans_JP/static/NotoSansJP-Medium.ttf'
   },
   {
     name: 'Noto Sans JP',
@@ -107,7 +107,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Bold',
     weight: 700,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Noto_Sans_JP/static/NotoSansJP-Bold.ttf'
   },
   {
     name: 'Noto Sans JP',
@@ -116,7 +116,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Black',
     weight: 900,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Noto_Sans_JP/static/NotoSansJP-Black.ttf'
   },
   {
     name: 'Zen Maru Gothic',
@@ -125,7 +125,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Light',
     weight: 300,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Zen_Maru_Gothic/ZenMaruGothic-Light.ttf'
   },
   {
     name: 'Zen Maru Gothic',
@@ -134,7 +134,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Medium',
     weight: 500,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Zen_Maru_Gothic/ZenMaruGothic-Medium.ttf'
   },
   {
     name: 'Zen Maru Gothic',
@@ -143,7 +143,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Black',
     weight: 900,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Zen_Maru_Gothic/ZenMaruGothic-Black.ttf'
   },
   {
     name: 'Noto Serif JP',
@@ -152,7 +152,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Light',
     weight: 300,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Noto_Serif_JP/static/NotoSerifJP-Light.ttf'
   },
   {
     name: 'Noto Serif JP',
@@ -161,7 +161,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Medium',
     weight: 500,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Noto_Serif_JP/static/NotoSerifJP-Medium.ttf'
   },
   {
     name: 'Noto Serif JP',
@@ -170,7 +170,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Bold',
     weight: 700,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Noto_Serif_JP/static/NotoSerifJP-Bold.ttf'
   },
   {
     name: 'Noto Serif JP',
@@ -179,7 +179,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Black',
     weight: 900,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Noto_Serif_JP/static/NotoSerifJP-Black.ttf'
   },
   {
     name: 'Hina Mincho',
@@ -188,7 +188,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Regular',
     weight: 400,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Hina_Mincho/HinaMincho-Regular.ttf'
   },
   {
     name: 'New Tegomin',
@@ -197,7 +197,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Regular',
     weight: 400,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/New_Tegomin/NewTegomin-Regular.ttf'
   },
   {
     name: 'Klee One',
@@ -206,7 +206,7 @@ export const fontListData: Font[] = [
     weightDescription: 'SemiBold',
     weight: 600,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Klee_One/KleeOne-SemiBold.ttf'
   },
   {
     name: 'Zen Kurenaido',
@@ -215,7 +215,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Regular',
     weight: 400,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Zen_Kurenaido/ZenKurenaido-Regular.ttf'
   },
   {
     name: 'Yuji Syuku',
@@ -224,7 +224,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Regular',
     weight: 400,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Yuji_Syuku/YujiSyuku-Regular.ttf'
   },
   {
     name: 'Kaisei Decol',
@@ -233,7 +233,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Regular',
     weight: 400,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Kaisei_Decol/KaiseiDecol-Regular.ttf'
   },
   {
     name: 'DotGothic16',
@@ -242,7 +242,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Regular',
     weight: 400,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/DotGothic16/DotGothic16-Regular.ttf'
   },
   {
     name: 'Hachi Maru Pop',
@@ -251,7 +251,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Regular',
     weight: 400,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Hachi_Maru_Pop/HachiMaruPop-Regular.ttf'
   },
   {
     name: 'Stick',
@@ -260,7 +260,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Regular',
     weight: 400,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Stick/Stick-Regular.ttf'
   },
   {
     name: 'Reggae One',
@@ -269,7 +269,7 @@ export const fontListData: Font[] = [
     weightDescription: 'Regular',
     weight: 400,
     webSrc: '',
-    localSrc: ''
+    localSrc: '/assets/fonts/Reggae_One/ReggaeOne-Regular.ttf'
   }
 ]
 

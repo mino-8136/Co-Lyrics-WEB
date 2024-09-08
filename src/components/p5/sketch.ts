@@ -42,10 +42,10 @@ export function defineSketch(project: any) {
       const asyncFunc = async () => {
         try {
           const fetchDone = await setFonts(
-            fontListData.map((e) => ({
-              name: e.name,
-              displayName: e.displayName,
-              weight: e.weight
+            fontListData.map((font) => ({
+              name: font.name,
+              displayName: font.displayName,
+              weight: font.weight
             })),
             onProgress
           )
