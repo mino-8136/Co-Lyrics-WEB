@@ -21,56 +21,65 @@ export const setFonts = async (
     name: string
     displayName: string
     weight: number
-  }[]
+  }[],
+  onProgress: (loadedName: string, loadedCount: number) => void
 ) => {
   for (let i = 0; i < fontFamilyList.length; i++) {
-    const fontCacheKey = `font_${fontFamilyList[i].name}_${fontFamilyList[i].weight}`;
-    const cacheTimeKey = `${fontCacheKey}_timestamp`;
-    const now = new Date().getTime();
+    // キャッシュキーとタイムスタンプキーを生成
+    const fontCacheKey = `font_${fontFamilyList[i].name}_${fontFamilyList[i].weight}`
+    const cacheTimeKey = `${fontCacheKey}_timestamp`
+    const now = new Date().getTime()
+
+    let loadedFontName = ''
 
     // キャッシュが存在し、期限内かどうかチェック
-    const cachedFont = localStorage.getItem(fontCacheKey);
-    const cacheTimestamp = localStorage.getItem(cacheTimeKey);
+    const cachedFont = localStorage.getItem(fontCacheKey)
+    const cacheTimestamp = localStorage.getItem(cacheTimeKey)
 
     if (cachedFont && cacheTimestamp && now - parseInt(cacheTimestamp, 10) < cacheTTL) {
-      console.log(fontFamilyList[i].displayName + 'はキャッシュされています');
-      const fontUrls = JSON.parse(cachedFont); // 複数のフォントURLを配列として取得
+      console.log(fontFamilyList[i].displayName + 'はキャッシュされています')
+      const fontUrls = JSON.parse(cachedFont) // 複数のフォントURLを配列として取得
       for (const url of fontUrls) {
-        const font = new FontFace(fontFamilyList[i].displayName, url);
-        await font.load();
-        (document.fonts as any).add(font);
+        const font = new FontFace(fontFamilyList[i].displayName, url)
+        await font.load()
+        ;(document.fonts as any).add(font)
       }
+      loadedFontName = fontFamilyList[i].displayName
     } else {
       // フォントをGoogle Fonts APIから取得し、キャッシュに保存
-      const urlFamilyName = fontFamilyList[i].name.replace(/ /g, '+');
-      const googleApiUrl = `https://fonts.googleapis.com/css2?family=${urlFamilyName}:wght@${fontFamilyList[i].weight}&subset=japanese`;
+      const urlFamilyName = fontFamilyList[i].name.replace(/ /g, '+')
+      const googleApiUrl = `https://fonts.googleapis.com/css2?family=${urlFamilyName}:wght@${fontFamilyList[i].weight}&subset=japanese`
 
-      const response = await fetch(googleApiUrl);
+      const response = await fetch(googleApiUrl)
 
       if (response.ok) {
-        const cssFontFace = await response.text();
-        const matchUrls = cssFontFace.match(/url\(.+?\)/g);
-        if (!matchUrls) throw new Error('フォントが見つかりませんでした');
+        const cssFontFace = await response.text()
+        const matchUrls = cssFontFace.match(/url\(.+?\)/g)
+        if (!matchUrls) throw new Error('フォントが見つかりませんでした')
 
-        const fontUrls = []; // 複数のフォントURLを保存する配列
+        const fontUrls = [] // 複数のフォントURLを保存する配列
 
         for (const url of matchUrls) {
-          fontUrls.push(url); // 取得したURLを配列に追加
-          const font = new FontFace(fontFamilyList[i].displayName, url);
-          await font.load();
-          (document.fonts as any).add(font);
+          fontUrls.push(url) // 取得したURLを配列に追加
+          const font = new FontFace(fontFamilyList[i].displayName, url)
+          await font.load()
+          ;(document.fonts as any).add(font)
         }
 
         // キャッシュに保存し、タイムスタンプを更新
-        localStorage.setItem(fontCacheKey, JSON.stringify(fontUrls)); // 複数のURLを保存
-        localStorage.setItem(cacheTimeKey, now.toString());
-        console.log(fontFamilyList[i].displayName + 'をキャッシュしました');
+        localStorage.setItem(fontCacheKey, JSON.stringify(fontUrls)) // 複数のURLを保存
+        localStorage.setItem(cacheTimeKey, now.toString())
+        console.log(fontFamilyList[i].displayName + 'をキャッシュしました')
+
+        loadedFontName = fontFamilyList[i].displayName
       } else {
-        throw new Error(response.statusText);
+        throw new Error(response.statusText)
       }
     }
+
+    onProgress(loadedFontName, i + 1)
   }
-  return 'done';
+  return 'done'
 }
 export const fontListData: Font[] = [
   {

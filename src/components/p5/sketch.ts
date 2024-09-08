@@ -20,8 +20,11 @@ const selectedObject = {
   startObjectY: 0
 }
 let currentFrame = 0
+
 let isFontLoaded = false
-const fontLimit = true // フォントファイルを読み込むかどうかのフラグ
+let loadedFontName = ''
+let loadedFontCount = 0
+
 let showCollisionBox = true
 const verticalCharacter = ['ー', '−', '～', '~'] // 縦書きにする文字のリスト
 
@@ -31,6 +34,11 @@ export function defineSketch(project: any) {
     p.preload = () => {
       // 全フォントデータの読み込みを行う(TODO:プロジェクトに読み込まれているものだけに限定する？)
       isFontLoaded = false
+      const onProgress = (loadedName: string, loadedCount: number) => {
+        loadedFontName = loadedName
+        loadedFontCount = loadedCount
+      }
+
       const asyncFunc = async () => {
         try {
           const fetchDone = await setFonts(
@@ -38,7 +46,8 @@ export function defineSketch(project: any) {
               name: e.name,
               displayName: e.displayName,
               weight: e.weight
-            }))
+            })),
+            onProgress
           )
           if (fetchDone) {
             isFontLoaded = true
@@ -73,12 +82,7 @@ export function defineSketch(project: any) {
 
       // デバッグ用
       p.fill(255)
-      p.ellipse(p.mouseX, p.mouseY, 50 * project.canvasScale)
-
-      if (!isFontLoaded) {
-        p.textSize(10)
-        p.text('フォントファイルの読み込み中です', p.width / 2, 10)
-      }
+      //p.ellipse(p.mouseX, p.mouseY, 50 * project.canvasScale)
 
       // メインの描画
       p.push()
@@ -116,6 +120,17 @@ export function defineSketch(project: any) {
         })
       }
       p.pop()
+
+      if (!isFontLoaded) {
+        p.push()
+        p.textSize(10)
+        p.text(
+          `フォントを読み込みました: ${loadedFontName} (${Math.floor((loadedFontCount / fontListData.length) * 100)}%) `,
+          p.width / 2,
+          10
+        )
+        p.pop()
+      }
     }
 
     ////////////////////////
