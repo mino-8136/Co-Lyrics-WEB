@@ -1,6 +1,7 @@
 import { Inform, Transform } from '@/components/parameters/p5Info'
 import { UIType } from '@/components/parameters/uiInfo'
 import gsap from 'gsap'
+import p5 from 'p5'
 
 // この形に従う
 export interface Animation {
@@ -35,7 +36,7 @@ export const animationList: Animation[] = [
       const transform = new Transform()
 
       let progress =
-        (inform.currentFrame - inform.start - inform.id * params.interval - params.delay) /
+        (inform.currentFrame - inform.start - inform.index * params.interval - params.delay) /
         params.time
       if (progress >= 0) {
         progress = 1
@@ -62,7 +63,7 @@ export const animationList: Animation[] = [
       const transform = new Transform()
 
       const progress =
-        (inform.currentFrame - inform.start - inform.id * params.interval) / params.time
+        (inform.currentFrame - inform.start - inform.index * params.interval) / params.time
       transform.opacity = baseObject.opacity * progress
 
       return transform
@@ -84,7 +85,7 @@ export const animationList: Animation[] = [
     ): Transform => {
       const transform = new Transform()
 
-      const progress = inform.currentFrame - inform.start - inform.id * params.interval
+      const progress = inform.currentFrame - inform.start - inform.index * params.interval
       if (progress < 0) transform.opacity = 0
       else if (progress < params.time && Math.round(progress) % 2 === 0) {
         transform.opacity = 0
@@ -111,13 +112,38 @@ export const animationList: Animation[] = [
     ): Transform => {
       const transform = new Transform()
 
-      const progress = inform.currentFrame - inform.start - inform.id * params.interval
+      const progress = inform.currentFrame - inform.start - inform.index * params.interval
       if (progress < 0) {
         transform.X = params.X
         transform.Y = params.Y
       } else if (progress < params.time) {
         transform.X = params.X * (1 - progress / params.time)
         transform.Y = params.Y * (1 - progress / params.time)
+      }
+      return transform
+    }
+  },
+  {
+    name: 'ランダム配置',
+    params: { X: 150, Y: 0, Seed: 100, Time: 10 },
+    description: 'オブジェクトをランダムに移動させます',
+    tag: ['in'],
+    parameters: {
+      X: { name: 'X', type: UIType.slider, min: -500, max: 500 },
+      Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 },
+      Seed: { name: 'シード値', type: UIType.slider, min: 0, max: 1000 },
+      Time: { name: '進行度', type: UIType.slider, min: 0, max: 60 }
+    },
+    applyEffect: (
+      inform: Inform,
+      baseObject: Transform,
+      params: { [key: string]: any }
+    ): Transform => {
+      const transform = new Transform()
+      if (inform.p5Canvas) {
+        inform.p5Canvas.noiseSeed(params.Seed)
+        transform.X = inform.p5Canvas.noise(inform.index * params.Time + 10000) * params.X
+        transform.Y = inform.p5Canvas.noise(inform.index * params.Time + 10000) * params.Y
       }
       return transform
     }

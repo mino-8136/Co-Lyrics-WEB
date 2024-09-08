@@ -9,7 +9,7 @@ import {
   type RenderObject
 } from '@/components/parameters/objectInfo'
 import { Inform, ShapeType, TextAlign } from '@/components/parameters/p5Info'
-import { fontListData } from '../parameters/fonts'
+import { fontListData, setFonts } from '../parameters/fonts'
 
 let renderObjects: RenderObject[] = []
 const selectedObject = {
@@ -20,23 +20,26 @@ const selectedObject = {
   startObjectY: 0
 }
 let currentFrame = 0
+let isFontLoaded = false
 const fontLimit = true // フォントファイルを読み込むかどうかのフラグ
 let showCollisionBox = true
 const verticalCharacter = ['ー', '−', '～', '~'] // 縦書きにする文字のリスト
-
-const fonts: { name: string; font: p5.Font }[] = []
 
 export function defineSketch(project: any) {
   // 実際はtimelineStoreを引数に取る
   return function sketch(p: p5) {
     p.preload = () => {
       // 全フォントデータの読み込みを行う(TODO:プロジェクトに読み込まれているものだけに限定する？)
-      if (!fontLimit) {
-        fontListData.forEach((font) => {
-          //console.log(font.src)
-          fonts.push({ name: font.name, font: p.loadFont(font.src) })
-        })
+      isFontLoaded = false
+      const asyncFunc = async () => {
+        const fetchDone = await setFonts(
+          fontListData.map((e) => ({ name: e.name, displayName: e.displayName, weight: e.weight }))
+        )
+        if (fetchDone) {
+          isFontLoaded = true
+        }
       }
+      asyncFunc()
     }
     p.setup = () => {
       const canvas = p.createCanvas(
@@ -99,6 +102,10 @@ export function defineSketch(project: any) {
         })
       }
 
+      if (!isFontLoaded) {
+        p.textSize(32)
+        p.text('フォントファイルの読み込み中です', 0, p.height)
+      }
       p.pop()
     }
 
@@ -257,14 +264,12 @@ export function defineSketch(project: any) {
       p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
 
       // T1. フォントの設定
-      if (fontLimit) {
-        p.textFont('Noto Sans JP')
-      } else {
-        if (fonts != null) {
-          const foundFont = fonts.find((e) => object.textSettings.font == e.name)?.font
-          p.textFont(foundFont ? foundFont : 'Arial')
-        }
-      }
+      const foundFont = fontListData.find(
+        (e) => object.textSettings.font == e.displayName
+      )?.displayName
+      //console.log(foundFont)
+      p.textFont(foundFont ?? 'Arial')
+
       p.textSize(object.textSettings.textSize)
 
       // T2. 文字の二重配列化(再生途中で変わることはない…)
@@ -292,7 +297,8 @@ export function defineSketch(project: any) {
             characters.length,
             object.start,
             object.end,
-            currentFrame
+            currentFrame,
+            p
           )
           const effectValue = object.animationSettings.animate(inform, object.animationSettings)
           //if (effectValue.opacity == 0) return

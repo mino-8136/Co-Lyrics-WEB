@@ -1,3 +1,6 @@
+import type p5 from 'p5'
+import type { pt } from 'vuetify/locale'
+
 // エフェクト処理用の相対パラメータ
 export class Transform {
   X: number
@@ -25,24 +28,27 @@ export function applyEffectToTransform(baseValue: Transform, effectValue: Transf
 }
 
 export class Inform {
-  id: number
-  totalId: number
+  index: number
+  totalIndex: number
   start: number
   end: number
   currentFrame: number
+  p5Canvas?: p5 // これおそらくいらない
 
   constructor(
-    id: number = 0,
-    totalId: number = 0,
+    index: number = 0,
+    totalIndex: number = 0,
     start: number = 0,
     end: number = 0,
-    currentFrame: number = 0
+    currentFrame: number = 0,
+    p5Canvas?: p5
   ) {
-    this.id = id
-    this.totalId = totalId
+    this.index = index
+    this.totalIndex = totalIndex
     this.start = start
     this.end = end
     this.currentFrame = currentFrame
+    this.p5Canvas = p5Canvas
   }
 }
 
