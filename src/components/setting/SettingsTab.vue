@@ -5,32 +5,20 @@
       <v-col
         :cols="getColSpan((parameters.constructor as typeof PropertyMethod).getUIType(label))"
         v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) != UIType.none"
-        style="border: 0.3px #ccc solid"
+        style="border: 0.1px #ccc solid;"
       >
-        <v-row align="center">
-          <v-col
-            :cols="
-              (12 /
-                getColSpan((parameters.constructor as typeof PropertyMethod).getUIType(label))) *
-              2
-            "
+        <v-row align="center" style="min-height: 50px;">
+          <!-- パラメータ名の表示 -->
+          <v-chip
+            class="parameter-name"
+            variant="outlined"
+            size="small"
+            @click="toggleKeyframeGraph(label)"
+            >{{ (parameters.constructor as typeof PropertyMethod).getParameterName(label) }}</v-chip
           >
-            <!-- パラメータ名の表示 -->
-            <v-chip
-              class="parameter-name"
-              variant="outlined"
-              size="small"
-              label
-              @click="toggleKeyframeGraph(label)"
-              >{{
-                (parameters.constructor as typeof PropertyMethod).getParameterName(label)
-              }}</v-chip
-            >
-          </v-col>
 
           <!-- キーフレーム対応の場合 -->
           <v-col
-            cols="10"
             v-if="
               (parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.keyframe
             "
@@ -98,7 +86,6 @@
 
           <!-- 数値型パラメータの場合 -->
           <v-col
-            cols="10"
             v-if="
               (parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.slider
             "
@@ -118,7 +105,6 @@
 
           <!-- テキスト型パラメータの場合 -->
           <v-col
-            cols="10"
             class="pb-0"
             v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.text"
           >
@@ -127,13 +113,12 @@
 
           <!-- セレクト型パラメータの場合 -->
           <v-col
-            cols="8"
             class="py-0"
             v-if="
               (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.select
             "
           >
-            <select v-model="parameters[label]">
+            <select v-model="parameters[label]" class="w-100">
               <option v-for="(e, index) in getOptionsList(label)" :key="index">
                 {{ e }}
               </option>
@@ -142,7 +127,6 @@
 
           <!-- カラー型パラメータの場合 -->
           <v-col
-            cols="8"
             class="py-0"
             v-if="
               (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.color
@@ -162,7 +146,6 @@
 
           <!-- チェックボックス型パラメータの場合 -->
           <v-col
-            cols="8"
             class="py-0"
             v-if="
               (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.checkbox
@@ -300,8 +283,8 @@ div.ease-setting {
 .parameter-name {
   width: 80px;
   font-weight: bold;
+  margin-left: 20px;
   justify-content: center;
-  margin-right: 10px;
   text-align: center;
 }
 
@@ -314,7 +297,7 @@ div.ease-setting {
 
 textarea {
   width: 100%;
-  height: 100px;
+  height: 80px;
   padding: 4px 12px;
   box-sizing: border-box;
   border: 1px solid #ccc;
@@ -328,16 +311,19 @@ select {
 }
 
 /* リストアニメーション */
-.list-move, /* 移動する要素にトランジションを適用 */
+.list-move,
+/* 移動する要素にトランジションを適用 */
 .list-enter-active,
 .list-leave-active {
   transition: all 0.5s ease;
 }
+
 .list-enter-from,
 .list-leave-to {
   opacity: 0;
   transform: translateX(30px);
 }
+
 .list-leave-active {
   position: absolute;
 }
