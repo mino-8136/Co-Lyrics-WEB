@@ -1,9 +1,9 @@
 <template>
   <v-dialog v-model="showPanel" class="EffectPanel">
     <v-card>
-      <v-card-title> {{ props.type }} エフェクトを選択 </v-card-title>
-      <v-tabs v-model="selectedTag">
-        <v-tab value="all"> all </v-tab>
+      <v-card-subtitle class="text-center pt-2"> {{ props.type }}</v-card-subtitle>
+      <v-tabs v-model="selectedTag" align-tabs="center">
+        <v-tab value="all" > all </v-tab>
         <v-tab v-for="(tag, index) in tagList" :key="index" :value="tag">
           {{ tag }}
         </v-tab>
@@ -11,24 +11,26 @@
 
       <v-tabs-window v-model="selectedTag">
         <v-row>
-          <transition-group name="fade">
-            <v-col
-              v-for="(effect, index) in filteredEffectList"
-              :key="index"
-              class="d-flex"
-              cols="3"
-            >
-              <v-container class="items">
-                <v-img :width="200" aspect-ratio="1" class="bg-pink-lighten-4" cover> </v-img>
-                <v-btn
-                  @click="handleButtonClick(effect.name, effect.params)"
-                  :disabled="isEffectAlreadySelected(effect.name)"
-                >
-                  {{ effect.name }}
-                </v-btn>
-              </v-container>
-            </v-col>
-          </transition-group>
+          <v-col v-for="effect in filteredEffectList" :key="effect" class="d-flex" cols="3">
+            <v-container class="items">
+              <v-img
+                :width="200"
+                aspect-ratio="1"
+                class="bg-pink-lighten-4 effect-image"
+                :class="imageColor(effect.tag)"
+              >
+                <p v-for="(tag, index) in effect.tag" :key="index">
+                  {{ tag }}
+                </p>
+              </v-img>
+              <v-btn
+                @click="handleButtonClick(effect.name, effect.params)"
+                :disabled="isEffectAlreadySelected(effect.name)"
+              >
+                {{ effect.name }}
+              </v-btn>
+            </v-container>
+          </v-col>
         </v-row>
       </v-tabs-window>
     </v-card>
@@ -55,7 +57,7 @@ const effectList = computed(() => {
 })
 
 const tagList = computed(() => {
-  const tags = [...new Set(effectList.value.flatMap((effect) => effect.tag))]
+  const tags = [...new Set(effectList.value.flatMap((effect) => effect.tag).filter((tag) => tag))]
   console.log(tags)
   return tags // 重複を削除して返却
 })
@@ -67,6 +69,19 @@ const filteredEffectList = computed(() => {
   }
   return effectList.value.filter((effect) => effect.tag?.includes(selectedTag.value))
 })
+
+/////////////////////////////////////////////////////////
+
+function imageColor(tags: string | [string] | undefined): string {
+  const colors = [
+    'bg-pink-lighten-4',
+    'bg-indigo-lighten-4',
+    'bg-green-lighten-4',
+    'bg-orange-lighten-4'
+  ]
+  const firstTag = tagList.value.findIndex((tag) => tags?.includes(tag ?? ''))
+  return colors[firstTag % colors.length]
+}
 
 /////////////////////////////////////////////////////////
 
@@ -97,18 +112,18 @@ function isEffectAlreadySelected(effectName: string): boolean {
   overflow-y: auto;
 }
 
+.effect-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
 .items {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>
