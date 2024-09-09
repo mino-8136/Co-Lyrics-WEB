@@ -27,9 +27,10 @@ import {
   TextObject,
   ImageObject,
   ShapeObject,
-  type RenderObject
+  type RenderObject,
+  type KeyframeSettings,
+  objectSettingsList,
 } from '../parameters/objectInfo'
-import { type KeyframeSettings } from '../parameters/objectInfo'
 import KeyframePoint from './KeyframePoint.vue'
 import gsap from 'gsap'
 
@@ -81,39 +82,31 @@ const bgColor = computed(() => {
 // キーフレームの抽出
 const keyFrameList = computed(() => {
   let keyFrameList: KeyframeSettings = []
-
-  // TODO: standardRenderSettings以外のプロパティにも対応する
-  if ('standardRenderSettings' in props.object) {
-    Object.entries(props.object.standardRenderSettings).reduce((acc, [key, value]) => {
-      // KeyframeSettingsの配列であるかを判定
-      if (Array.isArray(value) && value.length > 1) {
-        acc.push(...value)
-      }
-      return acc
-    }, keyFrameList)
-  }
-  if ('shapeSettings' in props.object) {
-    Object.entries(props.object.shapeSettings).reduce((acc, [key, value]) => {
-      // KeyframeSettingsの配列であるかを判定
-      if (Array.isArray(value) && value.length > 1) {
-        acc.push(...value)
-      }
-      return acc
-    }, keyFrameList)
-  }
+  objectSettingsList.forEach((anySetting) => {
+    if (anySetting in props.object) {
+      Object.entries(props.object[anySetting as keyof typeof props.object]).forEach(([param, value]) => {
+        // KeyframeSettingsの配列であるかを判定
+        if (Array.isArray(value) && value.length > 1) {
+          keyFrameList.push(...value)
+        }
+      })
+    }
+  })
   return keyFrameList
 })
 
 // props.objectのキーフレームの並び替え
 const sortKeyframe = () => {
-  if ('standardRenderSettings' in props.object) {
-    const keyframeSettings: { [key: string]: any } = props.object.standardRenderSettings
-    Object.entries(keyframeSettings).forEach(([key, value]) => {
+  console.log('sortKeyframe')
+  objectSettingsList.forEach((anySetting)=>{
+    if( anySetting in props.object){
+      Object.entries(props.object[anySetting as keyof typeof props.object]).forEach(([param, value]) => {
       if (Array.isArray(value) && value.length > 1) {
-        keyframeSettings[key] = value.sort((a, b) => a.frame - b.frame)
+        value = value.sort((a, b) => a.frame - b.frame)
       }
     })
-  }
+    }
+  })
 }
 
 //////////////////////////

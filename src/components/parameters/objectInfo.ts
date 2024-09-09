@@ -100,7 +100,9 @@ export abstract class PropertyMethod {
   }
 }
 
-//////////////////////////////////////////////////////////////
+/////////////////////////
+// Settings系統のクラス //
+/////////////////////////
 
 export class BaseSettings {
   id: number
@@ -340,6 +342,7 @@ export class ShapeObject extends BaseObject {
 //////////////////////////////////////
 export type typeString = '' | 'base' | 'text' | 'image' | 'shape'
 export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
+export const objectSettingsList = ['standardRenderSettings', 'textSettings', 'shapeSettings' , 'styleSettings', 'animationSettings']
 
 // 指定されたパラメータからオブジェクトを生成する(ファイル保存処理・再読込で使用)
 export function createObjectFromJson(obj: RenderObject): any {
