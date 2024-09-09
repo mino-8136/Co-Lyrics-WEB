@@ -5,9 +5,9 @@
       <v-col
         :cols="getColSpan((parameters.constructor as typeof PropertyMethod).getUIType(label))"
         v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) != UIType.none"
-        style="border: 0.1px #ccc solid;"
+        style="border: 0.1px #ccc solid"
       >
-        <v-row align="center" style="min-height: 50px;">
+        <v-row align="center" style="min-height: 50px">
           <!-- パラメータ名の表示 -->
           <v-chip
             class="parameter-name"
@@ -145,13 +145,14 @@
           </v-col>
 
           <!-- チェックボックス型パラメータの場合 -->
+
           <v-col
             class="py-0"
             v-if="
               (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.checkbox
             "
           >
-            <v-checkbox-btn v-model="parameters[label]" hide-details />
+            <CheckboxParameter v-model="parameters[label]"></CheckboxParameter>
           </v-col>
         </v-row>
       </v-col>
@@ -177,6 +178,8 @@ import { UIType } from '@/components/parameters/uiInfo'
 import EasingPanel from '@/components/setting/EasingPanel.vue'
 import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
 import { generateUniqueId } from '@/components/utils/common'
+
+import CheckboxParameter from './dom/CheckboxParameter.vue'
 
 import { fontListData } from '@/components/parameters/fonts'
 import { ShapeType, TextAlign } from '../parameters/p5Info'

@@ -71,7 +71,7 @@
 
             <!-- チェックボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.checkbox">
-              <v-checkbox v-model="params.parameters[paramLabel]" hide-details />
+              <CheckboxParameter v-model="params.parameters[paramLabel]" />
             </template>
           </div>
         </div>
@@ -111,6 +111,7 @@ import { UIType } from '@/components/parameters/uiInfo'
 import EffectPanel from './EffectPanel.vue'
 import { animationList } from '@/assets/effects/animation'
 import { styleList } from '@/assets/effects/style'
+import CheckboxParameter from './dom/CheckboxParameter.vue'
 
 const parameters = defineModel<StyleSettings>('params', { required: true })
 const props = defineProps<{

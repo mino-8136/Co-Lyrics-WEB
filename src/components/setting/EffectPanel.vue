@@ -3,7 +3,7 @@
     <v-card>
       <v-card-subtitle class="text-center pt-2"> {{ props.type }}</v-card-subtitle>
       <v-tabs v-model="selectedTag" align-tabs="center">
-        <v-tab value="all" > all </v-tab>
+        <v-tab value="all"> all </v-tab>
         <v-tab v-for="(tag, index) in tagList" :key="index" :value="tag">
           {{ tag }}
         </v-tab>
@@ -72,7 +72,7 @@ const filteredEffectList = computed(() => {
 
 /////////////////////////////////////////////////////////
 
-function imageColor(tags: string | [string] | undefined): string {
+function imageColor(tags: string | string[] | undefined): string {
   const colors = [
     'bg-pink-lighten-4',
     'bg-indigo-lighten-4',

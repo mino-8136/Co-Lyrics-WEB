@@ -7,7 +7,7 @@ export interface Style {
   name: string
   params: { [key: string]: any }
   description?: string
-  tag?: [string]
+  tag?: string[]
   parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応
   applyStyle: (p: p5, style: StyleSetting) => void
 }
