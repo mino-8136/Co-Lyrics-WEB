@@ -128,7 +128,7 @@ export const animationList: Animation[] = [
     name: 'ランダム配置',
     params: { X: 150, Y: 0, Seed: 100, Time: 10 },
     description: 'オブジェクトをランダムに移動させます',
-    tag: ['in'],
+    tag: ['other'],
     parameters: {
       X: { name: 'X', type: UIType.slider, min: -500, max: 500 },
       Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 },
