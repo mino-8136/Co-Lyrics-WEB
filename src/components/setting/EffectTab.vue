@@ -29,17 +29,11 @@
 
             <!-- 数値型パラメータの場合 -->
             <template v-if="param.type == UIType.slider">
-              <v-slider
+              <SliderParameter
                 v-model="params.parameters[paramLabel]"
                 :min="param.min"
                 :max="param.max"
-                step="1"
-                hide-details
-              >
-                <template v-slot:prepend>
-                  <input class="parameter-value" v-model.number="params.parameters[paramLabel]" />
-                </template>
-              </v-slider>
+              />
             </template>
 
             <!-- テキスト型パラメータの場合 -->
@@ -100,6 +94,8 @@ import EffectPanel from './EffectPanel.vue'
 import { animationList } from '@/assets/effects/animation'
 import { styleList } from '@/assets/effects/style'
 
+import SliderParameter from './dom/SliderParameter.vue'
+import TextParameter from './dom/TextParameter.vue'
 import SelectParameter from './dom/SelectParameter.vue'
 import ColorParameter from './dom/ColorParameter.vue'
 import CheckboxParameter from './dom/CheckboxParameter.vue'
@@ -165,12 +161,6 @@ function deleteEffect(index: number) {
   justify-content: center;
   margin-right: 10px;
   text-align: center;
-}
-
-.parameter-value {
-  width: 40px;
-  text-align: center;
-  color: #555;
 }
 
 /* リストアニメーション */

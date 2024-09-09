@@ -90,17 +90,11 @@
               (parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.slider
             "
           >
-            <v-slider
+            <SliderParameter
               v-model="parameters[label]"
               :min="(parameters.constructor as typeof PropertyMethod).getMinValue(label)"
               :max="(parameters.constructor as typeof PropertyMethod).getMaxValue(label)"
-              step="1"
-              hide-details
-            >
-              <template v-slot:prepend>
-                <input class="parameter-value" v-model.number="parameters[label]" />
-              </template>
-            </v-slider>
+            />
           </v-col>
 
           <!-- テキスト型パラメータの場合 -->
@@ -165,6 +159,7 @@ import EasingPanel from '@/components/setting/EasingPanel.vue'
 import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
 import { generateUniqueId } from '@/components/utils/common'
 
+import SliderParameter from './dom/SliderParameter.vue'
 import TextParameter from './dom/TextParameter.vue'
 import SelectParameter from './dom/SelectParameter.vue'
 import ColorParameter from './dom/ColorParameter.vue'
@@ -266,7 +261,6 @@ div.ease-setting {
 
 .parameter-value {
   width: 40px;
-  text-align: center;
   color: #555;
   text-align: right;
 }
