@@ -42,19 +42,15 @@
               </v-slider>
             </template>
 
+            <!-- セレクトボックス型パラメータの場合 -->
+            <template v-if="param.type === UIType.select">
+              <SelectParameter v-model="params.parameters[paramLabel]" :param="param.options" />
+            </template>
+
             <!-- カラー型パラメータの場合 -->
             <template v-if="param.type == UIType.color">
               <ColorParameter v-model="params.parameters[paramLabel]" />
             </template>
-
-            <!-- セレクトボックス型パラメータの場合 -->
-            <template v-if="param.type === UIType.select">
-              <select v-model="params.parameters[paramLabel]" hide-details>
-                <option v-for="(e, index) in param.options" :key="index">{{ e }}</option>
-              </select>
-            </template>
-
-            <!-- カラー-->
 
             <!-- チェックボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.checkbox">
@@ -99,6 +95,7 @@ import EffectPanel from './EffectPanel.vue'
 import { animationList } from '@/assets/effects/animation'
 import { styleList } from '@/assets/effects/style'
 
+import SelectParameter from './dom/SelectParameter.vue'
 import ColorParameter from './dom/ColorParameter.vue'
 import CheckboxParameter from './dom/CheckboxParameter.vue'
 

@@ -58,7 +58,7 @@ const effectList = computed(() => {
 
 const tagList = computed(() => {
   const tags = [...new Set(effectList.value.flatMap((effect) => effect.tag).filter((tag) => tag))]
-  console.log(tags)
+  //console.log(tags)
   return tags // 重複を削除して返却
 })
 

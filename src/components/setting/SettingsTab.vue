@@ -118,11 +118,7 @@
               (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.select
             "
           >
-            <select v-model="parameters[label]" class="w-100">
-              <option v-for="(e, index) in getOptionsList(label)" :key="index">
-                {{ e }}
-              </option>
-            </select>
+            <SelectParameter v-model="parameters[label]" :param="label" class="w-100" />
           </v-col>
 
           <!-- カラー型パラメータの場合 -->
@@ -132,20 +128,10 @@
               (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.color
             "
           >
-            <div>
-              <v-menu v-model="colorMenu" :close-on-content-click="false" location="end">
-                <template v-slot:activator="{ props }">
-                  <v-btn :color="parameters[label]" v-bind="props" width="110px" class="border">
-                    {{ parameters[label] }}
-                  </v-btn>
-                </template>
-                <v-color-picker v-model="parameters[label]" :modes="['hexa']" flat />
-              </v-menu>
-            </div>
+            <ColorParameter v-model="parameters[label]"></ColorParameter>
           </v-col>
 
           <!-- チェックボックス型パラメータの場合 -->
-
           <v-col
             class="py-0"
             v-if="
@@ -179,14 +165,12 @@ import EasingPanel from '@/components/setting/EasingPanel.vue'
 import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
 import { generateUniqueId } from '@/components/utils/common'
 
+import SelectParameter from './dom/SelectParameter.vue'
+import ColorParameter from './dom/ColorParameter.vue'
 import CheckboxParameter from './dom/CheckboxParameter.vue'
-
-import { fontListData } from '@/components/parameters/fonts'
-import { ShapeType, TextAlign } from '../parameters/p5Info'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
-const colorMenu = ref(false)
 
 const parameters = defineModel<StandardRenderSettings | TextSettings>('params', { required: true })
 
@@ -194,18 +178,6 @@ const parameters = defineModel<StandardRenderSettings | TextSettings>('params', 
 const selectedObject: Record<string, any> = computed(() => {
   return objectStore.objects.find((obj) => obj.id === timelineStore.selectedObjectId)
 })
-
-// TODO: どこでも使えるようにしたほうが良いかも
-function getOptionsList(label: string): string[] {
-  if (label === 'font') {
-    return fontListData.map((font) => font.displayName)
-  } else if (label === 'shape') {
-    return Object.values(ShapeType)
-  } else if (label === 'align') {
-    return Object.values(TextAlign)
-  }
-  return []
-}
 
 function getColSpan(uiType: UIType) {
   if (uiType === UIType.keyframe) {
@@ -304,13 +276,6 @@ textarea {
   padding: 4px 12px;
   box-sizing: border-box;
   border: 1px solid #ccc;
-}
-
-select {
-  padding: 4px 12px;
-  border: 1px solid #000000;
-  -webkit-appearance: menulist;
-  appearance: button;
 }
 
 /* リストアニメーション */
