@@ -2,19 +2,28 @@
   <v-dialog v-model="showPanel" class="EffectPanel">
     <v-card>
       <v-card-title> {{ props.type }} エフェクトを選択 </v-card-title>
-      <v-row>
-        <v-col v-for="(effect, index) in effectList" :key="index" class="d-flex" cols="3">
-          <v-container class="items">
-            <v-img :width="200" aspect-ratio="1" class="bg-pink-lighten-4" cover> </v-img>
-            <v-btn
-              @click="handleButtonClick(effect.name, effect.params)"
-              :disabled="isEffectAlreadySelected(effect.name)"
-            >
-              {{ effect.name }}
-            </v-btn>
-          </v-container>
-        </v-col>
-      </v-row>
+      <v-tabs>
+        <v-tab> all </v-tab>
+        <v-tab v-for="(tag, index) in tagList" :key="index">
+          {{ tag }}
+        </v-tab>
+      </v-tabs>
+
+      <v-tabs-window>
+        <v-row>
+          <v-col v-for="(effect, index) in effectList" :key="index" class="d-flex" cols="3">
+            <v-container class="items">
+              <v-img :width="200" aspect-ratio="1" class="bg-pink-lighten-4" cover> </v-img>
+              <v-btn
+                @click="handleButtonClick(effect.name, effect.params)"
+                :disabled="isEffectAlreadySelected(effect.name)"
+              >
+                {{ effect.name }}
+              </v-btn>
+            </v-container>
+          </v-col>
+        </v-row>
+      </v-tabs-window>
     </v-card>
   </v-dialog>
 </template>
@@ -34,6 +43,12 @@ const props = defineProps<{
 
 const effectList = computed(() => {
   return props.type == 'animation' ? animationList : styleList
+})
+
+const tagList = computed(() => {
+  const tags = [...new Set(effectList.value.flatMap((effect) => effect.tag))]
+  console.log(tags)
+  return tags // 重複を削除して返却
 })
 
 function handleButtonClick(effectName: string, parameters: Record<string, any>) {

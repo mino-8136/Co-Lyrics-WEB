@@ -23,6 +23,7 @@ export const animationList: Animation[] = [
     params: { time: 1, interval: 1, delay: 0 },
     description:
       '文字を一文字ずつ表示します。[時間]だけをマイナスにすると順番に文字が消えていきます。[遅延]を大きくして[間隔]だけをマイナスにすると後ろから文字が表れます。',
+    tag: ['in'],
     parameters: {
       time: { name: '時間(f)', type: UIType.slider, min: -60, max: 60 },
       interval: { name: '間隔(f)', type: UIType.slider, min: -20, max: 20 },
