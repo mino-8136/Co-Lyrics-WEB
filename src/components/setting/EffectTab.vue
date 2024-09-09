@@ -44,20 +44,7 @@
 
             <!-- カラー型パラメータの場合 -->
             <template v-if="param.type == UIType.color">
-              <div class="text-center">
-                <v-menu
-                  v-model="colorMenus[paramLabel]"
-                  :close-on-content-click="false"
-                  location="end"
-                >
-                  <template v-slot:activator="{ props }">
-                    <v-btn :color="params.parameters[paramLabel]" v-bind="props" width="100px">
-                      {{ params.parameters[paramLabel] }}
-                    </v-btn>
-                  </template>
-                  <v-color-picker v-model="params.parameters[paramLabel]" :modes="['hexa']" flat />
-                </v-menu>
-              </div>
+              <ColorParameter v-model="params.parameters[paramLabel]" />
             </template>
 
             <!-- セレクトボックス型パラメータの場合 -->
@@ -111,6 +98,8 @@ import { UIType } from '@/components/parameters/uiInfo'
 import EffectPanel from './EffectPanel.vue'
 import { animationList } from '@/assets/effects/animation'
 import { styleList } from '@/assets/effects/style'
+
+import ColorParameter from './dom/ColorParameter.vue'
 import CheckboxParameter from './dom/CheckboxParameter.vue'
 
 const parameters = defineModel<StyleSettings>('params', { required: true })
