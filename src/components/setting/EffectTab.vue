@@ -42,6 +42,11 @@
               </v-slider>
             </template>
 
+            <!-- テキスト型パラメータの場合 -->
+            <template v-if="param.type === UIType.text">
+              <TextParameter v-model="params.parameters[paramLabel]" class="w-100" />
+            </template>
+
             <!-- セレクトボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.select">
               <SelectParameter v-model="params.parameters[paramLabel]" :param="param.options" />
@@ -84,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import {
   type StyleSettings,
   type StyleSetting,
@@ -103,7 +108,6 @@ const parameters = defineModel<StyleSettings>('params', { required: true })
 const props = defineProps<{
   type: String // 'animation' or 'style'
 }>()
-const colorMenus = ref<{ [key: string]: boolean }>({}) // 各パラメータごとのカラーメニューの表示フラグ
 
 //////////////////////////////////
 // アニメーション設定に関する記述 //
@@ -146,12 +150,6 @@ function downEffect(index: number) {
 function deleteEffect(index: number) {
   parameters.value.effects.splice(index, 1)
 }
-
-onMounted(() => {
-  Object.keys(parameters.value.effects).forEach((label) => {
-    colorMenus.value[label] = false
-  })
-})
 </script>
 
 <style scoped>
@@ -173,13 +171,6 @@ onMounted(() => {
   width: 40px;
   text-align: center;
   color: #555;
-}
-
-select {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  -webkit-appearance: menulist;
-  appearance: button;
 }
 
 /* リストアニメーション */

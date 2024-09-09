@@ -108,7 +108,7 @@
             class="pb-0"
             v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.text"
           >
-            <textarea :id="label" v-model="parameters[label]" type="text" />
+            <TextParameter v-model="parameters[label]" class="w-100" />
           </v-col>
 
           <!-- セレクト型パラメータの場合 -->
@@ -165,6 +165,7 @@ import EasingPanel from '@/components/setting/EasingPanel.vue'
 import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
 import { generateUniqueId } from '@/components/utils/common'
 
+import TextParameter from './dom/TextParameter.vue'
 import SelectParameter from './dom/SelectParameter.vue'
 import ColorParameter from './dom/ColorParameter.vue'
 import CheckboxParameter from './dom/CheckboxParameter.vue'
@@ -268,14 +269,6 @@ div.ease-setting {
   text-align: center;
   color: #555;
   text-align: right;
-}
-
-textarea {
-  width: 100%;
-  height: 80px;
-  padding: 4px 12px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
 }
 
 /* リストアニメーション */
