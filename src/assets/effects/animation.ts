@@ -1,7 +1,7 @@
 import { Inform, Transform } from '@/components/parameters/p5Info'
 import { UIType } from '@/components/parameters/uiInfo'
 import gsap from 'gsap'
-import p5 from 'p5'
+import { clClamp } from '@/components/utils/common'
 
 // この形に従う
 export interface Animation {
@@ -50,7 +50,8 @@ export const animationList: Animation[] = [
   {
     name: 'フェードイン',
     params: { time: 10, interval: 1 },
-    description: '[時間]で指定したフレーム数で、不透明度が0→100に変化します。',
+    description:
+      '[時間]で指定したフレーム数で、不透明度が0→100に変化します。間隔にマイナスを入力すると、逆順で登場します。',
     tag: ['登場'],
     parameters: {
       time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
@@ -65,7 +66,35 @@ export const animationList: Animation[] = [
 
       const progress =
         (inform.currentFrame - inform.start - inform.index * params.interval) / params.time
-      transform.opacity = baseObject.opacity * progress
+      transform.opacity = baseObject.opacity * clClamp(0, 100, progress)
+
+      return transform
+    }
+  },
+  {
+    name: 'フェードアウト',
+    params: { time: 10, interval: 1 },
+    description:
+      '[時間]で指定したフレーム数で、不透明度が100→0に変化します。間隔をマイナスにすると、逆順で消失します。',
+    tag: ['消失'],
+    parameters: {
+      time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
+      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 }
+    },
+    applyEffect: (
+      inform: Inform,
+      baseObject: Transform,
+      params: { [key: string]: any }
+    ): Transform => {
+      const transform = new Transform()
+
+      // 100 → 0 に変化する
+      const progress =
+        (inform.end -
+          inform.currentFrame -
+          (inform.totalIndex - 1 - inform.index) * params.interval) /
+        params.time
+      transform.opacity = baseObject.opacity * clClamp(0, 100, progress)
 
       return transform
     }

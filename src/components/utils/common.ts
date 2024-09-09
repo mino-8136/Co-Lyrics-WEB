@@ -22,3 +22,7 @@ export function deepCopy(obj: any): any {
 
   return newObj
 }
+
+export function clClamp(min: number, max: number, value: number): number {
+  return Math.min(Math.max(value, min), max)
+}
