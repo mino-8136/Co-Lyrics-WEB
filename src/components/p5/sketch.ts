@@ -343,7 +343,9 @@ export function defineSketch(project: any) {
           // 4. エフェクトの影響の適用
           if (object.textSettings.isVertical) {
             p.translate(
-              -lerpValue(object.textSettings.spacing_x, object.start) * lineIndex + effectValue.Y,
+              -lerpValue(object.textSettings.spacing_x, object.start) *
+                (lineIndex - textAnchorY()) +
+                effectValue.Y,
               lerpValue(object.textSettings.spacing_y, object.start) *
                 (characterIndex - textAnchorX()) +
                 effectValue.X
