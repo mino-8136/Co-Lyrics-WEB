@@ -1,4 +1,11 @@
-import { ShapeType, Transform, Inform, applyEffectToTransform, TextAlign } from './p5Info'
+import {
+  ShapeType,
+  Transform,
+  Inform,
+  applyEffectToTransform,
+  TextAlignX,
+  TextAlignY
+} from './p5Info'
 import { styleList } from '@/assets/effects/style'
 import { animationList } from '@/assets/effects/animation'
 import { UIType } from './uiInfo'
@@ -127,7 +134,7 @@ export class StandardRenderSettings extends PropertyMethod {
   X: KeyframeSettings
   Y: KeyframeSettings
   //Z: KeyframeSettings
-  relativeX: number // アニメーションによる相対座標を記録
+  relativeX: number // アニメーションによる相対座標を記録する予定
   relativeY: number
   scale: KeyframeSettings
   opacity: KeyframeSettings
@@ -165,10 +172,9 @@ export class StandardRenderSettings extends PropertyMethod {
 export class TextSettings extends PropertyMethod {
   text: string
   font: string
+  fill_color: string
   spacing_x: KeyframeSettings
   spacing_y: KeyframeSettings
-  fill_color: string
-  isVertical: boolean
   //name: string
   textSize: number
   //display_speed: number
@@ -178,7 +184,9 @@ export class TextSettings extends PropertyMethod {
   //autoadjust: boolean
   //soft: boolean
   //monospace: boolean
-  align: TextAlign
+  align_x: TextAlignX
+  align_y: TextAlignY
+  isVertical: boolean
   individual_object: boolean
 
   //precision: number
@@ -193,14 +201,16 @@ export class TextSettings extends PropertyMethod {
     fill_color: { name: '色', type: UIType.color },
     font: { name: 'フォント', type: UIType.select },
     text: { name: 'テキスト', type: UIType.text },
-    align: { name: '整列', type: UIType.select }
+    align_x: { name: '横揃え', type: UIType.select },
+    align_y: { name: '縦揃え', type: UIType.select }
   }
 
   constructor({
     textSize = 80,
     isVertical = false,
     individual_object = true,
-    align = TextAlign.center,
+    align_x = TextAlignX.center,
+    align_y = TextAlignY.center,
     spacing_x = [{ value: 80, frame: 0, id: '0' }],
     spacing_y = [{ value: 80, frame: 0, id: '0' }],
     fill_color = '#ffffff',
@@ -211,7 +221,8 @@ export class TextSettings extends PropertyMethod {
     this.textSize = textSize
     this.isVertical = isVertical
     this.individual_object = individual_object
-    this.align = align
+    this.align_x = align_x
+    this.align_y = align_y
     this.spacing_x = spacing_x
     this.spacing_y = spacing_y
     this.fill_color = fill_color
@@ -342,7 +353,13 @@ export class ShapeObject extends BaseObject {
 //////////////////////////////////////
 export type typeString = '' | 'base' | 'text' | 'image' | 'shape'
 export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
-export const objectSettingsList = ['standardRenderSettings', 'textSettings', 'shapeSettings' , 'styleSettings', 'animationSettings']
+export const objectSettingsList = [
+  'standardRenderSettings',
+  'textSettings',
+  'shapeSettings',
+  'styleSettings',
+  'animationSettings'
+]
 
 // 指定されたパラメータからオブジェクトを生成する(ファイル保存処理・再読込で使用)
 export function createObjectFromJson(obj: RenderObject): any {

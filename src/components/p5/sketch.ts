@@ -8,7 +8,7 @@ import {
   BaseObject,
   type RenderObject
 } from '@/components/parameters/objectInfo'
-import { Inform, ShapeType, TextAlign } from '@/components/parameters/p5Info'
+import { Inform, ShapeType, TextAlignX, TextAlignY } from '@/components/parameters/p5Info'
 import { fontListData, setFonts } from '../parameters/fonts'
 
 let renderObjects: RenderObject[] = []
@@ -286,11 +286,24 @@ export function defineSketch(project: any) {
       )?.displayName
       //console.log(foundFont)
       p.textFont(foundFont ?? 'Arial')
-
       p.textSize(object.textSettings.textSize)
+      if (!object.textSettings.individual_object) {
+        p.textAlign(
+          object.textSettings.align_x == TextAlignX.center
+            ? p.CENTER
+            : object.textSettings.align_x == TextAlignX.right
+              ? p.RIGHT
+              : p.LEFT,
+          object.textSettings.align_y == TextAlignY.center
+            ? p.CENTER
+            : object.textSettings.align_y == TextAlignY.bottom
+              ? p.BOTTOM
+              : p.TOP
+        )
+      }
 
       // T2. 文字の二重配列化(再生途中で変わることはない…)
-      const characters = ((text) => {
+      const characterLines = ((text) => {
         if (!object.textSettings.individual_object) return [[text]]
         const lines = text.split(/\r?\n/)
         const lineCharacters = lines.map((line) => Array.from(line))
@@ -298,10 +311,16 @@ export function defineSketch(project: any) {
       })(object.textSettings.text)
 
       // T3. 文字ごとの描画開始
-      characters.forEach((characters, lineIndex) => {
-        const textAnchor = () => {
-          if (object.textSettings.align == TextAlign.center) return (characters.length - 1) / 2
-          if (object.textSettings.align == TextAlign.right) return characters.length - 1
+      characterLines.forEach((characters, lineIndex) => {
+        const textAnchorX = () => {
+          if (object.textSettings.align_x == TextAlignX.center) return (characters.length - 1) / 2
+          if (object.textSettings.align_x == TextAlignX.right) return characters.length - 1
+          return 0
+        }
+        const textAnchorY = () => {
+          if (object.textSettings.align_y == TextAlignY.center)
+            return (characterLines.length - 1) / 2
+          if (object.textSettings.align_y == TextAlignY.bottom) return characterLines.length - 1
           return 0
         }
 
@@ -326,7 +345,7 @@ export function defineSketch(project: any) {
             p.translate(
               -lerpValue(object.textSettings.spacing_x, object.start) * lineIndex + effectValue.Y,
               lerpValue(object.textSettings.spacing_y, object.start) *
-                (characterIndex - textAnchor()) +
+                (characterIndex - textAnchorX()) +
                 effectValue.X
             )
             if (verticalCharacter.includes(character)) {
@@ -335,9 +354,10 @@ export function defineSketch(project: any) {
           } else {
             p.translate(
               lerpValue(object.textSettings.spacing_x, object.start) *
-                (characterIndex - textAnchor()) +
+                (characterIndex - textAnchorX()) +
                 effectValue.X,
-              lerpValue(object.textSettings.spacing_y, object.start) * lineIndex + effectValue.Y
+              lerpValue(object.textSettings.spacing_y, object.start) * (lineIndex - textAnchorY()) +
+                effectValue.Y
             )
           }
           p.rotate(effectValue.angle)
@@ -359,7 +379,7 @@ export function defineSketch(project: any) {
             // バラバラじゃない場合
             const textWidth = p.drawingContext.measureText('あ').width
             p.drawingContext.letterSpacing =
-              lerpValue(object.textSettings.spacing_x, object.start) - textWidth + 'px'
+              lerpValue(object.textSettings.spacing_x, object.start) + 'px'
             p.textLeading(lerpValue(object.textSettings.spacing_y, object.start))
             p.text(object.textSettings.text, 0, 0)
           }

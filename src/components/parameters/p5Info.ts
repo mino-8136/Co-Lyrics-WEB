@@ -58,8 +58,14 @@ export enum ShapeType {
   ellipse = '円'
 }
 
-export enum TextAlign {
+export enum TextAlignX {
   left = '左揃え',
   center = '中央揃え',
   right = '右揃え'
+}
+
+export enum TextAlignY {
+  top = '上揃え',
+  center = '中央揃え',
+  bottom = '下揃え'
 }

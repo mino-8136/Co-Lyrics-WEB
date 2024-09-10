@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import { fontListData } from '@/components/parameters/fonts'
-import { ShapeType, TextAlign } from '@/components/parameters/p5Info'
+import { ShapeType, TextAlignX, TextAlignY } from '@/components/parameters/p5Info'
 import type { PropType } from 'vue'
 
 const parameter = defineModel({ type: String, required: true })
@@ -26,8 +26,10 @@ function getOptionsList(label: string | string[]): string[] {
     return fontListData.map((font) => font.displayName)
   } else if (label === 'shape') {
     return Object.values(ShapeType)
-  } else if (label === 'align') {
-    return Object.values(TextAlign)
+  } else if (label === 'align_x') {
+    return Object.values(TextAlignX)
+  } else if (label === 'align_y') {
+    return Object.values(TextAlignY)
   }
   return []
 }
