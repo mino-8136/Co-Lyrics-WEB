@@ -14,7 +14,12 @@
     <template v-if="configStore.isShowKeyframe">
       <div v-for="(keyframeSetting, settingIndex) in keyFrameSettingsList" :key="settingIndex">
         <div v-for="(keyframe, index) in keyframeSetting.keyframes" :key="index">
-          <KeyframePoint :point="keyframe" :scaler="scaler" @callKeyframeSort="sortKeyframe" />
+          <KeyframePoint
+            :point="keyframe"
+            :scaler="scaler"
+            :selected="timelineStore.selectedObjectId === baseObject.id"
+            @callKeyframeSort="sortKeyframe"
+          />
         </div>
       </div>
     </template>
@@ -101,13 +106,9 @@ const keyFrameSettingsList = computed(() => {
 
 // props.objectのキーフレームの並び替え
 const sortKeyframe = () => {
-  console.log('sortKeyframe')
+  //console.log('sortKeyframe')
   keyFrameSettingsList.value.forEach((keyframeSettings) => {
-    Object.entries(keyframeSettings).forEach(([param, value]) => {
-      if (Array.isArray(value) && value.length > 1) {
-        value = value.sort((a, b) => a.frame - b.frame)
-      }
-    })
+    keyframeSettings.sortKeyframes()
   })
 }
 
