@@ -85,12 +85,27 @@ function imageColor(tags: string | string[] | undefined): string {
 }
 
 /////////////////////////////////////////////////////////
+// エフェクト新規追加時にKeyframeSettingsを復元する処理(復帰時はobjectInfo.tsで行う)
+function hydrateKeyframeSettings(parameters: Record<string, any>): Record<string, any> {
+  Object.keys(parameters).forEach((key) => {
+    const param = parameters[key]
+
+    // keyframeSettings がある場合、KeyframeSettings に復元
+    if (param && param.keyframes && Array.isArray(param.keyframes)) {
+      parameters[key] = new KeyframeSettings(param.keyframes)
+      //console.log(parameters)
+    }
+  })
+  return parameters
+}
 
 function handleButtonClick(effectName: string, parameters: Record<string, any>) {
   const deepCopiedParameters = JSON.parse(JSON.stringify(parameters))
+  const hydratedParameters = hydrateKeyframeSettings(deepCopiedParameters)
+
   effects.value.effects.push({
     name: effectName,
-    parameters: deepCopiedParameters,
+    parameters: hydratedParameters,
     id: generateUniqueId()
   })
   showPanel.value = false
