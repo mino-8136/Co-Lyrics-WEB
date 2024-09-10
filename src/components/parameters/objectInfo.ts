@@ -201,8 +201,8 @@ export class TextSettings extends PropertyMethod {
     fill_color: { name: '色', type: UIType.color },
     font: { name: 'フォント', type: UIType.select },
     text: { name: 'テキスト', type: UIType.text },
-    align_x: { name: '横揃え', type: UIType.select },
-    align_y: { name: '縦揃え', type: UIType.select }
+    align_x: { name: '行', type: UIType.select },
+    align_y: { name: '列', type: UIType.select }
   }
 
   constructor({
