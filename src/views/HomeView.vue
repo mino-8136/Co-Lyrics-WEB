@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-card class="ma-4">
-      <v-card-title>ソフトウェア概要 v0.9.4</v-card-title>
+      <v-card-title>ソフトウェア概要 v0.9.5</v-card-title>
       <v-divider></v-divider>
       <v-card-text>
         <p>
