@@ -2,11 +2,11 @@ import { gsap } from 'gsap'
 import p5 from 'p5'
 import {
   type TextObject,
-  type KeyframeSettings,
   ShapeObject,
   ImageObject,
   BaseObject,
-  type RenderObject
+  type RenderObject,
+  type KeyframeSetting
 } from '@/components/parameters/objectInfo'
 import { Inform, ShapeType, TextAlignX, TextAlignY } from '@/components/parameters/p5Info'
 import { fontListData, setFonts } from '../parameters/fonts'
@@ -104,8 +104,8 @@ export function defineSketch(project: any) {
           p.stroke(255, 0, 0)
           p.noFill()
           p.rect(
-            lerpValue(object.standardRenderSettings.X, object.start),
-            lerpValue(object.standardRenderSettings.Y, object.start),
+            lerpValue(object.standardRenderSettings.X.keyframes, object.start),
+            lerpValue(object.standardRenderSettings.Y.keyframes, object.start),
             50,
             50
           )
@@ -140,10 +140,10 @@ export function defineSketch(project: any) {
         if (!('standardRenderSettings' in object)) return
 
         const objectX =
-          lerpValue(object.standardRenderSettings.X, object.start) +
+          lerpValue(object.standardRenderSettings.X.keyframes, object.start) +
           object.standardRenderSettings.relativeX
         const objectY =
-          lerpValue(object.standardRenderSettings.Y, object.start) +
+          lerpValue(object.standardRenderSettings.Y.keyframes, object.start) +
           object.standardRenderSettings.relativeY
 
         const distance = p.dist(mouseX, mouseY, objectX, objectY)
@@ -169,10 +169,10 @@ export function defineSketch(project: any) {
         const mouseX = (p.mouseX - p.width / 2) / project.canvasScale
         const mouseY = (p.mouseY - p.height / 2) / project.canvasScale
 
-        selectedObject.object.standardRenderSettings.X.forEach((keyframe) => {
+        selectedObject.object.standardRenderSettings.X.keyframes.forEach((keyframe) => {
           keyframe.value += mouseX - selectedObject.startMouseX
         })
-        selectedObject.object.standardRenderSettings.Y.forEach((keyframe) => {
+        selectedObject.object.standardRenderSettings.Y.keyframes.forEach((keyframe) => {
           keyframe.value += mouseY - selectedObject.startMouseY
         })
 
@@ -205,11 +205,13 @@ export function defineSketch(project: any) {
 
       // 2. 全体的なトランスフォームの実行(renderTextと同様)
       p.translate(
-        lerpValue(object.standardRenderSettings.X, object.start),
-        lerpValue(object.standardRenderSettings.Y, object.start)
+        lerpValue(object.standardRenderSettings.X.keyframes, object.start),
+        lerpValue(object.standardRenderSettings.Y.keyframes, object.start)
       )
-      p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
-      p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
+      p.rotate(lerpValue(object.standardRenderSettings.angle.keyframes, object.start))
+      p.scale(
+        lerpValue(convertToPercentage(object.standardRenderSettings.scale.keyframes), object.start)
+      )
 
       // 3. エフェクト値の計算
       const inform = new Inform(
@@ -231,7 +233,7 @@ export function defineSketch(project: any) {
       // 5. 色の設定
       const col = p.color(object.shapeSettings.fill_color)
       col.setAlpha(
-        (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
+        (lerpValue(object.standardRenderSettings.opacity.keyframes, object.start) / 100) *
           (effectValue.opacity / 100) *
           p.alpha(col)
       )
@@ -246,16 +248,16 @@ export function defineSketch(project: any) {
           p.rect(
             0,
             0,
-            lerpValue(object.shapeSettings.width, object.start),
-            lerpValue(object.shapeSettings.height, object.start)
+            lerpValue(object.shapeSettings.width.keyframes, object.start),
+            lerpValue(object.shapeSettings.height.keyframes, object.start)
           )
           break
         case ShapeType.ellipse:
           p.ellipse(
             0,
             0,
-            lerpValue(object.shapeSettings.width, object.start),
-            lerpValue(object.shapeSettings.height, object.start)
+            lerpValue(object.shapeSettings.width.keyframes, object.start),
+            lerpValue(object.shapeSettings.height.keyframes, object.start)
           )
           break
       }
@@ -274,11 +276,13 @@ export function defineSketch(project: any) {
 
       // 2. 全体的なトランスフォームの実行
       p.translate(
-        lerpValue(object.standardRenderSettings.X, object.start),
-        lerpValue(object.standardRenderSettings.Y, object.start)
+        lerpValue(object.standardRenderSettings.X.keyframes, object.start),
+        lerpValue(object.standardRenderSettings.Y.keyframes, object.start)
       )
-      p.rotate(lerpValue(object.standardRenderSettings.angle, object.start))
-      p.scale(lerpValue(convertToPercentage(object.standardRenderSettings.scale), object.start))
+      p.rotate(lerpValue(object.standardRenderSettings.angle.keyframes, object.start))
+      p.scale(
+        lerpValue(convertToPercentage(object.standardRenderSettings.scale.keyframes), object.start)
+      )
 
       // T1. フォントの設定
       const foundFont = fontListData.find(
@@ -343,10 +347,10 @@ export function defineSketch(project: any) {
           // 4. エフェクトの影響の適用
           if (object.textSettings.isVertical) {
             p.translate(
-              -lerpValue(object.textSettings.spacing_x, object.start) *
+              -lerpValue(object.textSettings.spacing_x.keyframes, object.start) *
                 (lineIndex - textAnchorY()) +
                 effectValue.Y,
-              lerpValue(object.textSettings.spacing_y, object.start) *
+              lerpValue(object.textSettings.spacing_y.keyframes, object.start) *
                 (characterIndex - textAnchorX()) +
                 effectValue.X
             )
@@ -355,10 +359,11 @@ export function defineSketch(project: any) {
             }
           } else {
             p.translate(
-              lerpValue(object.textSettings.spacing_x, object.start) *
+              lerpValue(object.textSettings.spacing_x.keyframes, object.start) *
                 (characterIndex - textAnchorX()) +
                 effectValue.X,
-              lerpValue(object.textSettings.spacing_y, object.start) * (lineIndex - textAnchorY()) +
+              lerpValue(object.textSettings.spacing_y.keyframes, object.start) *
+                (lineIndex - textAnchorY()) +
                 effectValue.Y
             )
           }
@@ -368,7 +373,7 @@ export function defineSketch(project: any) {
           // 5. 色の設定
           const col = p.color(object.textSettings.fill_color)
           col.setAlpha(
-            (lerpValue(object.standardRenderSettings.opacity, object.start) / 100) *
+            (lerpValue(object.standardRenderSettings.opacity.keyframes, object.start) / 100) *
               (effectValue.opacity / 100) *
               p.alpha(col)
           )
@@ -381,8 +386,8 @@ export function defineSketch(project: any) {
             // バラバラじゃない場合
             const textWidth = p.drawingContext.measureText('あ').width
             p.drawingContext.letterSpacing =
-              lerpValue(object.textSettings.spacing_x, object.start) + 'px'
-            p.textLeading(lerpValue(object.textSettings.spacing_y, object.start))
+              lerpValue(object.textSettings.spacing_x.keyframes, object.start) + 'px'
+            p.textLeading(lerpValue(object.textSettings.spacing_y.keyframes, object.start))
             p.text(object.textSettings.text, 0, 0)
           }
           p.pop()
@@ -396,7 +401,7 @@ export function defineSketch(project: any) {
     //////////////////////////
 
     // 受け取ったobjectのパラメータをすべて百分率にして返す関数
-    const convertToPercentage = (param: KeyframeSettings): KeyframeSettings => {
+    const convertToPercentage = (param: KeyframeSetting[]): KeyframeSetting[] => {
       const convertedParam = JSON.parse(JSON.stringify(param))
       convertedParam.forEach((keyframe: { value: number }) => {
         keyframe.value = keyframe.value / 100
@@ -405,7 +410,7 @@ export function defineSketch(project: any) {
     }
 
     // キーフレーム間の値を補完する関数1
-    function lerpValue(keyframes: KeyframeSettings, objectStartFrame: number): number {
+    function lerpValue(keyframes: KeyframeSetting[], objectStartFrame: number): number {
       // Parameterが配列であるという前提で行く
       const lastSection = keyframes.length - 1
       const currentSection = getCurrentSection(keyframes, objectStartFrame)
@@ -434,7 +439,7 @@ export function defineSketch(project: any) {
 
     // キーフレーム間の値を補完する関数2
     function getEaseValue(
-      param: KeyframeSettings,
+      param: KeyframeSetting[],
       currentSection: number,
       nextSection: number,
       currentFrame: number
@@ -462,7 +467,7 @@ export function defineSketch(project: any) {
 
     // どの区間のフレームを参照するかを求める(CurrentFrameを超えない最大のキーフレーム)
     // 最初のキーフレームに到達していない場合に-1を返す
-    function getCurrentSection(param: KeyframeSettings, objectStartFrame: number) {
+    function getCurrentSection(param: KeyframeSetting[], objectStartFrame: number) {
       let index = -1
       for (let i = 0; i < param.length; i++) {
         if (objectStartFrame + param[i].frame <= currentFrame) {

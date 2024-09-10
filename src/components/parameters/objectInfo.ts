@@ -10,7 +10,7 @@ import { styleList } from '@/assets/effects/style'
 import { animationList } from '@/assets/effects/animation'
 import { UIType } from './uiInfo'
 import p5 from 'p5'
-import { deepCopy } from '../utils/common'
+import { deepCopy, generateUniqueId } from '../utils/common'
 
 //////////////////////////////////////////////////////////////
 
@@ -21,36 +21,28 @@ export interface KeyframeSetting {
   id: string
   easeType?: string
 }
-//export type KeyframeSettings = KeyframeSetting[]
-
 export class KeyframeSettings {
   keyframes: KeyframeSetting[]
   isGraphOpen: boolean = false
   constructor(keyframes: KeyframeSetting[] = []) {
     this.keyframes = keyframes
   }
-  // キーフレームを追加するメソッド
-  addKeyframe(keyframe: KeyframeSetting): void {
-    this.keyframes.push(keyframe)
+
+  // 適当な順番にキーフレームを追加するメソッド
+  addKeyframe(index: number): void {
+    const newKeyframe =
+      this.keyframes.length - 1 !== index
+        ? Math.floor((this.keyframes[index].frame + this.keyframes[index + 1].frame) / 2)
+        : this.keyframes[index].frame + 20
+    this.keyframes.splice(index + 1, 0, {
+      frame: newKeyframe,
+      value: this.keyframes[index].value,
+      id: generateUniqueId()
+    })
   }
-  // キーフレームを削除するメソッド
-  deleteKeyframe(id: string): void {
-    this.keyframes = this.keyframes.filter((keyframe) => keyframe.id !== id)
-  }
-  // キーフレームを更新するメソッド
-  updateKeyframe(id: string, keyframe: KeyframeSetting): void {
-    const index = this.keyframes.findIndex((keyframe) => keyframe.id === id)
-    if (index !== -1) {
-      this.keyframes[index] = keyframe
-    }
-  }
-  // キーフレームを取得するメソッド
-  getKeyframe(id: string): KeyframeSetting | undefined {
-    return this.keyframes.find((keyframe) => keyframe.id === id)
-  }
-  // キーフレームをすべて取得するメソッド
-  getKeyframes(): KeyframeSetting[] {
-    return this.keyframes
+  // 指定した位置のキーフレームを削除するメソッド
+  deleteKeyframe(index: number): void {
+    this.keyframes.splice(index, 1)
   }
   // キーフレームをソートするメソッド
   sortKeyframes(): void {
@@ -58,14 +50,7 @@ export class KeyframeSettings {
   }
 }
 
-// パラメータがKeyframeSettings型かを判定する関数
-// TODO:配列かどうかで判定しているので、もう少し詳細の判定が必要
-export function isKeyframeSettings(element: any): element is KeyframeSettings {
-  return Array.isArray(element)
-}
-
-//////////////////////////////////////////////////////////////
-
+// アニメーションの情報管理
 export interface AnimationSetting {
   name: string
   parameters: { [key: string]: any }
@@ -92,12 +77,13 @@ export class AnimationSettings {
     return baseValue
   }
 }
+
+// アニメーションの情報管理
 export interface StyleSetting {
   name: string
   parameters: { [key: string]: any }
   id: string
 }
-
 export class StyleSettings {
   effects: StyleSetting[]
 
@@ -194,13 +180,13 @@ export class StandardRenderSettings extends PropertyMethod {
     angle = new KeyframeSettings([{ value: 0, frame: 0, id: '0' }])
   } = {}) {
     super()
-    this.X = X
-    this.Y = Y
+    this.X = new KeyframeSettings(X.keyframes)
+    this.Y = new KeyframeSettings(Y.keyframes)
     this.relativeX = 0
     this.relativeY = 0
-    this.scale = scale
-    this.opacity = opacity
-    this.angle = angle
+    this.scale = new KeyframeSettings(scale.keyframes)
+    this.opacity = new KeyframeSettings(opacity.keyframes)
+    this.angle = new KeyframeSettings(angle.keyframes)
   }
 }
 
@@ -258,8 +244,8 @@ export class TextSettings extends PropertyMethod {
     this.individual_object = individual_object
     this.align_x = align_x
     this.align_y = align_y
-    this.spacing_x = spacing_x
-    this.spacing_y = spacing_y
+    this.spacing_x = new KeyframeSettings(spacing_x.keyframes)
+    this.spacing_y = new KeyframeSettings(spacing_y.keyframes)
     this.fill_color = fill_color
     this.font = font
     this.text = text
@@ -286,8 +272,8 @@ export class ShapeSettings extends PropertyMethod {
     shape = ShapeType.rect
   } = {}) {
     super()
-    this.width = width
-    this.height = height
+    this.width = new KeyframeSettings(width.keyframes)
+    this.height = new KeyframeSettings(height.keyframes)
     this.fill_color = fill_color
     this.shape = shape
   }
