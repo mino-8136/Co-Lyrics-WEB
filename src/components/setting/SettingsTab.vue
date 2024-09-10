@@ -10,12 +10,20 @@
         <v-row align="center" style="min-height: 50px">
           <!-- パラメータ名の表示 -->
           <v-chip
+            v-if="
+              (parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.keyframe
+            "
             class="parameter-name"
             variant="outlined"
             size="small"
-            @click="toggleKeyframeGraph(label)"
-            >{{ (parameters.constructor as typeof PropertyMethod).getParameterName(label) }}</v-chip
-          >
+            @click="
+              (param as KeyframeSettings).isGraphOpen = !(param as KeyframeSettings).isGraphOpen
+            "
+            >{{ (parameters.constructor as typeof PropertyMethod).getParameterName(label) }}
+          </v-chip>
+          <v-chip v-else class="parameter-name" variant="outlined" size="small">{{
+            (parameters.constructor as typeof PropertyMethod).getParameterName(label)
+          }}</v-chip>
 
           <!-- キーフレーム対応の場合 -->
           <v-col
@@ -229,16 +237,6 @@ const currentKeyframe = ref<KeyframeSetting>({} as KeyframeSetting)
 function openEasingDialog(keyframe: KeyframeSetting) {
   currentKeyframe.value = keyframe
   showEasingPanel.value = true
-}
-
-// キーフレームグラフの表示切り替え
-const showKeyframes = ref<string[]>([])
-function toggleKeyframeGraph(label: string) {
-  if (showKeyframes.value.includes(label)) {
-    showKeyframes.value = showKeyframes.value.filter((keyframe) => keyframe !== label)
-  } else {
-    showKeyframes.value.push(label)
-  }
 }
 </script>
 

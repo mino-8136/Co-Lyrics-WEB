@@ -21,7 +21,42 @@ export interface KeyframeSetting {
   id: string
   easeType?: string
 }
-export type KeyframeSettings = KeyframeSetting[]
+//export type KeyframeSettings = KeyframeSetting[]
+
+export class KeyframeSettings {
+  keyframes: KeyframeSetting[]
+  isGraphOpen: boolean = false
+  constructor(keyframes: KeyframeSetting[] = []) {
+    this.keyframes = keyframes
+  }
+  // キーフレームを追加するメソッド
+  addKeyframe(keyframe: KeyframeSetting): void {
+    this.keyframes.push(keyframe)
+  }
+  // キーフレームを削除するメソッド
+  deleteKeyframe(id: string): void {
+    this.keyframes = this.keyframes.filter((keyframe) => keyframe.id !== id)
+  }
+  // キーフレームを更新するメソッド
+  updateKeyframe(id: string, keyframe: KeyframeSetting): void {
+    const index = this.keyframes.findIndex((keyframe) => keyframe.id === id)
+    if (index !== -1) {
+      this.keyframes[index] = keyframe
+    }
+  }
+  // キーフレームを取得するメソッド
+  getKeyframe(id: string): KeyframeSetting | undefined {
+    return this.keyframes.find((keyframe) => keyframe.id === id)
+  }
+  // キーフレームをすべて取得するメソッド
+  getKeyframes(): KeyframeSetting[] {
+    return this.keyframes
+  }
+  // キーフレームをソートするメソッド
+  sortKeyframes(): void {
+    this.keyframes.sort((a, b) => a.frame - b.frame)
+  }
+}
 
 // パラメータがKeyframeSettings型かを判定する関数
 // TODO:配列かどうかで判定しているので、もう少し詳細の判定が必要
@@ -152,11 +187,11 @@ export class StandardRenderSettings extends PropertyMethod {
   }
 
   constructor({
-    X = [{ value: 0, frame: 0, id: '0' }],
-    Y = [{ value: 0, frame: 0, id: '0' }],
-    scale = [{ value: 100, frame: 0, id: '0' }],
-    opacity = [{ value: 100, frame: 0, id: '0' }],
-    angle = [{ value: 0, frame: 0, id: '0' }]
+    X = new KeyframeSettings([{ value: 0, frame: 0, id: '0' }]),
+    Y = new KeyframeSettings([{ value: 0, frame: 0, id: '0' }]),
+    scale = new KeyframeSettings([{ value: 100, frame: 0, id: '0' }]),
+    opacity = new KeyframeSettings([{ value: 100, frame: 0, id: '0' }]),
+    angle = new KeyframeSettings([{ value: 0, frame: 0, id: '0' }])
   } = {}) {
     super()
     this.X = X
@@ -211,8 +246,8 @@ export class TextSettings extends PropertyMethod {
     individual_object = true,
     align_x = TextAlignX.center,
     align_y = TextAlignY.center,
-    spacing_x = [{ value: 80, frame: 0, id: '0' }],
-    spacing_y = [{ value: 80, frame: 0, id: '0' }],
+    spacing_x = new KeyframeSettings([{ value: 80, frame: 0, id: '0' }]),
+    spacing_y = new KeyframeSettings([{ value: 80, frame: 0, id: '0' }]),
     fill_color = '#ffffff',
     font = 'Noto Sans JP Bold',
     text = 'サンプル'
@@ -245,8 +280,8 @@ export class ShapeSettings extends PropertyMethod {
   }
 
   constructor({
-    width = [{ value: 200, frame: 0, id: '0' }],
-    height = [{ value: 200, frame: 0, id: '0' }],
+    width = new KeyframeSettings([{ value: 200, frame: 0, id: '0' }]),
+    height = new KeyframeSettings([{ value: 200, frame: 0, id: '0' }]),
     fill_color = '#D3D3D3',
     shape = ShapeType.rect
   } = {}) {
