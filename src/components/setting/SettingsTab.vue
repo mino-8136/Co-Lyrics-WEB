@@ -16,6 +16,7 @@
             class="parameter-name"
             variant="outlined"
             size="small"
+            label
             @click="
               (param as KeyframeSettings).isGraphOpen = !(param as KeyframeSettings).isGraphOpen
             "

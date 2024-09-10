@@ -12,8 +12,10 @@
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
 
     <template v-if="configStore.isShowKeyframe">
-      <div v-for="(keyframe, index) in keyFrameList" :key="index">
-        <KeyframePoint :point="keyframe" :scaler="scaler" @callKeyframeSort="sortKeyframe" />
+      <div v-for="(keyframeSetting, settingIndex) in keyFrameSettingsList" :key="settingIndex">
+        <div v-for="(keyframe, index) in keyframeSetting.keyframes" :key="index">
+          <KeyframePoint :point="keyframe" :scaler="scaler" @callKeyframeSort="sortKeyframe" />
+        </div>
       </div>
     </template>
   </div>
@@ -29,7 +31,7 @@ import {
   ShapeObject,
   type RenderObject,
   objectSettingsList,
-  type KeyframeSetting
+  KeyframeSettings
 } from '../parameters/objectInfo'
 import KeyframePoint from './KeyframePoint.vue'
 import gsap from 'gsap'
@@ -79,37 +81,33 @@ const bgColor = computed(() => {
 // キーフレーム操作の関数 //
 //////////////////////////
 
-// キーフレームの抽出
-const keyFrameList = computed(() => {
-  let keyFrameList: KeyframeSetting[] = []
+// 有効なキーフレームクラスの抽出
+const keyFrameSettingsList = computed(() => {
+  let tempList: KeyframeSettings[] = []
   objectSettingsList.forEach((anySetting) => {
     if (anySetting in props.object) {
       Object.entries(props.object[anySetting as keyof typeof props.object]).forEach(
         ([param, value]) => {
-          // KeyframeSettingsの配列であるかを判定
-          if (Array.isArray(value) && value.length > 1) {
-            keyFrameList.push(...value)
+          // KeyframeSettingsかを判定
+          if (value instanceof KeyframeSettings && value.keyframes.length > 1) {
+            tempList.push(value)
           }
         }
       )
     }
   })
-  return keyFrameList
+  return tempList
 })
 
 // props.objectのキーフレームの並び替え
 const sortKeyframe = () => {
   console.log('sortKeyframe')
-  objectSettingsList.forEach((anySetting) => {
-    if (anySetting in props.object) {
-      Object.entries(props.object[anySetting as keyof typeof props.object]).forEach(
-        ([param, value]) => {
-          if (Array.isArray(value) && value.length > 1) {
-            value = value.sort((a, b) => a.frame - b.frame)
-          }
-        }
-      )
-    }
+  keyFrameSettingsList.value.forEach((keyframeSettings) => {
+    Object.entries(keyframeSettings).forEach(([param, value]) => {
+      if (Array.isArray(value) && value.length > 1) {
+        value = value.sort((a, b) => a.frame - b.frame)
+      }
+    })
   })
 }
 

@@ -27,6 +27,15 @@
               param.name
             }}</v-chip>
 
+            <!-- キーフレーム対応の場合 -->
+            <template v-if="param.type == UIType.keyframe">
+              <KeyframeParameter
+                v-model="params.parameters[paramLabel]"
+                :min="param.min"
+                :max="param.max"
+              />
+            </template>
+
             <!-- 数値型パラメータの場合 -->
             <template v-if="param.type == UIType.slider">
               <SliderParameter
@@ -94,6 +103,7 @@ import EffectPanel from './EffectPanel.vue'
 import { animationList } from '@/assets/effects/animation'
 import { styleList } from '@/assets/effects/style'
 
+import KeyframeParameter from './dom/KeyframeParameter.vue'
 import SliderParameter from './dom/SliderParameter.vue'
 import TextParameter from './dom/TextParameter.vue'
 import SelectParameter from './dom/SelectParameter.vue'
