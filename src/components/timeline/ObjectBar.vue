@@ -86,21 +86,32 @@ const bgColor = computed(() => {
 // キーフレーム操作の関数 //
 //////////////////////////
 
-// 有効なキーフレームクラスの抽出
+// KeyframeSettingsを再帰的に探索して抽出する関数
+function extractKeyframeSettings(obj: any): KeyframeSettings[] {
+  let keyframeSettingsList: KeyframeSettings[] = []
+
+  if (obj instanceof KeyframeSettings && obj.keyframes.length > 1) {
+    keyframeSettingsList.push(obj)
+  } else if (typeof obj === 'object' && obj !== null) {
+    Object.values(obj).forEach((value) => {
+      keyframeSettingsList = keyframeSettingsList.concat(extractKeyframeSettings(value))
+    })
+  }
+
+  return keyframeSettingsList
+}
+
+// 有効なキーフレームクラスの抽出（再帰バージョン）
 const keyFrameSettingsList = computed(() => {
   let tempList: KeyframeSettings[] = []
+
   objectSettingsList.forEach((anySetting) => {
     if (anySetting in props.object) {
-      Object.entries(props.object[anySetting as keyof typeof props.object]).forEach(
-        ([param, value]) => {
-          // KeyframeSettingsかを判定
-          if (value instanceof KeyframeSettings && value.keyframes.length > 1) {
-            tempList.push(value)
-          }
-        }
-      )
+      const settings = props.object[anySetting as keyof typeof props.object]
+      tempList = tempList.concat(extractKeyframeSettings(settings))
     }
   })
+
   return tempList
 })
 

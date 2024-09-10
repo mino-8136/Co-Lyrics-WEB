@@ -27,6 +27,8 @@ def convert_to_standard_format(data):
     # ここでエフェクト名と変換するパラメータ名を指定
     param_mapping = {
         "ぼかし効果": ["blur_amount"], 
+        "縁取り":["line_width"],
+        "シャドー":["shadow_x", "shadow_y", "shadow_blur"],
     }
 
     for item in data:

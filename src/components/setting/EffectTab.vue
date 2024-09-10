@@ -16,6 +16,7 @@
           <v-icon @click="deleteEffect(label)">mdi-delete</v-icon>
         </template>
 
+        <!-- 各パラメータの表示 -->
         <div
           v-for="(param, paramLabel) in searchEffects(params).parameters"
           :key="param.name"
@@ -23,7 +24,20 @@
         >
           <div v-if="param.type != UIType.none" class="parameter-row">
             <!-- パラメータ名の表示 -->
-            <v-chip class="parameter-name" variant="outlined" size="small" label>{{
+            <v-chip
+              v-if="param.type == UIType.keyframe"
+              class="parameter-name"
+              variant="outlined"
+              size="small"
+              label
+              @click="
+                (params.parameters[paramLabel] as KeyframeSettings).isGraphOpen = !(
+                  params.parameters[paramLabel] as KeyframeSettings
+                ).isGraphOpen
+              "
+              >{{ param.name }}</v-chip
+            >
+            <v-chip v-else class="parameter-name" variant="outlined" size="small">{{
               param.name
             }}</v-chip>
 
@@ -68,6 +82,8 @@
               <CheckboxParameter v-model="params.parameters[paramLabel] as boolean" />
             </template>
           </div>
+
+          <v-divider />
         </div>
       </v-card>
     </div>
@@ -112,6 +128,7 @@ import TextParameter from './dom/TextParameter.vue'
 import SelectParameter from './dom/SelectParameter.vue'
 import ColorParameter from './dom/ColorParameter.vue'
 import CheckboxParameter from './dom/CheckboxParameter.vue'
+import type { KeyframeSetting, KeyframeSettings } from '../parameters/keyframeInfo'
 
 const parameters = defineModel<StyleSettings>('params', { required: true })
 const props = defineProps<{
@@ -165,7 +182,7 @@ function deleteEffect(index: number) {
 .parameter-row {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  margin: 2px 0px;
 }
 
 .parameter-name {

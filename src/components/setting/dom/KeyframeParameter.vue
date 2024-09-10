@@ -1,5 +1,5 @@
 <template>
-  <v-row>
+  <v-row class="py-2">
     <!-- キーフレームビューの表示 -->
     <KeyframeGraph
       v-if="parameter.isGraphOpen"
@@ -10,7 +10,7 @@
     />
 
     <transition-group v-else name="list" tag="div" style="width: 100%">
-      <v-col v-for="(keyframe, idx) in parameter.keyframes" :key="keyframe.id" class="pt-1 pb-2">
+      <v-col v-for="(keyframe, idx) in parameter.keyframes" :key="keyframe.id" class="py-1">
         <v-slider
           v-model="keyframe.value"
           :min="prop.min"
