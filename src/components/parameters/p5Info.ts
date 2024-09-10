@@ -1,5 +1,6 @@
 import type p5 from 'p5'
-import type { pt } from 'vuetify/locale'
+import {type KeyframeSetting } from './keyframeInfo'
+import gsap from 'gsap'
 
 // エフェクト処理用の相対パラメータ
 export class Transform {

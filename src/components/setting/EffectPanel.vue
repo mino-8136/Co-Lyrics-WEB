@@ -40,6 +40,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { type StyleSettings, type AnimationSettings } from '../parameters/objectInfo'
+import { KeyframeSettings } from '../parameters/keyframeInfo'
 import { generateUniqueId } from '@/components/utils/common'
 import { animationList } from '@/assets/effects/animation'
 import { styleList } from '@/assets/effects/style'

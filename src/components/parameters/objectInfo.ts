@@ -18,7 +18,7 @@ import { deepCopy, generateUniqueId } from '../utils/common'
 // アニメーションの情報管理
 export interface AnimationSetting {
   name: string
-  parameters: { [key: string]: any }
+  parameters: { [key: string]: number | string | boolean | KeyframeSettings }
   id: string
 }
 export class AnimationSettings {
@@ -43,10 +43,10 @@ export class AnimationSettings {
   }
 }
 
-// アニメーションの情報管理
+// スタイルの情報管理
 export interface StyleSetting {
   name: string
-  parameters: { [key: string]: any }
+  parameters: { [key: string]: number | string | boolean | KeyframeSettings }
   id: string
 }
 export class StyleSettings {
