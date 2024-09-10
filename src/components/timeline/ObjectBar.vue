@@ -35,9 +35,9 @@ import {
   ImageObject,
   ShapeObject,
   type RenderObject,
-  objectSettingsList,
-  KeyframeSettings
+  objectSettingsList
 } from '../parameters/objectInfo'
+import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import KeyframePoint from './KeyframePoint.vue'
 import gsap from 'gsap'
 

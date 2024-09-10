@@ -1,11 +1,13 @@
 import { type StyleSetting } from '@/components/parameters/objectInfo'
+import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import { UIType } from '@/components/parameters/uiInfo'
+import { generateUniqueId } from '@/components/utils/common'
 import p5 from 'p5'
 
 // この形に従う
 export interface Style {
   name: string
-  params: { [key: string]: any }
+  params: { [key: string]: number | string | boolean | KeyframeSettings }
   description?: string
   tag?: string[]
   parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応
@@ -43,9 +45,9 @@ export const styleList: Style[] = [
   },
   {
     name: 'ぼかし効果',
-    params: { blur_amount: 5 },
+    params: { blur_amount: new KeyframeSettings([{ frame: 0, value: 0, id: generateUniqueId() }]) },
     parameters: {
-      blur_amount: { name: 'ぼかし量', type: UIType.slider, min: 0, max: 100 }
+      blur_amount: { name: 'ぼかし量', type: UIType.keyframe, min: 0, max: 100 }
     },
     applyStyle: (p: p5, style: StyleSetting) => {
       p.drawingContext.filter = `blur(${style.parameters.blur_amount}px)`

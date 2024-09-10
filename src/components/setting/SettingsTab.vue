@@ -99,10 +99,10 @@
 <script setup lang="ts">
 import {
   StandardRenderSettings,
-  type KeyframeSettings,
   TextSettings,
   PropertyMethod
 } from '@/components/parameters/objectInfo'
+import { type KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import { UIType } from '@/components/parameters/uiInfo'
 
 import KeyframeParameter from './dom/KeyframeParameter.vue'

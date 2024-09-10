@@ -11,7 +11,7 @@
 
 <script setup lang="ts">
 import { ref, onUnmounted, computed } from 'vue'
-import type { KeyframeSetting } from '../parameters/objectInfo'
+import { type KeyframeSetting } from '@/components/parameters/keyframeInfo'
 
 const point = defineModel<KeyframeSetting>('point', { required: true })
 const props = defineProps<{ scaler: number; selected: boolean }>()

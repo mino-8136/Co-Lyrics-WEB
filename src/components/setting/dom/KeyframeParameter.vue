@@ -62,7 +62,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
-import { type KeyframeSetting, KeyframeSettings } from '@/components/parameters/objectInfo'
+import { type KeyframeSetting, KeyframeSettings } from '@/components/parameters/keyframeInfo'
 
 import KeyframeGraph from '@/components/setting/KeyframeGraph.vue'
 import EasingPanel from '@/components/setting/EasingPanel.vue'

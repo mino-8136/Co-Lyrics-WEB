@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { type KeyframeSetting } from '@/components/parameters/objectInfo'
+import { type KeyframeSetting } from '@/components/parameters/keyframeInfo'
 import gsap from 'gsap'
 
 const showPanel = defineModel<boolean>('show', { required: true })

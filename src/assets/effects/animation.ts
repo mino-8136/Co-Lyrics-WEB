@@ -1,3 +1,4 @@
+import type { KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import { Inform, Transform } from '@/components/parameters/p5Info'
 import { UIType } from '@/components/parameters/uiInfo'
 import { clClamp } from '@/components/utils/common'
@@ -5,7 +6,7 @@ import { clClamp } from '@/components/utils/common'
 // この形に従う
 export interface Animation {
   name: string
-  params: { [key: string]: any }
+  params: { [key: string]: number | string | boolean | KeyframeSettings }
   description?: string
   tag?: string[]
   parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応

@@ -5,11 +5,11 @@ import {
   ShapeObject,
   ImageObject,
   BaseObject,
-  type RenderObject,
-  type KeyframeSetting
+  type RenderObject
 } from '@/components/parameters/objectInfo'
+import { type KeyframeSetting } from '@/components/parameters/keyframeInfo'
 import { Inform, ShapeType, TextAlignX, TextAlignY } from '@/components/parameters/p5Info'
-import { fontListData, setFonts } from '../parameters/fonts'
+import { fontListData, setFonts } from '@/components/parameters/fonts'
 
 let renderObjects: RenderObject[] = []
 const selectedObject = {
