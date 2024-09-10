@@ -6,7 +6,7 @@
       :start="selectedObject.start"
       :end="selectedObject.end"
       :panelWidth="getBoundingClientRect() * 0.7"
-      v-model:keyframes="parameter"
+      v-model:keyframes="parameter.keyframes"
     />
 
     <transition-group v-else name="list" tag="div" style="width: 100%">

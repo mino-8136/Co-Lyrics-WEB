@@ -11,7 +11,7 @@
 
       <v-tabs-window v-model="selectedTag">
         <v-row>
-          <v-col v-for="effect in filteredEffectList" :key="effect" class="d-flex" cols="3">
+          <v-col v-for="(effect, index) in filteredEffectList" :key="index" class="d-flex" cols="3">
             <v-container class="items">
               <v-img
                 :width="200"

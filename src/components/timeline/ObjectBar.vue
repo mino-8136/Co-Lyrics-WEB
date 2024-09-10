@@ -28,8 +28,8 @@ import {
   ImageObject,
   ShapeObject,
   type RenderObject,
-  type KeyframeSettings,
   objectSettingsList,
+  type KeyframeSetting
 } from '../parameters/objectInfo'
 import KeyframePoint from './KeyframePoint.vue'
 import gsap from 'gsap'
@@ -57,7 +57,7 @@ const side = ref('')
 // 横幅の定義方法 : end-startで定義する
 const objectStyle = computed(() => ({
   left: `${Math.floor(tempStart.value) * scaler.value}px`,
-  width: `${Math.floor(tempEnd.value - Math.floor(tempStart.value)) * scaler.value}px`,
+  width: `${(Math.floor(tempEnd.value - Math.floor(tempStart.value)) + 0.5) * scaler.value}px`,
   position: 'absolute',
   background: bgColor.value,
   cursor: isMoving.value ? 'grabbing' : 'grab'
@@ -65,9 +65,9 @@ const objectStyle = computed(() => ({
 
 const bgColor = computed(() => {
   if (baseObject.value instanceof TextObject) {
-    return 'linear-gradient(to right, rgb(217, 233, 255), rgb(255, 255, 255))'
+    return 'linear-gradient(to right, rgb(217, 233, 255), rgba(230, 255, 255, 0.6))'
   } else if (baseObject.value instanceof ShapeObject) {
-    return 'linear-gradient(to bottom right, rgb(120, 152, 255), rgb(222, 255, 255))'
+    return 'linear-gradient(to bottom right, rgb(120, 152, 255), rgba(230, 255, 255, 0.6))'
   } else if (baseObject.value instanceof ImageObject) {
     return 'rgb(211, 211, 211)'
   } else {
@@ -81,15 +81,17 @@ const bgColor = computed(() => {
 
 // キーフレームの抽出
 const keyFrameList = computed(() => {
-  let keyFrameList: KeyframeSettings = []
+  let keyFrameList: KeyframeSetting[] = []
   objectSettingsList.forEach((anySetting) => {
     if (anySetting in props.object) {
-      Object.entries(props.object[anySetting as keyof typeof props.object]).forEach(([param, value]) => {
-        // KeyframeSettingsの配列であるかを判定
-        if (Array.isArray(value) && value.length > 1) {
-          keyFrameList.push(...value)
+      Object.entries(props.object[anySetting as keyof typeof props.object]).forEach(
+        ([param, value]) => {
+          // KeyframeSettingsの配列であるかを判定
+          if (Array.isArray(value) && value.length > 1) {
+            keyFrameList.push(...value)
+          }
         }
-      })
+      )
     }
   })
   return keyFrameList
@@ -98,13 +100,15 @@ const keyFrameList = computed(() => {
 // props.objectのキーフレームの並び替え
 const sortKeyframe = () => {
   console.log('sortKeyframe')
-  objectSettingsList.forEach((anySetting)=>{
-    if( anySetting in props.object){
-      Object.entries(props.object[anySetting as keyof typeof props.object]).forEach(([param, value]) => {
-      if (Array.isArray(value) && value.length > 1) {
-        value = value.sort((a, b) => a.frame - b.frame)
-      }
-    })
+  objectSettingsList.forEach((anySetting) => {
+    if (anySetting in props.object) {
+      Object.entries(props.object[anySetting as keyof typeof props.object]).forEach(
+        ([param, value]) => {
+          if (Array.isArray(value) && value.length > 1) {
+            value = value.sort((a, b) => a.frame - b.frame)
+          }
+        }
+      )
     }
   })
 }

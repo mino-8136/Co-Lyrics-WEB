@@ -102,7 +102,7 @@ import { generateUniqueId } from '../utils/common'
 import { useTimelineStore } from '@/stores/objectStore'
 
 const displayEasingPanel = ref(false)
-const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })
+const keyframes = defineModel<KeyframeSetting[]>('keyframes', { required: true })
 const selectedKeyframe = ref<KeyframeSetting>({} as KeyframeSetting)
 const timelineStore = useTimelineStore()
 
