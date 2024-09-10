@@ -30,6 +30,9 @@ function getOptionsList(label: string | string[]): string[] {
     return Object.values(TextAlignX)
   } else if (label === 'align_y') {
     return Object.values(TextAlignY)
+  } else if (label === 'music') {
+    // 仮置き
+    return ['レターポスト', '誘閃光']
   }
   return []
 }
