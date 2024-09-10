@@ -47,22 +47,25 @@
 
             <!-- テキスト型パラメータの場合 -->
             <template v-if="param.type === UIType.text">
-              <TextParameter v-model="params.parameters[paramLabel]" class="w-100" />
+              <TextParameter v-model="params.parameters[paramLabel] as string" class="w-100" />
             </template>
 
             <!-- セレクトボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.select">
-              <SelectParameter v-model="params.parameters[paramLabel]" :param="param.options" />
+              <SelectParameter
+                v-model="params.parameters[paramLabel] as string"
+                :param="param.options"
+              />
             </template>
 
             <!-- カラー型パラメータの場合 -->
-            <template v-if="param.type == UIType.color">
-              <ColorParameter v-model="params.parameters[paramLabel]" />
+            <template v-if="param.type === UIType.color">
+              <ColorParameter v-model="params.parameters[paramLabel] as string" />
             </template>
 
             <!-- チェックボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.checkbox">
-              <CheckboxParameter v-model="params.parameters[paramLabel]" />
+              <CheckboxParameter v-model="params.parameters[paramLabel] as boolean" />
             </template>
           </div>
         </div>
@@ -174,16 +177,19 @@ function deleteEffect(index: number) {
 }
 
 /* リストアニメーション */
-.list-move, /* 移動する要素にトランジションを適用 */
+.list-move,
+/* 移動する要素にトランジションを適用 */
 .list-enter-active,
 .list-leave-active {
   transition: all 0.2s ease;
 }
+
 .list-enter-from,
 .list-leave-to {
   opacity: 0;
   transform: translateX(30px);
 }
+
 .list-leave-active {
   position: absolute;
 }

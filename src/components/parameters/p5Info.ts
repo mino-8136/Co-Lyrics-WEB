@@ -34,7 +34,10 @@ export function lerpValue(
   objectStartFrame: number,
   currentFrame: number
 ): number {
-  // Parameterが配列であるという前提で行く
+  // Parameterが配列ではない場合はそのまま返す
+  if (!Array.isArray(keyframes)) return keyframes
+
+
   const lastSection = keyframes.length - 1
   const currentSection = getCurrentSection(keyframes, objectStartFrame, currentFrame)
   const nextSection = currentSection + 1
