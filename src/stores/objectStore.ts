@@ -73,7 +73,8 @@ export const useTimelineStore = defineStore('timeline', {
 export const useConfigStore = defineStore('config', {
   state: () => ({
     isShowCollisionBox: false,
-    isShowKeyframe: true
+    isShowKeyframe: true,
+    isLoadSubsetFont: false
   }),
   actions: {},
   persist: true

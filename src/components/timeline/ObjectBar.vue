@@ -12,8 +12,15 @@
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
 
     <template v-if="configStore.isShowKeyframe">
-      <div v-for="(keyframe, index) in keyFrameList" :key="index">
-        <KeyframePoint :point="keyframe" :scaler="scaler" @callKeyframeSort="sortKeyframe" />
+      <div v-for="(keyframeSetting, settingIndex) in keyFrameSettingsList" :key="settingIndex">
+        <div v-for="(keyframe, index) in keyframeSetting.keyframes" :key="index">
+          <KeyframePoint
+            :point="keyframe"
+            :scaler="scaler"
+            :selected="timelineStore.selectedObjectId === baseObject.id"
+            @callKeyframeSort="sortKeyframe"
+          />
+        </div>
       </div>
     </template>
   </div>
@@ -27,9 +34,10 @@ import {
   TextObject,
   ImageObject,
   ShapeObject,
-  type RenderObject
+  type RenderObject,
+  objectSettingsList
 } from '../parameters/objectInfo'
-import { type KeyframeSettings } from '../parameters/objectInfo'
+import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import KeyframePoint from './KeyframePoint.vue'
 import gsap from 'gsap'
 
@@ -56,7 +64,7 @@ const side = ref('')
 // 横幅の定義方法 : end-startで定義する
 const objectStyle = computed(() => ({
   left: `${Math.floor(tempStart.value) * scaler.value}px`,
-  width: `${Math.floor(tempEnd.value - Math.floor(tempStart.value)) * scaler.value}px`,
+  width: `${(Math.floor(tempEnd.value - Math.floor(tempStart.value)) + 0.5) * scaler.value}px`,
   position: 'absolute',
   background: bgColor.value,
   cursor: isMoving.value ? 'grabbing' : 'grab'
@@ -64,9 +72,9 @@ const objectStyle = computed(() => ({
 
 const bgColor = computed(() => {
   if (baseObject.value instanceof TextObject) {
-    return 'linear-gradient(to right, rgb(217, 233, 255), rgb(255, 255, 255))'
+    return 'linear-gradient(to right, rgb(217, 233, 255), rgba(230, 255, 255, 0.6))'
   } else if (baseObject.value instanceof ShapeObject) {
-    return 'linear-gradient(to bottom right, rgb(120, 152, 255), rgb(222, 255, 255))'
+    return 'linear-gradient(to bottom right, rgb(120, 152, 255), rgba(230, 255, 255, 0.6))'
   } else if (baseObject.value instanceof ImageObject) {
     return 'rgb(211, 211, 211)'
   } else {
@@ -78,42 +86,41 @@ const bgColor = computed(() => {
 // キーフレーム操作の関数 //
 //////////////////////////
 
-// キーフレームの抽出
-const keyFrameList = computed(() => {
-  let keyFrameList: KeyframeSettings = []
+// KeyframeSettingsを再帰的に探索して抽出する関数
+function extractKeyframeSettings(obj: any): KeyframeSettings[] {
+  let keyframeSettingsList: KeyframeSettings[] = []
 
-  // TODO: standardRenderSettings以外のプロパティにも対応する
-  if ('standardRenderSettings' in props.object) {
-    Object.entries(props.object.standardRenderSettings).reduce((acc, [key, value]) => {
-      // KeyframeSettingsの配列であるかを判定
-      if (Array.isArray(value) && value.length > 1) {
-        acc.push(...value)
-      }
-      return acc
-    }, keyFrameList)
+  if (obj instanceof KeyframeSettings && obj.keyframes.length > 1) {
+    keyframeSettingsList.push(obj)
+  } else if (typeof obj === 'object' && obj !== null) {
+    Object.values(obj).forEach((value) => {
+      keyframeSettingsList = keyframeSettingsList.concat(extractKeyframeSettings(value))
+    })
   }
-  if ('shapeSettings' in props.object) {
-    Object.entries(props.object.shapeSettings).reduce((acc, [key, value]) => {
-      // KeyframeSettingsの配列であるかを判定
-      if (Array.isArray(value) && value.length > 1) {
-        acc.push(...value)
-      }
-      return acc
-    }, keyFrameList)
-  }
-  return keyFrameList
+
+  return keyframeSettingsList
+}
+
+// 有効なキーフレームクラスの抽出（再帰バージョン）
+const keyFrameSettingsList = computed(() => {
+  let tempList: KeyframeSettings[] = []
+
+  objectSettingsList.forEach((anySetting) => {
+    if (anySetting in props.object) {
+      const settings = props.object[anySetting as keyof typeof props.object]
+      tempList = tempList.concat(extractKeyframeSettings(settings))
+    }
+  })
+
+  return tempList
 })
 
 // props.objectのキーフレームの並び替え
 const sortKeyframe = () => {
-  if ('standardRenderSettings' in props.object) {
-    const keyframeSettings: { [key: string]: any } = props.object.standardRenderSettings
-    Object.entries(keyframeSettings).forEach(([key, value]) => {
-      if (Array.isArray(value) && value.length > 1) {
-        keyframeSettings[key] = value.sort((a, b) => a.frame - b.frame)
-      }
-    })
-  }
+  //console.log('sortKeyframe')
+  keyFrameSettingsList.value.forEach((keyframeSettings) => {
+    keyframeSettings.sortKeyframes()
+  })
 }
 
 //////////////////////////

@@ -1,32 +1,23 @@
-import { ShapeType, Transform, Inform, applyEffectToTransform, TextAlign } from './p5Info'
+import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
+import {
+  ShapeType,
+  Transform,
+  Inform,
+  applyEffectToTransform,
+  TextAlignX,
+  TextAlignY
+} from './p5Info'
 import { styleList } from '@/assets/effects/style'
 import { animationList } from '@/assets/effects/animation'
 import { UIType } from './uiInfo'
-import p5 from 'p5'
-import { deepCopy } from '../utils/common'
+import { deepCopy, generateUniqueId } from '../utils/common'
 
 //////////////////////////////////////////////////////////////
 
-// キーフレームの情報管理
-export interface KeyframeSetting {
-  value: number
-  frame: number
-  id: string
-  easeType?: string
-}
-export type KeyframeSettings = KeyframeSetting[]
-
-// パラメータがKeyframeSettings型かを判定する関数
-// TODO:配列かどうかで判定しているので、もう少し詳細の判定が必要
-export function isKeyframeSettings(element: any): element is KeyframeSettings {
-  return Array.isArray(element)
-}
-
-//////////////////////////////////////////////////////////////
-
+// アニメーションの情報管理
 export interface AnimationSetting {
   name: string
-  parameters: { [key: string]: any }
+  parameters: { [key: string]: number | string | boolean | KeyframeSettings }
   id: string
 }
 export class AnimationSettings {
@@ -50,12 +41,13 @@ export class AnimationSettings {
     return baseValue
   }
 }
+
+// スタイルの情報管理
 export interface StyleSetting {
   name: string
-  parameters: { [key: string]: any }
+  parameters: { [key: string]: number | string | boolean | KeyframeSettings }
   id: string
 }
-
 export class StyleSettings {
   effects: StyleSetting[]
 
@@ -63,11 +55,11 @@ export class StyleSettings {
     this.effects = styles
   }
 
-  stylize(p: p5): void {
+  stylize(inform : Inform): void {
     this.effects.forEach((style) => {
       const effect = styleList.find((effect) => effect.name === style.name)
       if (effect) {
-        effect.applyStyle(p, style)
+        effect.applyStyle(inform, style)
       }
     })
   }
@@ -100,7 +92,9 @@ export abstract class PropertyMethod {
   }
 }
 
-//////////////////////////////////////////////////////////////
+/////////////////////////
+// Settings系統のクラス //
+/////////////////////////
 
 export class BaseSettings {
   id: number
@@ -125,7 +119,7 @@ export class StandardRenderSettings extends PropertyMethod {
   X: KeyframeSettings
   Y: KeyframeSettings
   //Z: KeyframeSettings
-  relativeX: number // アニメーションによる相対座標を記録
+  relativeX: number // アニメーションによる相対座標を記録する予定
   relativeY: number
   scale: KeyframeSettings
   opacity: KeyframeSettings
@@ -143,30 +137,29 @@ export class StandardRenderSettings extends PropertyMethod {
   }
 
   constructor({
-    X = [{ value: 0, frame: 0, id: '0' }],
-    Y = [{ value: 0, frame: 0, id: '0' }],
-    scale = [{ value: 100, frame: 0, id: '0' }],
-    opacity = [{ value: 100, frame: 0, id: '0' }],
-    angle = [{ value: 0, frame: 0, id: '0' }]
+    X = new KeyframeSettings([{ value: 0, frame: 0, id: '0' }]),
+    Y = new KeyframeSettings([{ value: 0, frame: 0, id: '0' }]),
+    scale = new KeyframeSettings([{ value: 100, frame: 0, id: '0' }]),
+    opacity = new KeyframeSettings([{ value: 100, frame: 0, id: '0' }]),
+    angle = new KeyframeSettings([{ value: 0, frame: 0, id: '0' }])
   } = {}) {
     super()
-    this.X = X
-    this.Y = Y
+    this.X = new KeyframeSettings(X.keyframes)
+    this.Y = new KeyframeSettings(Y.keyframes)
     this.relativeX = 0
     this.relativeY = 0
-    this.scale = scale
-    this.opacity = opacity
-    this.angle = angle
+    this.scale = new KeyframeSettings(scale.keyframes)
+    this.opacity = new KeyframeSettings(opacity.keyframes)
+    this.angle = new KeyframeSettings(angle.keyframes)
   }
 }
 
 export class TextSettings extends PropertyMethod {
   text: string
   font: string
+  fill_color: string
   spacing_x: KeyframeSettings
   spacing_y: KeyframeSettings
-  fill_color: string
-  isVertical: boolean
   //name: string
   textSize: number
   //display_speed: number
@@ -176,7 +169,9 @@ export class TextSettings extends PropertyMethod {
   //autoadjust: boolean
   //soft: boolean
   //monospace: boolean
-  align: TextAlign
+  align_x: TextAlignX
+  align_y: TextAlignY
+  isVertical: boolean
   individual_object: boolean
 
   //precision: number
@@ -191,16 +186,18 @@ export class TextSettings extends PropertyMethod {
     fill_color: { name: '色', type: UIType.color },
     font: { name: 'フォント', type: UIType.select },
     text: { name: 'テキスト', type: UIType.text },
-    align: { name: '整列', type: UIType.select }
+    align_x: { name: '行', type: UIType.select },
+    align_y: { name: '列', type: UIType.select }
   }
 
   constructor({
     textSize = 80,
     isVertical = false,
     individual_object = true,
-    align = TextAlign.center,
-    spacing_x = [{ value: 80, frame: 0, id: '0' }],
-    spacing_y = [{ value: 80, frame: 0, id: '0' }],
+    align_x = TextAlignX.center,
+    align_y = TextAlignY.center,
+    spacing_x = new KeyframeSettings([{ value: 80, frame: 0, id: '0' }]),
+    spacing_y = new KeyframeSettings([{ value: 80, frame: 0, id: '0' }]),
     fill_color = '#ffffff',
     font = 'Noto Sans JP Bold',
     text = 'サンプル'
@@ -209,9 +206,10 @@ export class TextSettings extends PropertyMethod {
     this.textSize = textSize
     this.isVertical = isVertical
     this.individual_object = individual_object
-    this.align = align
-    this.spacing_x = spacing_x
-    this.spacing_y = spacing_y
+    this.align_x = align_x
+    this.align_y = align_y
+    this.spacing_x = new KeyframeSettings(spacing_x.keyframes)
+    this.spacing_y = new KeyframeSettings(spacing_y.keyframes)
     this.fill_color = fill_color
     this.font = font
     this.text = text
@@ -232,14 +230,14 @@ export class ShapeSettings extends PropertyMethod {
   }
 
   constructor({
-    width = [{ value: 200, frame: 0, id: '0' }],
-    height = [{ value: 200, frame: 0, id: '0' }],
+    width = new KeyframeSettings([{ value: 200, frame: 0, id: '0' }]),
+    height = new KeyframeSettings([{ value: 200, frame: 0, id: '0' }]),
     fill_color = '#D3D3D3',
     shape = ShapeType.rect
   } = {}) {
     super()
-    this.width = width
-    this.height = height
+    this.width = new KeyframeSettings(width.keyframes)
+    this.height = new KeyframeSettings(height.keyframes)
     this.fill_color = fill_color
     this.shape = shape
   }
@@ -340,6 +338,13 @@ export class ShapeObject extends BaseObject {
 //////////////////////////////////////
 export type typeString = '' | 'base' | 'text' | 'image' | 'shape'
 export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
+export const objectSettingsList = [
+  'standardRenderSettings',
+  'textSettings',
+  'shapeSettings',
+  'styleSettings',
+  'animationSettings'
+]
 
 // 指定されたパラメータからオブジェクトを生成する(ファイル保存処理・再読込で使用)
 export function createObjectFromJson(obj: RenderObject): any {

@@ -97,12 +97,12 @@ import { ref, computed } from 'vue'
 import { gsap } from 'gsap'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import EasingPanel from '@/components/setting/EasingPanel.vue'
-import { type KeyframeSettings, type KeyframeSetting } from '@/components/parameters/objectInfo'
+import { type KeyframeSetting } from '@/components/parameters/keyframeInfo'
 import { generateUniqueId } from '../utils/common'
 import { useTimelineStore } from '@/stores/objectStore'
 
 const displayEasingPanel = ref(false)
-const keyframes = defineModel<KeyframeSettings>('keyframes', { required: true })
+const keyframes = defineModel<KeyframeSetting[]>('keyframes', { required: true })
 const selectedKeyframe = ref<KeyframeSetting>({} as KeyframeSetting)
 const timelineStore = useTimelineStore()
 

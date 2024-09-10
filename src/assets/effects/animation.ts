@@ -1,14 +1,14 @@
+import type { KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import { Inform, Transform } from '@/components/parameters/p5Info'
 import { UIType } from '@/components/parameters/uiInfo'
-import gsap from 'gsap'
-import p5 from 'p5'
+import { clClamp } from '@/components/utils/common'
 
 // この形に従う
 export interface Animation {
   name: string
-  params: { [key: string]: any }
+  params: { [key: string]: number | string | boolean | KeyframeSettings }
   description?: string
-  tag?: [string]
+  tag?: string[]
   parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応
   applyEffect: (
     inform: Inform,
@@ -23,6 +23,7 @@ export const animationList: Animation[] = [
     params: { time: 1, interval: 1, delay: 0 },
     description:
       '文字を一文字ずつ表示します。[時間]だけをマイナスにすると順番に文字が消えていきます。[遅延]を大きくして[間隔]だけをマイナスにすると後ろから文字が表れます。',
+    tag: ['登場'],
     parameters: {
       time: { name: '時間(f)', type: UIType.slider, min: -60, max: 60 },
       interval: { name: '間隔(f)', type: UIType.slider, min: -20, max: 20 },
@@ -48,12 +49,14 @@ export const animationList: Animation[] = [
   },
   {
     name: 'フェードイン',
-    params: { time: 10, interval: 1 },
-    description: '[時間]で指定したフレーム数で、不透明度が0→100に変化します。',
-    tag: ['in'],
+    params: { time: 10, interval: 1, out: false },
+    description:
+      '[時間]で指定したフレーム数で、不透明度が0→100に変化します。[退場]をONにするとオブジェクト終了地点を基準としたフェードアウトになります。フェードエフェクトを2個重ねるとフェードイン・フェードアウトができます。',
+    tag: ['登場', '退場'],
     parameters: {
       time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
-      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 }
+      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
+      out: { name: '退場', type: UIType.checkbox }
     },
     applyEffect: (
       inform: Inform,
@@ -62,21 +65,27 @@ export const animationList: Animation[] = [
     ): Transform => {
       const transform = new Transform()
 
-      const progress =
-        (inform.currentFrame - inform.start - inform.index * params.interval) / params.time
-      transform.opacity = baseObject.opacity * progress
+      // out=trueの場合は1 → 0 に、 falseの場合は0 → 1 に変化する
+      const progress = params.out
+        ? (inform.end -
+            inform.currentFrame -
+            (inform.totalIndex - 1 - inform.index) * params.interval) /
+          params.time
+        : (inform.currentFrame - inform.start - inform.index * params.interval) / params.time
+      transform.opacity = baseObject.opacity * clClamp(0, 1, progress)
 
       return transform
     }
   },
   {
     name: '明滅登場',
-    params: { time: 5, interval: 1 },
-    description: '文字を一文字ずつ表示します',
-    tag: ['in'],
+    params: { time: 5, interval: 1, out: false },
+    description: '文字を一文字ずつ表示します。[退場]をONにすると明滅して消えるようになります。',
+    tag: ['登場'],
     parameters: {
       time: { name: '登場時間(f)', type: UIType.slider, min: 0, max: 90 },
-      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 }
+      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
+      out: { name: '退場(未実装)', type: UIType.checkbox }
     },
     applyEffect: (
       inform: Inform,
@@ -96,14 +105,15 @@ export const animationList: Animation[] = [
   },
   {
     name: 'スライドイン',
-    params: { time: 10, interval: 1, X: 50, Y: 0 },
+    params: { time: 10, interval: 1, X: 50, Y: 0, out: false },
     description: '指定した相対座標([X],[Y])からスライドインします。',
-    tag: ['in'],
+    tag: ['登場'],
     parameters: {
       time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
       interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
       X: { name: 'X', type: UIType.slider, min: -500, max: 500 },
-      Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 }
+      Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 },
+      out: { name: '退場(未実装)', type: UIType.checkbox }
     },
     applyEffect: (
       inform: Inform,
@@ -127,7 +137,7 @@ export const animationList: Animation[] = [
     name: 'ランダム配置',
     params: { X: 150, Y: 0, Seed: 100, Time: 10 },
     description: 'オブジェクトをランダムに移動させます',
-    tag: ['in'],
+    tag: ['配置'],
     parameters: {
       X: { name: 'X', type: UIType.slider, min: -500, max: 500 },
       Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 },
@@ -140,12 +150,43 @@ export const animationList: Animation[] = [
       params: { [key: string]: any }
     ): Transform => {
       const transform = new Transform()
-      if (inform.p5Canvas) {
-        inform.p5Canvas.noiseSeed(params.Seed)
-        transform.X = inform.p5Canvas.noise(inform.index * params.Time + 10000) * params.X
-        transform.Y = inform.p5Canvas.noise(inform.index * params.Time + 10000) * params.Y
+      if (inform.p5) {
+        inform.p5.noiseSeed(params.Seed)
+        transform.X = inform.p5.noise(inform.index * params.Time + 10000) * params.X
+        transform.Y = inform.p5.noise(inform.index * params.Time + 10000) * params.Y
       }
       return transform
     }
   }
 ]
+
+/*
+  {
+    name: 'フェードアウト',
+    params: { time: 10, interval: 1 },
+    description:
+      '[時間]で指定したフレーム数で、オブジェクト終了地点を基準として不透明度が100→0に変化します。間隔を-1にすると逆順で消失します。',
+    tag: ['消失'],
+    parameters: {
+      time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
+      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 }
+    },
+    applyEffect: (
+      inform: Inform,
+      baseObject: Transform,
+      params: { [key: string]: any }
+    ): Transform => {
+      const transform = new Transform()
+
+      // 1 → 0 に変化する
+      const progress =
+        (inform.end -
+          inform.currentFrame -
+          (inform.totalIndex - 1 - inform.index) * params.interval) /
+        params.time
+      transform.opacity = baseObject.opacity * clClamp(0, 1, progress)
+
+      return transform
+    }
+  },
+  */

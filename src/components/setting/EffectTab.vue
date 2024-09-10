@@ -16,6 +16,7 @@
           <v-icon @click="deleteEffect(label)">mdi-delete</v-icon>
         </template>
 
+        <!-- 各パラメータの表示 -->
         <div
           v-for="(param, paramLabel) in searchEffects(params).parameters"
           :key="param.name"
@@ -23,57 +24,66 @@
         >
           <div v-if="param.type != UIType.none" class="parameter-row">
             <!-- パラメータ名の表示 -->
-            <v-chip class="parameter-name" variant="outlined" size="small" label>{{
+            <v-chip
+              v-if="param.type == UIType.keyframe"
+              class="parameter-name"
+              variant="outlined"
+              size="small"
+              label
+              @click="
+                (params.parameters[paramLabel] as KeyframeSettings).isGraphOpen = !(
+                  params.parameters[paramLabel] as KeyframeSettings
+                ).isGraphOpen
+              "
+              >{{ param.name }}</v-chip
+            >
+            <v-chip v-else class="parameter-name" variant="outlined" size="small">{{
               param.name
             }}</v-chip>
 
-            <!-- 数値型パラメータの場合 -->
-            <template v-if="param.type == UIType.slider">
-              <v-slider
+            <!-- キーフレーム対応の場合 -->
+            <template v-if="param.type == UIType.keyframe">
+              <KeyframeParameter
                 v-model="params.parameters[paramLabel]"
                 :min="param.min"
                 :max="param.max"
-                step="1"
-                hide-details
-              >
-                <template v-slot:prepend>
-                  <input class="parameter-value" v-model.number="params.parameters[paramLabel]" />
-                </template>
-              </v-slider>
+              />
             </template>
 
-            <!-- カラー型パラメータの場合 -->
-            <template v-if="param.type == UIType.color">
-              <div class="text-center">
-                <v-menu
-                  v-model="colorMenus[paramLabel]"
-                  :close-on-content-click="false"
-                  location="end"
-                >
-                  <template v-slot:activator="{ props }">
-                    <v-btn :color="params.parameters[paramLabel]" v-bind="props" width="100px">
-                      {{ params.parameters[paramLabel] }}
-                    </v-btn>
-                  </template>
-                  <v-color-picker v-model="params.parameters[paramLabel]" :modes="['hexa']" flat />
-                </v-menu>
-              </div>
+            <!-- 数値型パラメータの場合 -->
+            <template v-if="param.type == UIType.slider">
+              <SliderParameter
+                v-model="params.parameters[paramLabel]"
+                :min="param.min"
+                :max="param.max"
+              />
+            </template>
+
+            <!-- テキスト型パラメータの場合 -->
+            <template v-if="param.type === UIType.text">
+              <TextParameter v-model="params.parameters[paramLabel] as string" class="w-100" />
             </template>
 
             <!-- セレクトボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.select">
-              <select v-model="params.parameters[paramLabel]" hide-details>
-                <option v-for="(e, index) in param.options" :key="index">{{ e }}</option>
-              </select>
+              <SelectParameter
+                v-model="params.parameters[paramLabel] as string"
+                :param="param.options"
+              />
             </template>
 
-            <!-- カラー-->
+            <!-- カラー型パラメータの場合 -->
+            <template v-if="param.type === UIType.color">
+              <ColorParameter v-model="params.parameters[paramLabel] as string" />
+            </template>
 
             <!-- チェックボックス型パラメータの場合 -->
             <template v-if="param.type === UIType.checkbox">
-              <v-checkbox v-model="params.parameters[paramLabel]" hide-details />
+              <CheckboxParameter v-model="params.parameters[paramLabel] as boolean" />
             </template>
           </div>
+
+          <v-divider />
         </div>
       </v-card>
     </div>
@@ -101,7 +111,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import {
   type StyleSettings,
   type StyleSetting,
@@ -112,11 +122,18 @@ import EffectPanel from './EffectPanel.vue'
 import { animationList } from '@/assets/effects/animation'
 import { styleList } from '@/assets/effects/style'
 
+import KeyframeParameter from './dom/KeyframeParameter.vue'
+import SliderParameter from './dom/SliderParameter.vue'
+import TextParameter from './dom/TextParameter.vue'
+import SelectParameter from './dom/SelectParameter.vue'
+import ColorParameter from './dom/ColorParameter.vue'
+import CheckboxParameter from './dom/CheckboxParameter.vue'
+import type { KeyframeSetting, KeyframeSettings } from '../parameters/keyframeInfo'
+
 const parameters = defineModel<StyleSettings>('params', { required: true })
 const props = defineProps<{
   type: String // 'animation' or 'style'
 }>()
-const colorMenus = ref<{ [key: string]: boolean }>({}) // 各パラメータごとのカラーメニューの表示フラグ
 
 //////////////////////////////////
 // アニメーション設定に関する記述 //
@@ -159,19 +176,13 @@ function downEffect(index: number) {
 function deleteEffect(index: number) {
   parameters.value.effects.splice(index, 1)
 }
-
-onMounted(() => {
-  Object.keys(parameters.value.effects).forEach((label) => {
-    colorMenus.value[label] = false
-  })
-})
 </script>
 
 <style scoped>
 .parameter-row {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
+  margin: 2px 0px;
 }
 
 .parameter-name {
@@ -182,30 +193,20 @@ onMounted(() => {
   text-align: center;
 }
 
-.parameter-value {
-  width: 40px;
-  text-align: center;
-  color: #555;
-}
-
-select {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  -webkit-appearance: menulist;
-  appearance: button;
-}
-
 /* リストアニメーション */
-.list-move, /* 移動する要素にトランジションを適用 */
+.list-move,
+/* 移動する要素にトランジションを適用 */
 .list-enter-active,
 .list-leave-active {
   transition: all 0.2s ease;
 }
+
 .list-enter-from,
 .list-leave-to {
   opacity: 0;
   transform: translateX(30px);
 }
+
 .list-leave-active {
   position: absolute;
 }
