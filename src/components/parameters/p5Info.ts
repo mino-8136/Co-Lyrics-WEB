@@ -1,5 +1,5 @@
 import type p5 from 'p5'
-import {type KeyframeSetting } from './keyframeInfo'
+import { type KeyframeSetting } from './keyframeInfo'
 import gsap from 'gsap'
 
 // エフェクト処理用の相対パラメータ
@@ -17,6 +17,92 @@ export class Transform {
     this.opacity = 100
     this.angle = 0
   }
+}
+
+// 受け取ったobjectのパラメータをすべて百分率にして返す関数
+export const convertToPercentage = (param: KeyframeSetting[]): KeyframeSetting[] => {
+  const convertedParam = JSON.parse(JSON.stringify(param))
+  convertedParam.forEach((keyframe: { value: number }) => {
+    keyframe.value = keyframe.value / 100
+  })
+  return convertedParam
+}
+
+// キーフレーム間の値を補完する関数1
+export function lerpValue(
+  keyframes: KeyframeSetting[],
+  objectStartFrame: number,
+  currentFrame: number
+): number {
+  // Parameterが配列であるという前提で行く
+  const lastSection = keyframes.length - 1
+  const currentSection = getCurrentSection(keyframes, objectStartFrame, currentFrame)
+  const nextSection = currentSection + 1
+
+  // 最初の相対キーフレームに到達していない場合、最初の値で止める
+  if (currentSection === -1) {
+    return keyframes[0].value
+  }
+
+  // 最後の相対キーフレームに到達していた場合、最後の値で止める
+  // console.log(param, "curr: ", currentSection, "last: " , lastSection)
+  if (currentSection == lastSection) {
+    return keyframes[currentSection].value
+  }
+
+  // それ以外の場合、値を補完して返す
+  const currentValue = getEaseValue(
+    keyframes,
+    currentSection,
+    nextSection,
+    currentFrame - objectStartFrame
+  )
+  return currentValue
+}
+
+// キーフレーム間の値を補完する関数2
+export function getEaseValue(
+  param: KeyframeSetting[],
+  currentSection: number,
+  nextSection: number,
+  currentFrame: number
+) {
+  const initialValue = param[currentSection].value
+  const deltaValue = param[nextSection].value - param[currentSection].value
+  const progress =
+    (gsap.utils.clamp(param[currentSection].frame, param[nextSection].frame, currentFrame) -
+      param[currentSection].frame) /
+    (param[nextSection].frame - param[currentSection].frame)
+  return (
+    initialValue + deltaValue * getAnimationStateAtTime(progress, param[currentSection].easeType)
+  )
+}
+
+// keyframeに登録されたGSAPのアニメーションの実行結果を返す関数
+export function getAnimationStateAtTime(progress: number, easeType: string | undefined) {
+  if (easeType === 'none' || easeType == null) {
+    return progress
+  }
+  const easingFunction = gsap.parseEase(easeType)
+  return easingFunction(progress)
+}
+
+// どの区間のフレームを参照するかを求める(CurrentFrameを超えない最大のキーフレーム)
+// 最初のキーフレームに到達していない場合に-1を返す
+export function getCurrentSection(
+  param: KeyframeSetting[],
+  objectStartFrame: number,
+  currentFrame: number
+): number {
+  let index = -1
+  for (let i = 0; i < param.length; i++) {
+    if (objectStartFrame + param[i].frame <= currentFrame) {
+      index = i
+    } else {
+      break
+    }
+  }
+  return index
 }
 
 // エフェクトをトランスフォームに適用する関数
