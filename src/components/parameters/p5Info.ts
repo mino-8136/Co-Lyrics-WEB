@@ -34,7 +34,7 @@ export class Inform {
   start: number
   end: number
   currentFrame: number
-  p5Canvas?: p5 // これおそらくいらない
+  p5: p5 // エフェクト等を適用する先
 
   constructor(
     index: number = 0,
@@ -42,14 +42,14 @@ export class Inform {
     start: number = 0,
     end: number = 0,
     currentFrame: number = 0,
-    p5Canvas?: p5
+    p5: p5
   ) {
     this.index = index
     this.totalIndex = totalIndex
     this.start = start
     this.end = end
     this.currentFrame = currentFrame
-    this.p5Canvas = p5Canvas
+    this.p5 = p5
   }
 }
 

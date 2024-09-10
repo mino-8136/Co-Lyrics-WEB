@@ -150,10 +150,10 @@ export const animationList: Animation[] = [
       params: { [key: string]: any }
     ): Transform => {
       const transform = new Transform()
-      if (inform.p5Canvas) {
-        inform.p5Canvas.noiseSeed(params.Seed)
-        transform.X = inform.p5Canvas.noise(inform.index * params.Time + 10000) * params.X
-        transform.Y = inform.p5Canvas.noise(inform.index * params.Time + 10000) * params.Y
+      if (inform.p5) {
+        inform.p5.noiseSeed(params.Seed)
+        transform.X = inform.p5.noise(inform.index * params.Time + 10000) * params.X
+        transform.Y = inform.p5.noise(inform.index * params.Time + 10000) * params.Y
       }
       return transform
     }

@@ -10,7 +10,6 @@ import {
 import { styleList } from '@/assets/effects/style'
 import { animationList } from '@/assets/effects/animation'
 import { UIType } from './uiInfo'
-import p5 from 'p5'
 import { deepCopy, generateUniqueId } from '../utils/common'
 
 //////////////////////////////////////////////////////////////
@@ -56,11 +55,11 @@ export class StyleSettings {
     this.effects = styles
   }
 
-  stylize(p: p5): void {
+  stylize(inform : Inform): void {
     this.effects.forEach((style) => {
       const effect = styleList.find((effect) => effect.name === style.name)
       if (effect) {
-        effect.applyStyle(p, style)
+        effect.applyStyle(inform, style)
       }
     })
   }

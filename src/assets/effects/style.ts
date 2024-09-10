@@ -1,5 +1,6 @@
 import { type StyleSetting } from '@/components/parameters/objectInfo'
 import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
+import { Inform, lerpValue } from '@/components/parameters/p5Info'
 import { UIType } from '@/components/parameters/uiInfo'
 import { generateUniqueId } from '@/components/utils/common'
 import p5 from 'p5'
@@ -11,7 +12,7 @@ export interface Style {
   description?: string
   tag?: string[]
   parameters: { [key: string]: any } // 現在sliderとcheckboxのみに対応
-  applyStyle: (p: p5, style: StyleSetting) => void
+  applyStyle: (inform: Inform, style: StyleSetting) => void
 }
 
 export const styleList: Style[] = [
@@ -22,9 +23,9 @@ export const styleList: Style[] = [
       line_width: { name: '線の太さ', type: UIType.slider, min: 0, max: 100 },
       line_color: { name: '線の色', type: UIType.color }
     },
-    applyStyle: (p: p5, style: StyleSetting) => {
-      p.stroke(style.parameters.line_color)
-      p.strokeWeight(style.parameters.line_width)
+    applyStyle: (inform: Inform, style: StyleSetting) => {
+      inform.p5.stroke(style.parameters.line_color as string)
+      inform.p5.strokeWeight(style.parameters.line_width as number)
     }
   },
   {
@@ -36,11 +37,11 @@ export const styleList: Style[] = [
       shadow_blur: { name: '影のぼかし', type: UIType.slider, min: 0, max: 100 },
       shadow_color: { name: '影の色', type: UIType.color }
     },
-    applyStyle: (p: p5, style: StyleSetting) => {
-      p.drawingContext.shadowOffsetX = style.parameters.shadow_x
-      p.drawingContext.shadowOffsetY = style.parameters.shadow_y
-      p.drawingContext.shadowBlur = style.parameters.shadow_blur
-      p.drawingContext.shadowColor = style.parameters.shadow_color
+    applyStyle: (inform: Inform, style: StyleSetting) => {
+      inform.p5.drawingContext.shadowOffsetX = style.parameters.shadow_x
+      inform.p5.drawingContext.shadowOffsetY = style.parameters.shadow_y
+      inform.p5.drawingContext.shadowBlur = style.parameters.shadow_blur
+      inform.p5.drawingContext.shadowColor = style.parameters.shadow_color
     }
   },
   {
@@ -49,8 +50,13 @@ export const styleList: Style[] = [
     parameters: {
       blur_amount: { name: 'ぼかし量', type: UIType.keyframe, min: 0, max: 100 }
     },
-    applyStyle: (p: p5, style: StyleSetting) => {
-      p.drawingContext.filter = `blur(${style.parameters.blur_amount}px)`
+    applyStyle: (inform: Inform, style: StyleSetting) => {
+      const blur = lerpValue(
+        (style.parameters.blur_amount as KeyframeSettings).keyframes,
+        inform.start,
+        inform.currentFrame
+      )
+      inform.p5.drawingContext.filter = `blur(${blur}px)`
     }
   },
   {
@@ -63,8 +69,8 @@ export const styleList: Style[] = [
         options: ['source-over', 'multiply', 'screen', 'overlay', 'darken', 'lighten']
       }
     },
-    applyStyle: (p: p5, style: StyleSetting) => {
-      p.drawingContext.globalCompositeOperation = style.parameters.blend_mode
+    applyStyle: (inform: Inform, style: StyleSetting) => {
+      inform.p5.drawingContext.globalCompositeOperation = style.parameters.blend_mode
     }
   }
 ]
