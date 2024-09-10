@@ -21,14 +21,16 @@
           hide-details
         >
           <template v-slot:prepend>
-            <!-- イージング設定 -->
-            <div
-              class="ease-setting"
-              :style="{
-                backgroundColor: keyframe.easeType ? '#09b7f6' : '#ccc'
-              }"
-              @click="openEasingDialog(keyframe)"
-            ></div>
+            <div class="easingChip">
+              <v-chip
+                v-if="parameter.keyframes.length - 1 != idx"
+                variant="outlined"
+                class="px-1 w-100 h-100 elevation-1"
+                :color="keyframe.easeType ? '#09b7f6' : '#999'"
+                @click="openEasingDialog(keyframe)"
+                ><v-icon class="pr-1" size="small">mdi-arrow-top-right-thick</v-icon>
+              </v-chip>
+            </div>
 
             <!-- キーフレームのフレーム数と値 -->
             <input
@@ -98,18 +100,18 @@ function openEasingDialog(keyframe: KeyframeSetting) {
 </script>
 
 <style scoped>
-div.ease-setting {
-  width: 12px;
-  height: 12px;
-  border-radius: 100%;
-  margin-right: 10px;
-  background-color: #09b7f6;
-}
-
 .parameter-value {
   width: 40px;
   color: #555;
   text-align: right;
+}
+
+.easingChip {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* リストアニメーション */

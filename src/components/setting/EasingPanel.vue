@@ -1,87 +1,124 @@
 <template>
   <v-dialog class="EasingPanel" v-model="showPanel">
     <v-card>
+      <v-container class="pt-4 pb-0">
+        <v-tabs v-model="selectedTag" align-tabs="center">
+          <v-tab value="all"> all </v-tab>
+          <v-tab v-for="(tag, index) in tagList" :key="index" :value="tag">
+            {{ tag }}
+          </v-tab>
+        </v-tabs>
+      </v-container>
+
       <v-card-text>
-        <v-row>
-          <v-col
-            v-for="effect in effects"
-            :key="effect.id"
-            class="d-flex"
-            cols="12"
-            sm="4"
-            md="3"
-            lg="2"
-            xl="2"
-          >
-            <v-container class="items">
-              <svg
-                :id="'svg-' + effect.id"
-                class="bg-grey-lighten-2"
-                :width="width + 'px'"
-                :height="height + 'px'"
-              >
-                <rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#ccc" />
-                <path :d="drawPath(effect.name)" fill="none" stroke="#ff0000" stroke-width="2" />
-              </svg>
-              <v-btn block @click="handleButtonClick(effect.name, effect.id)">
-                {{ effect.name }}
-              </v-btn>
-            </v-container>
-          </v-col>
-        </v-row>
+        <v-tabs-window v-model="selectedTag">
+          <v-row>
+            <v-col
+              v-for="easing in filteredEasingList"
+              :key="easing"
+              class="d-flex"
+              cols="12"
+              sm="4"
+              md="3"
+              lg="2"
+              xl="2"
+            >
+              <v-container class="items">
+                <svg
+                  :id="'svg-' + easing"
+                  class="bg-grey-lighten-2"
+                  :width="width + 'px'"
+                  :height="height + 'px'"
+                  :class="{ selected: isEasingAlreadySelected(easing.name) }"
+                >
+                  <rect x="0" y="0" width="100%" height="100%" fill="none" stroke="#ccc" />
+                  <path :d="drawPath(easing.name)" fill="none" stroke="#ff0000" stroke-width="2" />
+                </svg>
+                <v-btn
+                  block
+                  @click="handleButtonClick(easing.name)"
+                  :disabled="isEasingAlreadySelected(easing.name)"
+                >
+                  {{ easing.name }}
+                </v-btn>
+              </v-container>
+            </v-col>
+          </v-row>
+        </v-tabs-window>
       </v-card-text>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { type KeyframeSetting } from '@/components/parameters/keyframeInfo'
 import gsap from 'gsap'
 
 const showPanel = defineModel<boolean>('show', { required: true })
 const easing = defineModel<KeyframeSetting>('easing', { required: true })
 
-const effects = ref([
-  { id: 1, name: 'none' },
-  { id: 2, name: 'power1.in' },
-  { id: 3, name: 'power1.out' },
-  { id: 4, name: 'power1.inOut' },
-  { id: 5, name: 'power2.in' },
-  { id: 6, name: 'power2.out' },
-  { id: 7, name: 'power2.inOut' },
-  { id: 8, name: 'power3.in' },
-  { id: 9, name: 'power3.out' },
-  { id: 10, name: 'power3.inOut' },
-  { id: 11, name: 'power4.in' },
-  { id: 12, name: 'power4.out' },
-  { id: 13, name: 'power4.inOut' },
-  { id: 14, name: 'back.in' },
-  { id: 15, name: 'back.out' },
-  { id: 16, name: 'back.inOut' },
-  { id: 17, name: 'elastic.in' },
-  { id: 18, name: 'elastic.out' },
-  { id: 19, name: 'elastic.inOut' },
-  { id: 20, name: 'bounce.in' },
-  { id: 21, name: 'bounce.out' },
-  { id: 22, name: 'bounce.inOut' },
-  { id: 23, name: 'circ.in' },
-  { id: 24, name: 'circ.out' },
-  { id: 25, name: 'circ.inOut' },
-  { id: 26, name: 'expo.in' },
-  { id: 27, name: 'expo.out' },
-  { id: 28, name: 'expo.inOut' },
-  { id: 29, name: 'sine.in' },
-  { id: 30, name: 'sine.out' },
-  { id: 31, name: 'sine.inOut' }
-])
-
 const width = 100
 const height = 120
 
-const handleButtonClick = (name: string, id: number) => {
+const selectedTag = ref('all')
+const tagList = ['加速', '減速', '加減速']
+const easingList = [
+  { name: 'linear', tag: [''] },
+  { name: 'sine.in', tag: ['加速'] },
+  { name: 'sine.out', tag: ['減速'] },
+  { name: 'sine.inOut', tag: ['加減速'] },
+  { name: 'power1.in', tag: ['加速'] },
+  { name: 'power1.out', tag: ['減速'] },
+  { name: 'power1.inOut', tag: ['加減速'] },
+  { name: 'power2.in', tag: ['加速'] },
+  { name: 'power2.out', tag: ['減速'] },
+  { name: 'power2.inOut', tag: ['加減速'] },
+  { name: 'power3.in', tag: ['加速'] },
+  { name: 'power3.out', tag: ['減速'] },
+  { name: 'power3.inOut', tag: ['加減速'] },
+  { name: 'power4.in', tag: ['加速'] },
+  { name: 'power4.out', tag: ['減速'] },
+  { name: 'power4.inOut', tag: ['加減速'] },
+  { name: 'circ.in', tag: ['加速'] },
+  { name: 'circ.out', tag: ['減速'] },
+  { name: 'circ.inOut', tag: ['加減速'] },
+  { name: 'expo.in', tag: ['加速'] },
+  { name: 'expo.out', tag: ['減速'] },
+  { name: 'expo.inOut', tag: ['加減速'] },
+  { name: 'back.in', tag: ['加速'] },
+  { name: 'back.out', tag: ['減速'] },
+  { name: 'back.inOut', tag: ['加減速'] },
+  { name: 'elastic.in', tag: ['加速'] },
+  { name: 'elastic.out', tag: ['減速'] },
+  { name: 'elastic.inOut', tag: ['加減速'] },
+  { name: 'bounce.in', tag: ['加速'] },
+  { name: 'bounce.out', tag: ['減速'] },
+  { name: 'bounce.inOut', tag: ['加減速'] }
+]
+const filteredEasingList = computed(() => {
+  if (selectedTag.value === 'all' || selectedTag.value === '') {
+    return easingList
+  }
+  return easingList.filter((easing) => easing.tag?.includes(selectedTag.value))
+})
+
+//////////////////////////////////////////////////
+
+const handleButtonClick = (name: string) => {
   easing.value.easeType = name
   showPanel.value = false
+}
+
+function isEasingAlreadySelected(easingName: string): boolean {
+  if (
+    easingName == 'linear' &&
+    (easing.value.easeType === undefined ||
+      easing.value.easeType === 'none' ||
+      easing.value.easeType === '')
+  )
+    return true
+  return easing.value.easeType?.includes(easingName) ?? false
 }
 
 const drawPath = (easingName: string) => {
@@ -104,11 +141,14 @@ const drawPath = (easingName: string) => {
   width: 60%;
   min-width: 400px;
   height: 60%;
+}
+
+v-tabs-window {
   overflow-y: auto;
 }
 
-v-card {
-  width: 100%;
+.selected {
+  box-shadow: inset 0 0 0 2px #09b7f6;
 }
 
 .items {

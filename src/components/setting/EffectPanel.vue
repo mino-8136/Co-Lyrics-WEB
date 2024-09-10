@@ -2,37 +2,46 @@
   <v-dialog v-model="showPanel" class="EffectPanel">
     <v-card>
       <v-card-subtitle class="text-center pt-2"> {{ props.type }}</v-card-subtitle>
-      <v-tabs v-model="selectedTag" align-tabs="center">
-        <v-tab value="all"> all </v-tab>
-        <v-tab v-for="(tag, index) in tagList" :key="index" :value="tag">
-          {{ tag }}
-        </v-tab>
-      </v-tabs>
+      <v-container class="py-0">
+        <v-tabs v-model="selectedTag" align-tabs="center">
+          <v-tab value="all"> all </v-tab>
+          <v-tab v-for="(tag, index) in tagList" :key="index" :value="tag">
+            {{ tag }}
+          </v-tab>
+        </v-tabs>
+      </v-container>
 
-      <v-tabs-window v-model="selectedTag">
-        <v-row>
-          <v-col v-for="(effect, index) in filteredEffectList" :key="index" class="d-flex" cols="3">
-            <v-container class="items">
-              <v-img
-                :width="200"
-                aspect-ratio="1"
-                class="bg-pink-lighten-4 effect-image"
-                :class="imageColor(effect.tag)"
-              >
-                <p v-for="(tag, index) in effect.tag" :key="index">
-                  {{ tag }}
-                </p>
-              </v-img>
-              <v-btn
-                @click="handleButtonClick(effect.name, effect.params)"
-                :disabled="isEffectAlreadySelected(effect.name)"
-              >
-                {{ effect.name }}
-              </v-btn>
-            </v-container>
-          </v-col>
-        </v-row>
-      </v-tabs-window>
+      <v-card-text>
+        <v-tabs-window v-model="selectedTag">
+          <v-row>
+            <v-col
+              v-for="(effect, index) in filteredEffectList"
+              :key="index"
+              class="d-flex"
+              cols="3"
+            >
+              <v-container class="items">
+                <v-img
+                  :width="200"
+                  aspect-ratio="1"
+                  class="bg-pink-lighten-4 effect-image"
+                  :class="imageColor(effect.tag)"
+                >
+                  <p v-for="(tag, index) in effect.tag" :key="index">
+                    {{ tag }}
+                  </p>
+                </v-img>
+                <v-btn
+                  @click="handleButtonClick(effect.name, effect.params)"
+                  :disabled="isEffectAlreadySelected(effect.name)"
+                >
+                  {{ effect.name }}
+                </v-btn>
+              </v-container>
+            </v-col>
+          </v-row>
+        </v-tabs-window>
+      </v-card-text>
     </v-card>
   </v-dialog>
 </template>
@@ -52,11 +61,9 @@ const props = defineProps<{
 }>()
 
 const selectedTag = ref('all')
-
 const effectList = computed(() => {
   return props.type == 'animation' ? animationList : styleList
 })
-
 const tagList = computed(() => {
   const tags = [...new Set(effectList.value.flatMap((effect) => effect.tag).filter((tag) => tag))]
   //console.log(tags)
