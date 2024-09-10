@@ -14,8 +14,8 @@
         <v-tabs-window v-model="selectedTag">
           <v-row>
             <v-col
-              v-for="easing in filteredEasingList"
-              :key="easing"
+              v-for="(easing, index) in filteredEasingList"
+              :key="index"
               class="d-flex"
               cols="12"
               sm="4"

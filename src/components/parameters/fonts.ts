@@ -14,13 +14,12 @@ const textList =
   'あいうえかがきくけこしじせそただっつづてとどなにのはもらりるをん切列刻君呪字幸捉捩文淡無確私縛色見証震頭風' +
   'サンプル'
 
-const enableWebLoad = true
-
 // Googleフォントの動的読み込み (https://style01.net/3037/)
 const cacheTTL = 1000 * 60 * 60 * 24 * 60 // 60日間のキャッシュ有効期間
 export const setFonts = async (
   fontListData: Font[],
-  onProgress: (loadedName: string, loadedCount: number) => void
+  onProgress: (loadedName: string, loadedCount: number) => void,
+  loadSubsetFonts: Boolean
 ) => {
   for (let i = 0; i < fontListData.length; i++) {
     // キャッシュキーとタイムスタンプキーを生成
@@ -34,12 +33,7 @@ export const setFonts = async (
     const cachedFont = localStorage.getItem(fontCacheKey)
     const cacheTimestamp = localStorage.getItem(cacheTimeKey)
 
-    if (
-      enableWebLoad &&
-      cachedFont &&
-      cacheTimestamp &&
-      now - parseInt(cacheTimestamp, 10) < cacheTTL
-    ) {
+    if (cachedFont && cacheTimestamp && now - parseInt(cacheTimestamp, 10) < cacheTTL) {
       console.log(fontListData[i].displayName + 'はキャッシュされています')
       const fontUrls = JSON.parse(cachedFont) // 複数のフォントURLを配列として取得
       for (const url of fontUrls) {
@@ -56,7 +50,7 @@ export const setFonts = async (
       try {
         const response = await fetch(googleApiUrl)
 
-        if (enableWebLoad && response.ok) {
+        if (!loadSubsetFonts && response.ok) {
           const cssFontFace = await response.text()
           const matchUrls = cssFontFace.match(/url\(.+?\)/g)
           if (!matchUrls) throw new Error('フォントが見つかりませんでした')

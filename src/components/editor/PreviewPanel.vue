@@ -25,7 +25,7 @@ onMounted(() => {
     timelineStore.canvasScale = calculateCanvasScale(width, height)
   }
   if (!p.value) {
-    let sketch = defineSketch(timelineStore)
+    let sketch = defineSketch(timelineStore, configStore.isLoadSubsetFont)
     p.value = new p5(sketch)
 
     // ウィンドウのリサイズイベントを監視

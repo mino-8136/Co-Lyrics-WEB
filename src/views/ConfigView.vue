@@ -18,6 +18,10 @@
           label="オブジェクト上でキーフレームを表示する"
           v-model="configStore.isShowKeyframe"
         ></v-checkbox>
+        <v-checkbox
+          label="軽量化されたフォントのみを読み込む (変更後はブラウザ上でキャッシュの削除をしてください)"
+          v-model="configStore.isLoadSubsetFont"
+        ></v-checkbox>
       </v-col>
     </v-card-actions>
   </v-card>

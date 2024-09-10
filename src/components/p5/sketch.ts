@@ -33,7 +33,7 @@ let loadedFontCount = 0
 let showCollisionBox = true
 const verticalCharacter = ['ー', '−', '～', '~'] // 縦書きにする文字のリスト
 
-export function defineSketch(project: any) {
+export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
   // 実際はtimelineStoreを引数に取る
   return function sketch(p: p5) {
     p.preload = () => {
@@ -46,7 +46,7 @@ export function defineSketch(project: any) {
 
       const asyncFunc = async () => {
         try {
-          const fetchDone = await setFonts(fontListData, onProgress)
+          const fetchDone = await setFonts(fontListData, onProgress, isLoadSubsetFonts)
           if (fetchDone) {
             isFontLoaded = true
           }
