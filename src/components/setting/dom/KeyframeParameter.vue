@@ -26,7 +26,11 @@
                 v-if="parameter.keyframes.length - 1 != idx"
                 variant="outlined"
                 class="px-1 w-100 h-100 elevation-1"
-                :color="keyframe.easeType ? '#09b7f6' : '#999'"
+                :color="
+                  keyframe.easeType && keyframe.easeType != 'none' && keyframe.easeType != 'linear'
+                    ? '#09b7f6'
+                    : '#999'
+                "
                 @click="openEasingDialog(keyframe)"
                 ><v-icon class="pr-1" size="small">mdi-arrow-top-right-thick</v-icon>
               </v-chip>

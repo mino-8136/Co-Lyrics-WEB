@@ -3,5 +3,5 @@
 </template>
 
 <script setup lang="ts">
-const parameter = defineModel({ type: Boolean, required: true })
+const parameter = defineModel({ type: Boolean, required: true, default: false })
 </script>
