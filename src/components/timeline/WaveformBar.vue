@@ -8,6 +8,7 @@ import WaveSurfer from 'wavesurfer.js'
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js'
 import { useTimelineStore } from '@/stores/objectStore'
+import { type Note, getLyricMarker } from '../parameters/musics'
 const timelineStore = useTimelineStore()
 
 const waveform = ref(null) // DOM要素への参照を作成
@@ -83,22 +84,8 @@ onMounted(() => {
 })
 
 async function setLyricMarker(regions: RegionsPlugin) {
-  // 歌詞データを読み込み
-  interface Note {
-    note: number
-    start_time: number
-    end_time: number
-    lyric?: string
-  }
-  let noteData: Note[] = []
-  try {
-    const response = await fetch(timelineStore.musicData.lyricPath)
-    noteData = await response.json()
-  } catch (error) {
-    console.error('Error loading JSON:', error)
-  }
-
   // 各ノートデータに基づいてリージョンを追加
+  const noteData = await getLyricMarker(timelineStore.musicData.lyricPath)
   noteData.forEach((note: Note) => {
     if ('lyric' in note) {
       regions.addRegion({
@@ -136,6 +123,7 @@ watch(
   }
 )
 
+// musicDataの変更を監視
 watch(
   () => timelineStore.musicData,
   async (newAudio) => {
