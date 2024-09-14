@@ -1,7 +1,7 @@
 <template>
   <v-container class="setting-panel">
     <div v-if="selectedObject">
-      <v-tabs v-model="tab">
+      <v-tabs class="tab" v-model="tab">
         <v-tab v-if="'standardRenderSettings' in selectedObject" value="basic">基本設定</v-tab>
         <v-tab v-if="'textSettings' in selectedObject" value="text">テキスト</v-tab>
         <v-tab v-if="'shapeSettings' in selectedObject" value="shape">図形</v-tab>
@@ -9,8 +9,7 @@
         <v-tab v-if="'animationSettings' in selectedObject" value="animation">アニメーション</v-tab>
       </v-tabs>
 
-
-      <div class="scroll">
+      <div class="scroll" :style="{ height: configStore.upperSideHeight - 80 + 'px' }">
         <v-tabs-window v-model="tab">
           <!-- 基本設定タブ -->
           <v-tabs-window-item value="basic">
@@ -114,7 +113,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
+import { useConfigStore, useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import SettingsTab from '../setting/SettingsTab.vue'
 import EffectTab from '../setting/EffectTab.vue'
 import SelectParameter from '../setting/dom/SelectParameter.vue'
@@ -123,6 +122,7 @@ import TextParameter from '../setting/dom/TextParameter.vue'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
+const configStore = useConfigStore()
 const tab = ref('basic')
 
 // 選択されたオブジェクトの情報が自動的に表示される
@@ -141,6 +141,10 @@ const selectedFont = ref('Noto Sans JP Medium')
 </script>
 
 <style scoped>
+.tab {
+  height: 50px;
+}
+
 .scroll {
   height: 335px;
   min-width: 500px;

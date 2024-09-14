@@ -1,8 +1,8 @@
 <template>
   <menu-panel />
   <div class="d-flex">
-    <preview-panel />
-    <setting-panel />
+    <preview-panel :style="{ height: configStore.upperSideHeight + 'px' }" />
+    <setting-panel :style="{ height: configStore.upperSideHeight + 'px' }" />
   </div>
   <timeline-panel />
 
@@ -86,6 +86,9 @@ import PreviewPanel from '@/components/editor/PreviewPanel.vue'
 import TimelinePanel from '@/components/editor/TimelinePanel.vue'
 import SettingPanel from '@/components/editor/SettingPanel.vue'
 import MenuPanel from '@/components/setting/MenuPanel.vue'
+
+import { useConfigStore } from '@/stores/objectStore'
+const configStore = useConfigStore()
 </script>
 
 <style>

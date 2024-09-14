@@ -128,7 +128,7 @@ import TextParameter from './dom/TextParameter.vue'
 import SelectParameter from './dom/SelectParameter.vue'
 import ColorParameter from './dom/ColorParameter.vue'
 import CheckboxParameter from './dom/CheckboxParameter.vue'
-import type { KeyframeSetting, KeyframeSettings } from '../parameters/keyframeInfo'
+import type { KeyframeSettings } from '../parameters/keyframeInfo'
 
 const parameters = defineModel<StyleSettings>('params', { required: true })
 const props = defineProps<{

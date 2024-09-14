@@ -74,7 +74,8 @@ export const useConfigStore = defineStore('config', {
   state: () => ({
     isShowCollisionBox: false,
     isShowKeyframe: true,
-    isLoadSubsetFont: false
+    isLoadSubsetFont: false,
+    upperSideHeight: 400
   }),
   actions: {},
   persist: true
