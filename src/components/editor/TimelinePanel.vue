@@ -217,6 +217,7 @@ function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
   if (type === 'text') {
     let newText = new TextObject(settings)
     newText.textSettings.text = findNearestLyrics(offsetX)
+    newText.textSettings.font = timelineStore.defaultFont
     objectStore.addNewObject(newText)
   } else if (type === 'image') {
     objectStore.addNewObject(new ImageObject(settings))

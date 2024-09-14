@@ -79,16 +79,21 @@
             ></SelectParameter>
           </v-col>
 
-          <!-- 基本背景カラー -->
-          <v-col cols="126" class="d-flex">
-            <p class="project-label">基本背景カラー:</p>
-            <ColorParameter v-model="backgroundColor"> </ColorParameter>
-          </v-col>
-
           <!-- 基本フォント -->
           <v-col cols="12" class="d-flex">
             <p class="project-label">基本フォント:</p>
-            <SelectParameter v-model="selectedFont" :param="'font'"></SelectParameter>
+            <SelectParameter :param="'font'" v-model="timelineStore.defaultFont"></SelectParameter>
+          </v-col>
+
+          <!-- 基本背景カラー -->
+          <v-col cols="126" class="d-flex">
+            <p class="project-label">基本背景カラー:</p>
+            <ColorParameter
+              :color-type="'hex'"
+              v-model="timelineStore.defaultBackgroundColor"
+              @update:model-value="timelineStore.isRedrawNeeded = true"
+            >
+            </ColorParameter>
           </v-col>
         </v-row>
       </v-tabs-window>
@@ -118,8 +123,6 @@ const selectedObject: Record<string, any> = computed(() => {
 /////////////////////
 // プロジェクト設定 //
 /////////////////////
-const backgroundColor = ref('#ffffff') // 初期色は白
-const selectedFont = ref('Noto Sans JP Medium')
 const selectedMusic = ref('')
 
 function setMusicData(name: string) {

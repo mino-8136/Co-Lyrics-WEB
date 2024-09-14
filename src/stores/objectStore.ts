@@ -57,6 +57,8 @@ export const useTimelineStore = defineStore('timeline', {
       audioPath: '/assets/music/レターポスト/レターポスト_192k.mp3',
       lyricPath: '/assets/music/レターポスト/レターポスト_melody.json'
     },
+    defaultFont: 'Noto Sans JP Medium',
+    defaultBackgroundColor: '#808080',
     ////////
     currentFrame: 0,
     canvasScale: 1,
