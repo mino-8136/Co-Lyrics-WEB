@@ -69,29 +69,14 @@
       <v-tabs-window v-model="tab">
         <!-- チーム名 -->
         <v-row dense>
-          <v-col cols="12" class="d-flex">
-            <p class="project-label">チーム名:</p>
-            <TextParameter
-              class="project-text"
-              v-model="teamName"
-              :param="'teamName'"
-            ></TextParameter>
-          </v-col>
-
-          <!-- グループメンバーID (4つまで追加可能) -->
-          <v-col cols="12" class="d-flex">
-            <p class="project-label">グループメンバーID:</p>
-            <TextParameter
-              class="project-text"
-              v-model="groupMemberInput"
-              :param="'groupMember'"
-            ></TextParameter>
-          </v-col>
-
           <!-- 選んだ楽曲 -->
           <v-col cols="12" class="d-flex">
-            <p class="project-label">選んだ楽曲:</p>
-            <SelectParameter v-model="selectedSong" :param="'music'"></SelectParameter>
+            <p class="project-label">楽曲選択:</p>
+            <SelectParameter
+              :param="'music'"
+              v-model="selectedMusic"
+              @change="setMusicData(selectedMusic)"
+            ></SelectParameter>
           </v-col>
 
           <!-- 基本背景カラー -->
@@ -118,7 +103,7 @@ import SettingsTab from '../setting/SettingsTab.vue'
 import EffectTab from '../setting/EffectTab.vue'
 import SelectParameter from '../setting/dom/SelectParameter.vue'
 import ColorParameter from '../setting/dom/ColorParameter.vue'
-import TextParameter from '../setting/dom/TextParameter.vue'
+import { musicListData } from '../parameters/musics'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -133,11 +118,16 @@ const selectedObject: Record<string, any> = computed(() => {
 /////////////////////
 // プロジェクト設定 //
 /////////////////////
-const teamName = ref('')
-const groupMemberInput = ref('')
-const selectedSong = ref('')
 const backgroundColor = ref('#ffffff') // 初期色は白
 const selectedFont = ref('Noto Sans JP Medium')
+const selectedMusic = ref('')
+
+function setMusicData(name: string) {
+  const musicData = musicListData.find((music) => music.name === name)
+  if (musicData) {
+    timelineStore.musicData = musicData
+  }
+}
 </script>
 
 <style scoped>

@@ -8,6 +8,7 @@
 
 <script setup lang="ts">
 import { fontListData } from '@/components/parameters/fonts'
+import { musicListData } from '@/components/parameters/musics'
 import { ShapeType, TextAlignX, TextAlignY } from '@/components/parameters/p5Info'
 import type { PropType } from 'vue'
 
@@ -32,7 +33,7 @@ function getOptionsList(label: string | string[]): string[] {
     return Object.values(TextAlignY)
   } else if (label === 'music') {
     // 仮置き
-    return ['レターポスト', '誘閃光']
+    return musicListData.map((music) => music.name)
   }
   return []
 }
