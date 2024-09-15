@@ -26,7 +26,7 @@
         @callSetScrollPosition="setScrollPosition"
         v-model:isPlaying="isPlaying"
       ></Waveformbar>
-      <div class="timeline" style="overflow-y: auto">
+      <div class="timeline" style="overflow-y: auto" @click.stop="clearObjectSelect">
         <div
           class="seekbar"
           :style="{
@@ -39,7 +39,6 @@
           v-for="(layer, layerIndex) in layers"
           :key="layerIndex"
           :style="{ width: waveformWidth, height: configStore.timelineLayerHeight + 'px' }"
-          @click.stop="clearObjectSelect"
         >
           <div
             class="layerTimeline"
