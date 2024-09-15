@@ -142,6 +142,7 @@ const move = (event: MouseEvent) => {
     const dx = (event.clientX - lastMouseX.value) / scaler.value
     const dy = event.clientY - lastMouseY.value
     lastMouseX.value = event.clientX
+
     if (tempStart.value + dx >= 0) {
       tempStart.value += dx
       tempEnd.value += dx
@@ -191,6 +192,7 @@ const resize = (event: MouseEvent) => {
         tempStart.value += dx
       }
     }
+    tempEnd.value = Math.max(tempEnd.value, tempStart.value)
   }
 }
 
