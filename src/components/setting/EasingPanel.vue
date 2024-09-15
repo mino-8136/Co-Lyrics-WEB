@@ -116,7 +116,7 @@ function isEasingAlreadySelected(easingName: string): boolean {
       easing.value.easeType === '')
   )
     return true
-  return easing.value.easeType == easingName ?? false
+  return easing.value.easeType == easingName
 }
 
 const drawPath = (easingName: string) => {
