@@ -59,6 +59,7 @@ export const useTimelineStore = defineStore('timeline', {
     },
     defaultFont: 'Noto Sans JP Medium',
     defaultBackgroundColor: '#808080',
+    layerNumbers: 20,
     ////////
     currentFrame: 0,
     canvasScale: 1,

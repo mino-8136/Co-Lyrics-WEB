@@ -147,11 +147,7 @@ const move = (event: MouseEvent) => {
     if (Math.abs(event.clientY - lastMouseY.value) > layerHeight) {
       baseObject.value.layer += Math.round((event.clientY - lastMouseY.value) / layerHeight)
       lastMouseY.value = event.clientY
-      baseObject.value.layer = gsap.utils.clamp(
-        0,
-        timelineStore.layerNumbers - 1,
-        baseObject.value.layer
-      )
+      baseObject.value.layer = gsap.utils.clamp(0, 9, baseObject.value.layer)
     }
   }
 }

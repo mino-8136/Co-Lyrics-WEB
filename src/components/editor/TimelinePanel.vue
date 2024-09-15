@@ -94,7 +94,7 @@ import { getLyricMarker, type Note } from '../parameters/musics'
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
 const layers = ref(
-  Array.from({ length: 20 }, () => ({
+  Array.from({ length: timelineStore.layerNumbers }, () => ({
     name: 'Layer'
   }))
 )
@@ -334,7 +334,7 @@ watch(
   position: absolute; /* 絶対位置を指定 */
   top: 0;
   width: 2px;
-  height: 78vh; /* 親要素の高さに合わせる */
+  height: 60vh; /* 親要素の高さに合わせる */
   background-color: #4cabe2;
   z-index: 100; /* z-indexを高く設定して最前面に */
   pointer-events: none; /* クリックイベントを無視 */
