@@ -39,6 +39,7 @@
           v-for="(layer, layerIndex) in layers"
           :key="layerIndex"
           :style="{ width: waveformWidth, height: configStore.timelineLayerHeight + 'px' }"
+          @click.stop="clearObjectSelect"
         >
           <div
             class="layerTimeline"
@@ -55,14 +56,14 @@
                 :object="object"
                 v-model:text="object.textSettings.text"
                 @contextmenu.prevent="onObjectContextMenu($event, object.id)"
-                @click="selectObject(object.id)"
+                @click.stop="selectObject(object.id)"
               />
               <!-- その他のオブジェクトの場合 -->
               <object-bar
                 v-else
                 :object="object"
                 @contextmenu.prevent="onObjectContextMenu($event, object.id)"
-                @click="selectObject(object.id)"
+                @click.stop="selectObject(object.id)"
               />
             </template>
             <p class="layerindex">{{ layerIndex }}</p>
@@ -90,7 +91,6 @@ import {
   type typeString
 } from '@/components/parameters/objectInfo'
 import { getLyricMarker, type Note } from '../parameters/musics'
-import { config } from 'process'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -191,13 +191,9 @@ function onObjectContextMenu(event: MouseEvent, objIndex: number) {
   event.stopPropagation()
 }
 
-///////////////////
-// それぞれの処理 //
-///////////////////
-
-function playPause() {
-  isPlaying.value = !isPlaying.value
-}
+//////////////////////////
+// オブジェクト操作の処理 //
+//////////////////////////
 
 // オブジェクトクリックで選択
 function selectObject(objectId: number) {
@@ -238,6 +234,14 @@ function removeObject(objIndex: number) {
   timelineStore.isRedrawNeeded = true
 }
 
+function clearObjectSelect() {
+  timelineStore.selectedObjectId = -1
+}
+
+///////////////////
+// そのほかの処理 //
+///////////////////
+
 function findNearestLyrics(offsetX: number = 0): string {
   const markerOffset = timelineStore.musicData.offset
   const mouseTime = offsetX / timelineStore.pxPerSec - markerOffset
@@ -254,6 +258,10 @@ function findNearestLyrics(offsetX: number = 0): string {
 ////////////////////////////
 // タイムライン操作用の関数 //
 ////////////////////////////
+
+function playPause() {
+  isPlaying.value = !isPlaying.value
+}
 
 function setWaveformWidth(width: number) {
   waveformWidth.value = width
