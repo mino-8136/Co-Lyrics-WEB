@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { createObjectFromJson, type RenderObject } from '@/components/parameters/objectInfo'
+import { type Music } from '@/components/parameters/musics'
 
 export const useObjectStore = defineStore('objects', {
   state: () => ({
@@ -49,8 +50,15 @@ export const useTimelineStore = defineStore('timeline', {
     width: 1280,
     height: 720,
     framerate: 30,
-    title: 'New Project',
-    audioPath: '/assets/music/レターポスト_192k.mp3',
+    musicData: {
+      name: 'レターポスト',
+      bpm: 108,
+      offset: 2.2,
+      audioPath: '/assets/music/レターポスト/レターポスト_192k.mp3',
+      lyricPath: '/assets/music/レターポスト/レターポスト_melody.json'
+    },
+    defaultFont: 'Noto Sans JP Medium',
+    defaultBackgroundColor: '#808080',
     ////////
     currentFrame: 0,
     canvasScale: 1,
@@ -65,6 +73,9 @@ export const useTimelineStore = defineStore('timeline', {
     },
     updateCanvasScale(receivedWidth: number) {
       this.canvasScale = receivedWidth / this.width
+    },
+    setMusicData(musicData: Music) {
+      this.musicData = musicData
     }
   },
   persist: true
@@ -74,7 +85,8 @@ export const useConfigStore = defineStore('config', {
   state: () => ({
     isShowCollisionBox: false,
     isShowKeyframe: true,
-    isLoadSubsetFont: false
+    isLoadSubsetFont: false,
+    upperSideHeight: 400
   }),
   actions: {},
   persist: true

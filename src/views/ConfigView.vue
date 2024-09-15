@@ -19,9 +19,23 @@
           v-model="configStore.isShowKeyframe"
         ></v-checkbox>
         <v-checkbox
-          label="軽量化されたフォントのみを読み込む (変更後はブラウザ上でキャッシュの削除をしてください)"
+          label="軽量化されたフォントのみを読み込む (ブラウザ上でキャッシュの削除をしてから選択してください)"
           v-model="configStore.isLoadSubsetFont"
         ></v-checkbox>
+
+        <v-text-field
+          type="number"
+          variant="outlined"
+          density="compact"
+          hide-details
+          single-line
+          style="width: 400px"
+          step="10"
+          v-model.number="configStore.upperSideHeight"
+          @change="configStore.upperSideHeight = clClamp(100, 1000, configStore.upperSideHeight)"
+        >
+          <template v-slot:append>プレビューパネルの高さ(初期値:400)</template>
+        </v-text-field>
       </v-col>
     </v-card-actions>
   </v-card>
@@ -29,6 +43,7 @@
 
 <script setup lang="ts">
 import { useTimelineStore, useConfigStore } from '@/stores/objectStore'
+import { clClamp } from '@/components/utils/common'
 const timelineStore = useTimelineStore()
 const configStore = useConfigStore()
 </script>

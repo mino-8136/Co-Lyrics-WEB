@@ -14,5 +14,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 const parameter = defineModel({ type: String, required: true })
+
+// settingpanel用だが、現在は未使用
+const props = defineProps({
+  colorType: {
+    type: String,
+    default: 'hexa'
+  }
+})
 const colorMenu = ref(false)
 </script>

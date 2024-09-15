@@ -8,6 +8,7 @@ import WaveSurfer from 'wavesurfer.js'
 import TimelinePlugin from 'wavesurfer.js/dist/plugins/timeline.esm.js'
 import RegionsPlugin from 'wavesurfer.js/dist/plugins/regions.js'
 import { useTimelineStore } from '@/stores/objectStore'
+import { type Note, getLyricMarker } from '../parameters/musics'
 const timelineStore = useTimelineStore()
 
 const waveform = ref(null) // DOM要素への参照を作成
@@ -40,7 +41,7 @@ onMounted(() => {
       container: waveform.value,
       waveColor: '#4F4A85',
       progressColor: '#383351',
-      url: timelineStore.audioPath,
+      url: timelineStore.musicData.audioPath,
       height: 40,
       minPxPerSec: timelineStore.pxPerSec, // ここが1フレームあたりの幅
       autoplay: false,
@@ -77,36 +78,25 @@ onMounted(() => {
 
     // マーカーの追加
     wavesurfer.on('decode', async () => {
-      // 歌詞データを読み込み
-      console
-      interface Note {
-        note: number
-        start_time: number
-        end_time: number
-        lyric?: string
-      }
-      let noteData: Note[] = []
-      try {
-        const response = await fetch('assets/lyrics/レターポスト_melody.json')
-        noteData = await response.json()
-      } catch (error) {
-        console.error('Error loading JSON:', error)
-      }
-
-      // 各ノートデータに基づいてリージョンを追加
-      noteData.forEach((note: Note) => {
-        if ('lyric' in note) {
-          regions.addRegion({
-            start: note.start_time + 2.2,
-            content: note.lyric || '', // 歌詞がある場合のみ表示
-            drag: false,
-            color: 'rgba(255, 255, 0, 0.5)'
-          })
-        }
-      })
+      setLyricMarker(regions)
     })
   }
 })
+
+async function setLyricMarker(regions: RegionsPlugin) {
+  // 各ノートデータに基づいてリージョンを追加
+  const noteData = await getLyricMarker(timelineStore.musicData.lyricPath)
+  noteData.forEach((note: Note) => {
+    if ('lyric' in note) {
+      regions.addRegion({
+        start: note.start_time + timelineStore.musicData.offset,
+        content: note.lyric || '', // 歌詞がある場合のみ表示
+        drag: false,
+        color: 'rgba(255, 255, 0, 0.5)'
+      })
+    }
+  })
+}
 
 // isPlayingの変更を監視して再生・停止を管理
 watch(
@@ -129,6 +119,25 @@ watch(
     if (wavesurfer) {
       wavesurfer.zoom(newPxPerSec)
       emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
+    }
+  }
+)
+
+// musicDataの変更を監視
+watch(
+  () => timelineStore.musicData,
+  async (newAudio) => {
+    if (wavesurfer) {
+      // 既存のリージョンをクリア
+      const regions = wavesurfer
+        .getActivePlugins()
+        .find((plugin) => plugin instanceof RegionsPlugin) as RegionsPlugin
+      if (regions) {
+        regions.clearRegions()
+      }
+
+      // 新しい音声ファイルをロード
+      wavesurfer.load(newAudio.audioPath)
     }
   }
 )

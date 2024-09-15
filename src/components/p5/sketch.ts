@@ -25,12 +25,13 @@ const selectedObject = {
   startObjectY: 0
 }
 let currentFrame = 0
+let backgroundColor = '#80'
 
 let isFontLoaded = false
 let loadedFontName = ''
 let loadedFontCount = 0
-
 let showCollisionBox = true
+
 const verticalCharacter = ['ー', '−', '～', '~'] // 縦書きにする文字のリスト
 
 export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
@@ -72,11 +73,11 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
       p.frameRate(project.framerate)
       p.textAlign(p.CENTER, p.CENTER)
 
-      p.background(0)
+      p.background(backgroundColor)
     }
 
     p.draw = () => {
-      p.background(80)
+      p.background(backgroundColor)
 
       // デバッグ用
       p.fill(255)
@@ -434,6 +435,10 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
       currentFrame = frame
     }
 
+    p.updateBackgroundColor = (color: string) => {
+      backgroundColor = color
+    }
+
     p.updateShowCollisionBox = (show: boolean) => {
       showCollisionBox = show
     }
@@ -449,6 +454,7 @@ declare module 'p5' {
   interface p5InstanceExtensions {
     addRenderObjects: (currentObjects: RenderObject[]) => void
     updateCurrentFrame: (frame: number) => void
+    updateBackgroundColor: (color: string) => void
     updateShowCollisionBox: (show: boolean) => void
     updateCanvasScale: () => void
   }

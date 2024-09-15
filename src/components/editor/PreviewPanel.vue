@@ -27,6 +27,7 @@ onMounted(() => {
   if (!p.value) {
     let sketch = defineSketch(timelineStore, configStore.isLoadSubsetFont)
     p.value = new p5(sketch)
+    p.value.updateBackgroundColor(timelineStore.defaultBackgroundColor)
 
     // ウィンドウのリサイズイベントを監視
     window.addEventListener('resize', updateCanvasSize)
@@ -42,7 +43,6 @@ watch(
   () => {
     renderObjects()
     p.value.updateCurrentFrame(timelineStore.currentFrame)
-    p.value.updateShowCollisionBox(configStore.isShowCollisionBox)
   }
 )
 
@@ -60,6 +60,7 @@ watch(
 function redrawCanvas() {
   if (timelineStore.isRedrawNeeded) {
     renderObjects()
+    p.value.updateBackgroundColor(timelineStore.defaultBackgroundColor)
     p.value.updateShowCollisionBox(configStore.isShowCollisionBox)
     p.value.redraw()
     timelineStore.isRedrawNeeded = false

@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '@/components/timeline/ObjectBar.vue'
@@ -89,6 +89,7 @@ import {
   TextObject,
   type typeString
 } from '@/components/parameters/objectInfo'
+import { getLyricMarker, type Note } from '../parameters/musics'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -100,6 +101,7 @@ const layers = ref(
 const waveformWidth = ref(900)
 const isPlaying = ref(false)
 const copiedObject = ref<RenderObject>()
+let markerData: Note[] = []
 
 ///////////////////
 // メニューの定義 //
@@ -213,7 +215,10 @@ function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
   }
 
   if (type === 'text') {
-    objectStore.addNewObject(new TextObject(settings))
+    let newText = new TextObject(settings)
+    newText.textSettings.text = findNearestLyrics(offsetX)
+    newText.textSettings.font = timelineStore.defaultFont
+    objectStore.addNewObject(newText)
   } else if (type === 'image') {
     objectStore.addNewObject(new ImageObject(settings))
   } else if (type === 'shape') {
@@ -231,6 +236,19 @@ function removeObject(objIndex: number) {
   timelineStore.isRedrawNeeded = true
 }
 
+function findNearestLyrics(offsetX: number = 0): string {
+  const markerOffset = timelineStore.musicData.offset
+  const mouseTime = offsetX / timelineStore.pxPerSec - markerOffset
+  // console.log(mouseTime)
+  // 最大値を超えないmarkerを見つける
+  const nearestMarker = markerData
+    .filter((marker) => marker.start_time <= mouseTime) // start_time が offset を超えないものをフィルタ
+    .reduce((prev, curr) => (curr.start_time > prev.start_time ? curr : prev), markerData[0])
+
+  // marker.lyricを返す
+  return nearestMarker.lyric ?? 'サンプル'
+}
+
 ////////////////////////////
 // タイムライン操作用の関数 //
 ////////////////////////////
@@ -246,6 +264,18 @@ function setScrollPosition(position: number) {
     scrollable.scrollLeft = position
   }
 }
+
+onMounted(async () => {
+  markerData = await getLyricMarker(timelineStore.musicData.lyricPath)
+})
+
+// musicDataの変更を監視
+watch(
+  () => timelineStore.musicData,
+  async () => {
+    markerData = await getLyricMarker(timelineStore.musicData.lyricPath)
+  }
+)
 </script>
 
 <style scoped>
