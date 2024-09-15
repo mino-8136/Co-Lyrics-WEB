@@ -59,7 +59,6 @@ export const useTimelineStore = defineStore('timeline', {
     },
     defaultFont: 'Noto Sans JP Medium',
     defaultBackgroundColor: '#808080',
-    layerNumbers: 20,
     ////////
     currentFrame: 0,
     canvasScale: 1,
@@ -87,7 +86,10 @@ export const useConfigStore = defineStore('config', {
     isShowCollisionBox: false,
     isShowKeyframe: true,
     isLoadSubsetFont: false,
-    upperSideHeight: 400
+    upperSideHeight: 400,
+    // 非公開設定 //
+    timelineLayerNumbers: 20,
+    timelineLayerHeight: 40,
   }),
   actions: {},
   persist: true

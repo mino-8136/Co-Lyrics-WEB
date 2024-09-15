@@ -41,18 +41,18 @@ import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import KeyframePoint from './KeyframePoint.vue'
 import gsap from 'gsap'
 
+const timelineStore = useTimelineStore()
+const configStore = useConfigStore()
 const text = defineModel('text')
 const props = defineProps<{
   object: RenderObject
 }>()
 
-const timelineStore = useTimelineStore()
-const configStore = useConfigStore()
-const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
-
 const baseObject = ref(props.object)
 const tempStart = ref(baseObject.value.start)
 const tempEnd = ref(baseObject.value.end)
+const deltaLayer = ref(0)
+const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
 
 // ドラッグ時の挙動 : 右端を掴んだらendを変更、左端を掴んだらstartを変更
 const isResizing = ref(false)
@@ -61,10 +61,13 @@ const lastMouseX = ref(0)
 const lastMouseY = ref(0)
 const side = ref('')
 
+////////////////////////////////////////
+
 // 横幅の定義方法 : end-startで定義する
 const objectStyle = computed(() => ({
   left: `${Math.floor(tempStart.value) * scaler.value}px`,
   width: `${(Math.floor(tempEnd.value - Math.floor(tempStart.value)) + 0.5) * scaler.value}px`,
+  top: isMoving.value ? `${deltaLayer.value * configStore.timelineLayerHeight}px` : 0,
   position: 'absolute',
   background: bgColor.value,
   cursor: isMoving.value ? 'grabbing' : 'grab'
@@ -131,27 +134,24 @@ const startMove = (event: MouseEvent) => {
   isMoving.value = true
   lastMouseX.value = event.clientX
   lastMouseY.value = event.clientY
+  deltaLayer.value = 0
 }
 
 const move = (event: MouseEvent) => {
   if (isMoving.value) {
     const dx = (event.clientX - lastMouseX.value) / scaler.value
+    const dy = event.clientY - lastMouseY.value
     lastMouseX.value = event.clientX
     if (tempStart.value + dx >= 0) {
       tempStart.value += dx
       tempEnd.value += dx
     }
-    // レイヤー変更に対応
-    const layerHeight = 40
-    // console.log(lastMouseY.value, event.clientY)
-    if (Math.abs(event.clientY - lastMouseY.value) > layerHeight) {
-      baseObject.value.layer += Math.round((event.clientY - lastMouseY.value) / layerHeight)
-      lastMouseY.value = event.clientY
-      baseObject.value.layer = gsap.utils.clamp(
-        0,
-        timelineStore.layerNumbers - 1,
-        baseObject.value.layer
-      )
+
+    // レイヤー変更に対応し、横移動をクリアする
+    deltaLayer.value = Math.round(dy / configStore.timelineLayerHeight)
+    if (deltaLayer.value !== 0) {
+      tempStart.value = baseObject.value.start
+      tempEnd.value = baseObject.value.end
     }
   }
 }
@@ -160,9 +160,18 @@ const stopMove = () => {
   if (isMoving.value) {
     baseObject.value.start = Math.floor(tempStart.value)
     baseObject.value.end = Math.floor(tempEnd.value)
+
+    baseObject.value.layer = gsap.utils.clamp(
+      0,
+      configStore.timelineLayerNumbers - 1,
+      (baseObject.value.layer += deltaLayer.value)
+    )
   }
   isMoving.value = false
+  deltaLayer.value = 0
 }
+
+//////////////////////////////////////////////////////////
 
 const startResize = (sideValue: string, event: MouseEvent) => {
   isResizing.value = true

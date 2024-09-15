@@ -38,7 +38,7 @@
           class="layer"
           v-for="(layer, layerIndex) in layers"
           :key="layerIndex"
-          :style="{ width: waveformWidth }"
+          :style="{ width: waveformWidth, height: configStore.timelineLayerHeight + 'px' }"
         >
           <div
             class="layerTimeline"
@@ -75,7 +75,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
+import { useConfigStore, useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '@/components/timeline/ObjectBar.vue'
 import Waveformbar from '@/components/timeline/WaveformBar.vue'
@@ -90,11 +90,13 @@ import {
   type typeString
 } from '@/components/parameters/objectInfo'
 import { getLyricMarker, type Note } from '../parameters/musics'
+import { config } from 'process'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
+const configStore = useConfigStore()
 const layers = ref(
-  Array.from({ length: timelineStore.layerNumbers }, () => ({
+  Array.from({ length: configStore.timelineLayerNumbers }, () => ({
     name: 'Layer'
   }))
 )
@@ -300,7 +302,6 @@ watch(
 
 .layer {
   display: flex;
-  height: 40px;
   width: 100%; /* layerの幅を親に合わせる */
 }
 
