@@ -19,9 +19,7 @@
               class="d-flex"
               cols="12"
               sm="4"
-              md="3"
               lg="2"
-              xl="2"
             >
               <v-container class="items">
                 <svg
