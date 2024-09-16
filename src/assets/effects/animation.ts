@@ -86,11 +86,11 @@ export const animationList: Animation[] = [
     name: '明滅登場',
     params: { time: 5, interval: 1, out: false },
     description: '文字を一文字ずつ表示します。[退場]をONにすると明滅して消えるようになります。',
-    tag: ['登場'],
+    tag: ['登場', '退場'],
     parameters: {
       time: { name: '登場時間(f)', type: UIType.slider, min: 0, max: 90 },
       interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
-      out: { name: '退場(未実装)', type: UIType.checkbox }
+      out: { name: '退場', type: UIType.checkbox }
     },
     applyEffect: (
       inform: Inform,
@@ -99,7 +99,11 @@ export const animationList: Animation[] = [
     ): Transform => {
       const transform = new Transform()
 
-      const progressFrame = inform.currentFrame - inform.start - inform.index * params.interval
+      const progressFrame = params.out
+        ? inform.end -
+          inform.currentFrame -
+          (inform.totalIndex - 1 - inform.index) * params.interval
+        : inform.currentFrame - inform.start - inform.index * params.interval
       if (progressFrame < 0) transform.opacity = 0
       else if (progressFrame < params.time && Math.round(progressFrame) % 2 === 0) {
         transform.opacity = 0
@@ -112,14 +116,14 @@ export const animationList: Animation[] = [
     name: 'スライドイン',
     params: { time: 10, interval: 1, X: 50, Y: 0, out: false, ease: 'linear' },
     description: '指定した相対座標([X],[Y])からスライドインします。',
-    tag: ['登場'],
+    tag: ['登場', '退場'],
     parameters: {
       time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
       interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
       X: { name: 'X', type: UIType.slider, min: -500, max: 500 },
       Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 },
       ease: { name: 'イージング', type: UIType.easing },
-      out: { name: '退場(未実装)', type: UIType.checkbox }
+      out: { name: '退場', type: UIType.checkbox }
     },
     applyEffect: (
       inform: Inform,
@@ -129,8 +133,11 @@ export const animationList: Animation[] = [
       const transform = new Transform()
 
       // 0→1 に変化する
-      const progress =
-        (inform.currentFrame - inform.start - inform.index * params.interval) / params.time
+      const progress = params.out
+        ? (inform.end -
+          inform.currentFrame -
+          (inform.totalIndex - 1 - inform.index) * params.interval) / params.time
+        : (inform.currentFrame - inform.start - inform.index * params.interval) / params.time
       const easeProgress = getAnimationStateAtTime(clClamp(0, 1, progress), params.ease)
 
       if (progress < 0) {
