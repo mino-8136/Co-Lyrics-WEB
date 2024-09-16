@@ -55,7 +55,7 @@ export class StyleSettings {
     this.effects = styles
   }
 
-  stylize(inform : Inform): void {
+  stylize(inform: Inform): void {
     this.effects.forEach((style) => {
       const effect = styleList.find((effect) => effect.name === style.name)
       if (effect) {
@@ -127,8 +127,8 @@ export class StandardRenderSettings extends PropertyMethod {
   //blend: number
 
   static parameterInfo = {
-    X: { name: 'X', type: UIType.keyframe, min: -1024, max: 1024 },
-    Y: { name: 'Y', type: UIType.keyframe, min: -1024, max: 1024 },
+    X: { name: 'X', type: UIType.keyframe, min: -1500, max: 1500 },
+    Y: { name: 'Y', type: UIType.keyframe, min: -1000, max: 1000 },
     relativeX: { name: '相対X', type: UIType.none },
     relativeY: { name: '相対Y', type: UIType.none },
     scale: { name: '拡大率', type: UIType.keyframe, min: 0, max: 500 },
