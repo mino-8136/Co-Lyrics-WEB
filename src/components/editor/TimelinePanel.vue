@@ -247,18 +247,21 @@ const openFile = (layerIndex: number, state: string, offsetX: number) => {
       const minLayer = tempObjects.reduce((prev, curr) =>
         curr.layer < prev.layer ? curr : prev
       ).layer
-      console.log(minFrame, minLayer)
+
       tempObjects.forEach((obj: RenderObject) => {
-        obj.start = clClamp(0, 99999, obj.start - minFrame + offsetFrame) // TODO:最後のフレームを取得する
-        obj.end = obj.end - minFrame + offsetFrame
+        const duration = obj.end - obj.start
+        obj.start = clClamp(
+          0,
+          timelineStore.durationFrame - 1 - duration,
+          obj.start - minFrame + offsetFrame
+        ) // TODO:最後のフレームを取得する
+        obj.end = obj.start + duration
         obj.layer = clClamp(
           0,
           configStore.timelineLayerNumbers - 1,
           obj.layer - minLayer + layerIndex
         )
       })
-
-      console.log(tempObjects)
 
       // 準備を終えたので追加する
       timelineStore.selectedObjectIds = []
@@ -385,7 +388,8 @@ function findNearestLyrics(offsetX: number = 0): string {
 function groupMoveFrame(deltaFrame: number) {
   objectStore.objects.forEach((obj) => {
     if (timelineStore.selectedObjectIds.includes(obj.id)) {
-      const maxMoveFrame = Math.max(obj.start + deltaFrame, 0) - obj.start // 0未満には移動させない
+      let maxMoveFrame = Math.max(obj.start + deltaFrame, 0) - obj.start // 0未満には移動させない
+      maxMoveFrame = Math.min(obj.end + deltaFrame, timelineStore.durationFrame - 1) - obj.end // 最大フレーム数を超えないように
       obj.start += maxMoveFrame
       obj.end += maxMoveFrame
     }

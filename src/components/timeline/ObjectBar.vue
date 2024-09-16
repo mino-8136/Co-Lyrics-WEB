@@ -149,6 +149,7 @@ const move = (event: MouseEvent) => {
   if (isMoving.value) {
     let deltaFrame = Math.round((event.clientX - initialMouseX.value) / scaler.value)
     deltaFrame = Math.max(deltaFrame, -baseObject.value.start)
+    deltaFrame = Math.min(deltaFrame, timelineStore.durationFrame - baseObject.value.end - 1)
     deltaStartFrame.value = deltaFrame
     deltaEndFrame.value = deltaFrame
 
@@ -210,7 +211,7 @@ const resize = (event: MouseEvent) => {
     if (side.value === 'right') {
       deltaEndFrame.value = clClamp(
         -baseObject.value.end + baseObject.value.start + 1,
-        1000, // 仮置き
+        timelineStore.durationFrame - baseObject.value.end - 1,
         deltaFrame
       )
     } else {
