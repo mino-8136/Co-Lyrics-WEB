@@ -258,12 +258,16 @@ export class ImageSettings extends PropertyMethod {
 
 export class GroupSettings extends PropertyMethod {
   affectLayerNum: number
+
   static parameterInfo = {
     affectLayerNum: { name: 'レイヤー数', type: UIType.slider, min: 1, max: 10 }
   }
-  constructor({ affectLayers = 1 } = {}) {
+
+  constructor({ 
+    affectLayerNum = 1 
+  } = {}) {
     super()
-    this.affectLayerNum = affectLayers
+    this.affectLayerNum = affectLayerNum
   }
 }
 

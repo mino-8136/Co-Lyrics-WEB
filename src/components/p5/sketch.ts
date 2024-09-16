@@ -91,31 +91,13 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
       p.scale(project.canvasScale)
 
       let region = 0
-      const transformStack: Transform[] = [] // 各GroupObjectの変化量を保持するスタック
-      const totalTransform = { X: 0, Y: 0, angle: 0, scale: 1 } // 合算されたトランスフォーム情報
-
+      let isGroupEffect = false
       renderObjects.forEach((object) => {
         // グループの終了処理
-        if (object.layer > region && transformStack.length > 0) {
-          // トランスフォームをpopして元に戻す
-          const removedTransform = transformStack.pop()
-          if (removedTransform) {
-            totalTransform.X -= removedTransform.X
-            totalTransform.Y -= removedTransform.Y
-            totalTransform.angle -= removedTransform.angle
-            totalTransform.scale /= removedTransform.scale
-          }
-
-          if (transformStack.length === 0) {
-            p.pop() // 全てのgroupが終了したらpop
-          }
+        if (object.layer > region && isGroupEffect) {
+          p.pop()
+          isGroupEffect = false
         }
-
-        p.push();
-        p.translate(totalTransform.X, totalTransform.Y)
-        p.rotate(totalTransform.angle)
-        p.scale(totalTransform.scale)
-
         switch (object.type) {
           case 'text':
             renderText(object as TextObject)
@@ -126,28 +108,17 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
           case 'shape':
             renderShape(object as ShapeObject)
             break
-          case 'group': {
+          case 'group':
             p.push()
-            const groupTransform = renderGroup(object as GroupObject) // グループのトランスフォームを取得
-            transformStack.push(groupTransform) // トランスフォーム情報をスタックに追加
-
-            // 合算していく
-            totalTransform.X += groupTransform.X
-            totalTransform.Y += groupTransform.Y
-            totalTransform.angle += groupTransform.angle
-            totalTransform.scale *= groupTransform.scale
-
-            region = object.layer + object.groupSettings.affectLayerNum - 1 // 次のレイヤー範囲を設定
+            isGroupEffect = true
+            region = renderGroup(object as GroupObject)
             break
-          }
         }
-        p.pop()
       })
       // グループの終了処理
-      // 最後に残っているグループの終了処理
-      while (transformStack.length > 0) {
+      if (isGroupEffect) {
         p.pop()
-        transformStack.pop()
+        isGroupEffect = false
       }
 
       if (showCollisionBox) {
@@ -250,21 +221,20 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
     }
 
     const renderGroup = (object: GroupObject) => {
-      const transform: Transform = {
-        X: lerpValue(object.standardRenderSettings.X.keyframes, object.start, currentFrame),
-        Y: lerpValue(object.standardRenderSettings.Y.keyframes, object.start, currentFrame),
-        angle: lerpValue(object.standardRenderSettings.angle.keyframes, object.start, currentFrame),
-        opacity: 100,
-        scale: lerpValue(
+      // 2. 全体的なトランスフォームの実行(renderTextと同様)
+      p.translate(
+        lerpValue(object.standardRenderSettings.X.keyframes, object.start, currentFrame),
+        lerpValue(object.standardRenderSettings.Y.keyframes, object.start, currentFrame)
+      )
+      p.rotate(lerpValue(object.standardRenderSettings.angle.keyframes, object.start, currentFrame))
+      p.scale(
+        lerpValue(
           convertToPercentage(object.standardRenderSettings.scale.keyframes),
           object.start,
           currentFrame
         )
-      }
-      console.log(transform)
-
-      // グループ内で使用するレイヤー範囲を返す
-      return transform
+      )
+      return object.layer + object.groupSettings.affectLayerNum - 1
     }
 
     //////////////////////////
