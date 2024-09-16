@@ -36,7 +36,8 @@ import {
   ImageObject,
   ShapeObject,
   type RenderObject,
-  objectSettingsList
+  objectSettingsList,
+  GroupObject
 } from '../parameters/objectInfo'
 import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import KeyframePoint from './KeyframePoint.vue'
@@ -71,9 +72,14 @@ const objectStyle = computed(() => ({
   left: `${(baseObject.value.start + deltaStartFrame.value) * scaler.value}px`,
   width: `${(baseObject.value.end + deltaEndFrame.value - (baseObject.value.start + deltaStartFrame.value) + 0.5) * scaler.value}px`,
   top: isMoving.value ? `${deltaLayer.value * configStore.timelineLayerHeight}px` : 0,
+  height:
+    baseObject.value instanceof GroupObject
+      ? `${configStore.timelineLayerHeight * baseObject.value.groupSettings.affectLayerNum}px`
+      : `${configStore.timelineLayerHeight}px`,
   position: 'absolute',
   background: bgColor.value,
-  cursor: isMoving.value ? 'grabbing' : 'grab'
+  cursor: isMoving.value ? 'grabbing' : 'grab',
+  zIndex: baseObject.value instanceof GroupObject ? 2 : 3
 }))
 
 const bgColor = computed(() => {
@@ -83,6 +89,8 @@ const bgColor = computed(() => {
     return 'linear-gradient(to bottom right, rgb(120, 152, 255), rgba(230, 255, 255, 0.6))'
   } else if (baseObject.value instanceof ImageObject) {
     return 'rgb(211, 211, 211)'
+  } else if (baseObject.value instanceof GroupObject) {
+    return 'linear-gradient(to right, rgb(180, 240, 180), rgba(230, 255, 255, 0.6))'
   } else {
     return 'rgb(211, 211, 211)'
   }
@@ -257,6 +265,7 @@ watch(
   left: 20px;
   cursor: move;
   user-select: none;
+  z-index: 3;
 }
 
 .object .text {

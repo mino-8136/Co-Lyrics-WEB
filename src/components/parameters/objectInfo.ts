@@ -256,6 +256,21 @@ export class ImageSettings extends PropertyMethod {
   }
 }
 
+export class GroupSettings extends PropertyMethod {
+  affectLayerNum: number
+
+  static parameterInfo = {
+    affectLayerNum: { name: 'レイヤー数', type: UIType.slider, min: 1, max: 10 }
+  }
+
+  constructor({ 
+    affectLayerNum = 1 
+  } = {}) {
+    super()
+    this.affectLayerNum = affectLayerNum
+  }
+}
+
 /////////////////////////
 // 各オブジェクトの実装  //
 /////////////////////////
@@ -333,15 +348,28 @@ export class ShapeObject extends BaseObject {
   }
 }
 
+export class GroupObject extends BaseObject {
+  standardRenderSettings: StandardRenderSettings
+  groupSettings: GroupSettings
+
+  constructor(settings: BaseSettings) {
+    super(settings)
+    this.type = 'group'
+    this.standardRenderSettings = new StandardRenderSettings()
+    this.groupSettings = new GroupSettings()
+  }
+}
+
 //////////////////////////////////////
 // オブジェクトが増えたら適宜追加する  //
 //////////////////////////////////////
-export type typeString = '' | 'base' | 'text' | 'image' | 'shape'
-export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject
+export type typeString = '' | 'base' | 'text' | 'image' | 'shape' | 'group'
+export type RenderObject = TextObject | BaseObject | ShapeObject | ImageObject | GroupObject
 export const objectSettingsList = [
   'standardRenderSettings',
   'textSettings',
   'shapeSettings',
+  'groupSettings',
   'styleSettings',
   'animationSettings'
 ]
@@ -353,6 +381,7 @@ export function createObjectFromJson(obj: RenderObject): any {
     base: BaseObject,
     shape: ShapeObject,
     image: ImageObject,
+    group: GroupObject,
     '': BaseObject
   }
 
@@ -377,6 +406,9 @@ export function createObjectFromJson(obj: RenderObject): any {
   }
   if ('shapeSettings' in obj) {
     ;(newObj as any).shapeSettings = new ShapeSettings(deepCopy(obj.shapeSettings))
+  }
+  if ('groupSettings' in obj) {
+    ;(newObj as any).groupSettings = new GroupSettings(deepCopy(obj.groupSettings))
   }
   if ('styleSettings' in obj) {
     ;(newObj as any).styleSettings = new StyleSettings(deepCopy(obj.styleSettings.effects))

@@ -4,6 +4,7 @@ import {
   ShapeObject,
   ImageObject,
   BaseObject,
+  GroupObject,
   type RenderObject
 } from '@/components/parameters/objectInfo'
 import {
@@ -12,7 +13,8 @@ import {
   TextAlignX,
   TextAlignY,
   lerpValue,
-  convertToPercentage
+  convertToPercentage,
+  Transform
 } from '@/components/parameters/p5Info'
 import { fontListData, setFonts } from '@/components/parameters/fonts'
 
@@ -88,7 +90,14 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
       p.translate(p.width / 2, p.height / 2)
       p.scale(project.canvasScale)
 
+      let region = 0
+      let isGroupEffect = false
       renderObjects.forEach((object) => {
+        // グループの終了処理
+        if (object.layer > region && isGroupEffect) {
+          p.pop()
+          isGroupEffect = false
+        }
         switch (object.type) {
           case 'text':
             renderText(object as TextObject)
@@ -99,12 +108,23 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
           case 'shape':
             renderShape(object as ShapeObject)
             break
+          case 'group':
+            p.push()
+            isGroupEffect = true
+            region = renderGroup(object as GroupObject)
+            break
         }
       })
+      // グループの終了処理
+      if (isGroupEffect) {
+        p.pop()
+        isGroupEffect = false
+      }
 
       if (showCollisionBox) {
         renderObjects.forEach((object) => {
           if (!('standardRenderSettings' in object)) return
+          //if (object.type == 'group') return
           p.push()
           p.strokeWeight(3)
           p.stroke(255, 0, 0)
@@ -118,6 +138,7 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
           p.pop()
         })
       }
+
       p.pop()
 
       if (!isFontLoaded) {
@@ -197,6 +218,23 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
     //////////////////////////
     const renderImage = (object: ImageObject) => {
       return null
+    }
+
+    const renderGroup = (object: GroupObject) => {
+      // 2. 全体的なトランスフォームの実行(renderTextと同様)
+      p.translate(
+        lerpValue(object.standardRenderSettings.X.keyframes, object.start, currentFrame),
+        lerpValue(object.standardRenderSettings.Y.keyframes, object.start, currentFrame)
+      )
+      p.rotate(lerpValue(object.standardRenderSettings.angle.keyframes, object.start, currentFrame))
+      p.scale(
+        lerpValue(
+          convertToPercentage(object.standardRenderSettings.scale.keyframes),
+          object.start,
+          currentFrame
+        )
+      )
+      return object.layer + object.groupSettings.affectLayerNum - 1
     }
 
     //////////////////////////

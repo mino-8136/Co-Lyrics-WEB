@@ -108,6 +108,7 @@ import {
   BaseObject,
   BaseSettings,
   createObjectFromJson,
+  GroupObject,
   ImageObject,
   type RenderObject,
   ShapeObject,
@@ -177,9 +178,15 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
       // },
       {
         label: '図形オブジェクトを追加',
-        divided: true,
         onClick: () => {
           addObject(layerIndex, 'shape', event.offsetX)
+        }
+      },
+      {
+        label: 'グループ制御を追加 (重複させると不具合)',
+        divided: true,
+        onClick: () => {
+          addObject(layerIndex, 'group', event.offsetX)
         }
       },
       // {
@@ -342,6 +349,8 @@ function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
     objectStore.addNewObject(new ImageObject(settings))
   } else if (type === 'shape') {
     objectStore.addNewObject(new ShapeObject(settings))
+  } else if (type === 'group') {
+    objectStore.addNewObject(new GroupObject(settings))
   } else {
     objectStore.addNewObject(new BaseObject(settings))
   }
