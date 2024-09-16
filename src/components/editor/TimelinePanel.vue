@@ -286,6 +286,7 @@ function removeObject(objIndex: number) {
 
 function clearObjectSelect() {
   timelineStore.selectedObjectId = -1
+  ;(document.activeElement as HTMLElement)?.blur()
 }
 
 ///////////////////
@@ -423,6 +424,9 @@ function onMouseUp(event: MouseEvent) {
 }
 
 function onSpaceDown(event: KeyboardEvent) {
+  const activeElement = document.activeElement as HTMLElement
+  if (activeElement.tagName === 'INPUT') return
+
   if (event.key === ' ') {
     playPause()
     event.preventDefault()
