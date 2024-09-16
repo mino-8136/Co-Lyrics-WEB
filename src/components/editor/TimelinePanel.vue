@@ -280,7 +280,17 @@ function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
 }
 
 function removeObject(objIndex: number) {
-  objectStore.removeObject(objIndex)
+  // 右クリック時にobjIndexのオブジェクトが含まれる想定
+  if (timelineStore.selectedObjectIds.length > 0) {
+    timelineStore.selectedObjectIds.forEach((id) => {
+      objectStore.removeObject(id)
+    })
+    timelineStore.selectedObjectIds = []
+  } else {
+    objectStore.removeObject(objIndex)
+    timelineStore.selectedObjectId = -1
+  }
+
   timelineStore.isRedrawNeeded = true
 }
 
