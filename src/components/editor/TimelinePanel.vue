@@ -309,8 +309,9 @@ function findNearestLyrics(offsetX: number = 0): string {
 function groupMoveFrame(deltaFrame: number) {
   objectStore.objects.forEach((obj) => {
     if (timelineStore.selectedObjectIds.includes(obj.id)) {
-      obj.start = Math.max(obj.start + deltaFrame, 0)
-      obj.end += deltaFrame
+      const maxMoveFrame = Math.max(obj.start + deltaFrame, 0) - obj.start // 0未満には移動させない
+      obj.start += maxMoveFrame
+      obj.end += maxMoveFrame
     }
   })
 }
