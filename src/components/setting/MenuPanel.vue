@@ -66,12 +66,24 @@ const saveFile = (state: string = 'all') => {
     objects = objectStore.objects
   }
 
+  // 楽曲名と現在の日時を使ってファイル名を生成
+  const musicName = timelineStore.musicData.name || 'music' // 楽曲名が存在しない場合のデフォルト
+  const now = new Date()
+  const formattedDate = `${now.getFullYear()}-${(now.getMonth() + 1)
+    .toString()
+    .padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now
+    .getHours()
+    .toString()
+    .padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}`
+  const fileName = `${musicName}_${formattedDate}_${state}.json`
+
+  // JSONファイルを作成
   let jsonData = JSON.stringify(objects)
   const blob = new Blob([jsonData], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'data_' + state + '.json' // ダウンロードするファイル名
+  a.download = fileName // ダウンロードするファイル名
 
   // リンクをクリックしてダウンロードをトリガー
   document.body.appendChild(a)
