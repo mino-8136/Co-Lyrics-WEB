@@ -135,8 +135,9 @@ export const animationList: Animation[] = [
       // 0→1 に変化する
       const progress = params.out
         ? (inform.end -
-          inform.currentFrame -
-          (inform.totalIndex - 1 - inform.index) * params.interval) / params.time
+            inform.currentFrame -
+            (inform.totalIndex - 1 - inform.index) * params.interval) /
+          params.time
         : (inform.currentFrame - inform.start - inform.index * params.interval) / params.time
       const easeProgress = getAnimationStateAtTime(clClamp(0, 1, progress), params.ease)
 
@@ -146,6 +147,45 @@ export const animationList: Animation[] = [
       } else if (progress < params.time) {
         transform.X = params.X * (1 - easeProgress)
         transform.Y = params.Y * (1 - easeProgress)
+      }
+      return transform
+    }
+  },
+  {
+    name: '拡大回転登場',
+    params: { time: 10, interval: 1, scale: 150, angle: 0, out: false, ease: 'linear' },
+    description: '指定した指定した拡大率から登場します。',
+    tag: ['登場', '退場'],
+    parameters: {
+      time: { name: '時間(f)', type: UIType.slider, min: 0, max: 60 },
+      interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
+      scale: { name: '拡大率', type: UIType.slider, min: 0, max: 500 },
+      angle: { name: '回転角', type: UIType.slider, min: -500, max: 500 },
+      ease: { name: 'イージング', type: UIType.easing },
+      out: { name: '退場', type: UIType.checkbox }
+    },
+    applyEffect: (
+      inform: Inform,
+      baseObject: Transform,
+      params: { [key: string]: any }
+    ): Transform => {
+      const transform = new Transform()
+
+      // 0→1 に変化する
+      const progress = params.out
+        ? (inform.end -
+            inform.currentFrame -
+            (inform.totalIndex - 1 - inform.index) * params.interval) /
+          params.time
+        : (inform.currentFrame - inform.start - inform.index * params.interval) / params.time
+      const easeProgress = getAnimationStateAtTime(clClamp(0, 1, progress), params.ease)
+
+      if (progress < 0) {
+        transform.scale = params.scale
+        transform.angle = params.angle
+      } else if (progress < params.time) {
+        transform.scale = 100 + (params.scale - 100) * (1 - easeProgress) // 増分にイージングする
+        transform.angle = params.angle * (1 - easeProgress)
       }
       return transform
     }
