@@ -240,6 +240,11 @@ function onObjectContextMenu(event: MouseEvent, objIndex: number) {
 function selectObject(objectId: number) {
   // クリックしたオブジェクトを選択
   timelineStore.selectedObjectId = objectId
+
+  // 選択外のオブジェクトをクリックした場合は複数選択解除
+  if (!timelineStore.selectedObjectIds.includes(objectId)) {
+    timelineStore.selectedObjectIds = []
+  }
 }
 
 // オブジェクトの追加
