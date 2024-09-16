@@ -81,6 +81,11 @@
             <template v-if="param.type === UIType.checkbox">
               <CheckboxParameter v-model="params.parameters[paramLabel] as boolean" />
             </template>
+
+            <!-- イージング型パラメータの場合 -->
+            <template v-if="param.type === UIType.easing">
+              <EasingParameter v-model="params.parameters[paramLabel] as string" />
+            </template>
           </div>
 
           <v-divider />
@@ -128,6 +133,8 @@ import TextParameter from './dom/TextParameter.vue'
 import SelectParameter from './dom/SelectParameter.vue'
 import ColorParameter from './dom/ColorParameter.vue'
 import CheckboxParameter from './dom/CheckboxParameter.vue'
+import EasingParameter from './dom/EasingParameter.vue'
+
 import type { KeyframeSettings } from '../parameters/keyframeInfo'
 
 const parameters = defineModel<StyleSettings>('params', { required: true })

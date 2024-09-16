@@ -3,7 +3,6 @@ import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import { Inform, lerpValue } from '@/components/parameters/p5Info'
 import { UIType } from '@/components/parameters/uiInfo'
 import { generateUniqueId } from '@/components/utils/common'
-import p5 from 'p5'
 
 // この形に従う
 export interface Style {

@@ -62,7 +62,7 @@
   </v-row>
 
   <!-- イージング設定の呼び出し -->
-  <EasingPanel v-model:show="showEasingPanel" v-model:easing="currentKeyframe" />
+  <EasingPanel v-model:show="showEasingPanel" v-model:easing="currentKeyframe.easeType" />
 </template>
 
 <script setup lang="ts">

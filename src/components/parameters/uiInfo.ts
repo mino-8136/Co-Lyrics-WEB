@@ -6,5 +6,6 @@ export enum UIType {
   select = 'select',
   color = 'color',
   checkbox = 'checkbox',
-  text = 'text'
+  text = 'text',
+  easing = 'easing'
 }
