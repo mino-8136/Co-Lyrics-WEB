@@ -370,7 +370,7 @@ function clearObjectSelect() {
 ///////////////////
 
 function findNearestLyrics(offsetX: number = 0): string {
-  const markerOffset = timelineStore.musicData.offset
+  const markerOffset = timelineStore.musicData.offset - 0.3 // 0.3秒前から表示
   const mouseTime = offsetX / timelineStore.pxPerSec - markerOffset
   // console.log(mouseTime)
   // 最大値を超えないmarkerを見つける
