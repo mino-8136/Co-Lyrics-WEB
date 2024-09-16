@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useConfigStore, useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '@/components/timeline/ObjectBar.vue'
@@ -422,8 +422,22 @@ function onMouseUp(event: MouseEvent) {
   }
 }
 
+function onSpaceDown(event: KeyboardEvent) {
+  if (event.key === ' ') {
+    playPause()
+    event.preventDefault()
+  }
+}
+
 onMounted(async () => {
   markerData = await getLyricMarker(timelineStore.musicData.lyricPath)
+
+  // スペースキーが押されたら再生開始
+  window.addEventListener('keydown', onSpaceDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onSpaceDown)
 })
 
 // musicDataの変更を監視
