@@ -115,6 +115,7 @@ import {
   type typeString
 } from '@/components/parameters/objectInfo'
 import { getLyricMarker, type Note } from '../parameters/musics'
+import { clClamp } from '../utils/common'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -205,10 +206,75 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
             objectStore.addNewObject(newObj)
           }
         }
+      },
+      {
+        label: 'この位置からファイル追加 (先に保存推奨)',
+        onClick: () => {
+          openFile(layerIndex, 'add', event.offsetX)
+        }
       }
     ]
   })
   event.stopPropagation()
+}
+
+// MenuPanel.vueにあるものとほぼ同一
+const openFile = (layerIndex: number, state: string, offsetX: number) => {
+  const offsetFrame = Math.floor((offsetX / timelineStore.pxPerSec) * timelineStore.framerate)
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = 'application/json'
+
+  input.onchange = (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      const jsonData = reader.result as string
+      const objData = JSON.parse(jsonData)
+
+      // 一度Hydrateしてから必要な処理を行う
+      let tempObjects: RenderObject[] = []
+      objData.forEach((obj: RenderObject) => {
+        let newObj = createObjectFromJson(obj)
+        tempObjects.push(newObj)
+      })
+      // 読み込まれたもののなかで最小の開始フレーム・レイヤーを取得し、全体をずらす
+      const minFrame = tempObjects.reduce((prev, curr) =>
+        curr.start < prev.start ? curr : prev
+      ).start
+      const minLayer = tempObjects.reduce((prev, curr) =>
+        curr.layer < prev.layer ? curr : prev
+      ).layer
+      console.log(minFrame, minLayer)
+      tempObjects.forEach((obj: RenderObject) => {
+        obj.start = clClamp(0, 99999, obj.start - minFrame + offsetFrame) // TODO:最後のフレームを取得する
+        obj.end = obj.end - minFrame + offsetFrame
+        obj.layer = clClamp(
+          0,
+          configStore.timelineLayerNumbers - 1,
+          obj.layer - minLayer + layerIndex
+        )
+      })
+
+      console.log(tempObjects)
+
+      // 準備を終えたので追加する
+      timelineStore.selectedObjectIds = []
+      tempObjects.forEach((obj: RenderObject) => {
+        objectStore.addNewObject(obj) // カウンターも更新される
+        timelineStore.selectedObjectIds.push(objectStore.objects[objectStore.objects.length - 1].id)
+      })
+
+      timelineStore.selectedObjectId = -1
+      timelineStore.isRedrawNeeded = true
+    }
+
+    reader.readAsText(file)
+  }
+  // ファイル選択ダイアログを開く
+  input.click()
 }
 
 // オブジェクトを右クリックした場合のメニュー
