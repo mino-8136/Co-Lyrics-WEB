@@ -110,7 +110,7 @@ export const animationList: Animation[] = [
   },
   {
     name: 'スライドイン',
-    params: { time: 10, interval: 1, X: 50, Y: 0, out: false },
+    params: { time: 10, interval: 1, X: 50, Y: 0, out: false, ease: 'linear' },
     description: '指定した相対座標([X],[Y])からスライドインします。',
     tag: ['登場'],
     parameters: {
@@ -118,6 +118,7 @@ export const animationList: Animation[] = [
       interval: { name: '間隔(f)', type: UIType.slider, min: 0, max: 20 },
       X: { name: 'X', type: UIType.slider, min: -500, max: 500 },
       Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 },
+      ease: { name: 'イージング', type: UIType.easing },
       out: { name: '退場(未実装)', type: UIType.checkbox }
     },
     applyEffect: (
@@ -127,13 +128,17 @@ export const animationList: Animation[] = [
     ): Transform => {
       const transform = new Transform()
 
-      const progress = inform.currentFrame - inform.start - inform.index * params.interval
+      // 0→1 に変化する
+      const progress =
+        (inform.currentFrame - inform.start - inform.index * params.interval) / params.time
+      const easeProgress = getAnimationStateAtTime(clClamp(0, 1, progress), params.ease)
+
       if (progress < 0) {
         transform.X = params.X
         transform.Y = params.Y
       } else if (progress < params.time) {
-        transform.X = params.X * (1 - progress / params.time)
-        transform.Y = params.Y * (1 - progress / params.time)
+        transform.X = params.X * (1 - easeProgress)
+        transform.Y = params.Y * (1 - easeProgress)
       }
       return transform
     }
