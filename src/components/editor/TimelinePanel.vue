@@ -190,6 +190,7 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
       // }
       {
         label: 'オブジェクトを貼り付け',
+        divided: true,
         disabled: copiedObject.value == null,
         onClick: () => {
           if (copiedObject.value) {
@@ -209,6 +210,7 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
       },
       {
         label: 'この位置からファイル追加 (先に保存推奨)',
+
         onClick: () => {
           openFile(layerIndex, 'add', event.offsetX)
         }
