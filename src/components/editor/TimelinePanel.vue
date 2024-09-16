@@ -26,19 +26,38 @@
         @callSetScrollPosition="setScrollPosition"
         v-model:isPlaying="isPlaying"
       ></Waveformbar>
-      <div class="timeline" style="overflow-y: auto">
+      <div
+        class="timeline"
+        style="overflow-y: auto"
+        @click.stop="clearObjectSelect"
+        @mousedown.left.stop="onMouseDown"
+      >
         <div
           class="seekbar"
           :style="{
             left:
-              (timelineStore.currentFrame * timelineStore.pxPerSec) / timelineStore.framerate + 'px'
+              (timelineStore.currentFrame * timelineStore.pxPerSec) / timelineStore.framerate +
+              'px',
+            height: configStore.timelineLayerHeight * configStore.timelineLayerNumbers + 'px'
           }"
         ></div>
+
+        <div
+          v-if="isSelecting"
+          class="selection-rectangle"
+          :style="{
+            left: selectionRectangle.left + 'px',
+            top: selectionRectangle.top + 'px',
+            width: selectionRectangle.width + 'px',
+            height: selectionRectangle.height + 'px'
+          }"
+        ></div>
+
         <div
           class="layer"
           v-for="(layer, layerIndex) in layers"
           :key="layerIndex"
-          :style="{ width: waveformWidth }"
+          :style="{ width: waveformWidth, height: configStore.timelineLayerHeight + 'px' }"
         >
           <div
             class="layerTimeline"
@@ -49,20 +68,26 @@
               v-for="object in objectStore.objects.filter((obj) => obj.layer === layerIndex)"
               :key="object.id"
             >
-              <!-- TextObjectの場合はテキスト変更機能を用意 -->
+              <!-- TextObjectの場合はテキスト変更機能を用意(TODO: objectbarにtemplateを仕込めば統一できる) -->
               <object-bar
                 v-if="object instanceof TextObject"
                 :object="object"
+                :isMultiSelect="timelineStore.selectedObjectIds.includes(object.id)"
                 v-model:text="object.textSettings.text"
+                @callGroupMoveFrame="groupMoveFrame"
+                @callGroupMoveLayer="groupMoveLayer"
                 @contextmenu.prevent="onObjectContextMenu($event, object.id)"
-                @click="selectObject(object.id)"
+                @click.stop="selectObject(object.id)"
               />
               <!-- その他のオブジェクトの場合 -->
               <object-bar
                 v-else
                 :object="object"
+                :isMultiSelect="timelineStore.selectedObjectIds.includes(object.id)"
+                @callGroupMoveFrame="groupMoveFrame"
+                @callGroupMoveLayer="groupMoveLayer"
                 @contextmenu.prevent="onObjectContextMenu($event, object.id)"
-                @click="selectObject(object.id)"
+                @click.stop="selectObject(object.id)"
               />
             </template>
             <p class="layerindex">{{ layerIndex }}</p>
@@ -74,8 +99,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useConfigStore, useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '@/components/timeline/ObjectBar.vue'
 import Waveformbar from '@/components/timeline/WaveformBar.vue'
@@ -93,8 +118,9 @@ import { getLyricMarker, type Note } from '../parameters/musics'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
+const configStore = useConfigStore()
 const layers = ref(
-  Array.from({ length: 20 }, () => ({
+  Array.from({ length: configStore.timelineLayerNumbers }, () => ({
     name: 'Layer'
   }))
 )
@@ -102,6 +128,27 @@ const waveformWidth = ref(900)
 const isPlaying = ref(false)
 const copiedObject = ref<RenderObject>()
 let markerData: Note[] = []
+
+// Reactive properties for selection
+const isSelecting = ref(false)
+const selectionStartX = ref(0)
+const selectionStartY = ref(0)
+const selectionCurrentX = ref(0)
+const selectionCurrentY = ref(0)
+
+// Computed property for selection rectangle
+const selectionRectangle = computed(() => {
+  const x1 = selectionStartX.value
+  const y1 = selectionStartY.value
+  const x2 = selectionCurrentX.value
+  const y2 = selectionCurrentY.value
+  return {
+    left: Math.min(x1, x2),
+    top: Math.min(y1, y2),
+    width: Math.abs(x2 - x1),
+    height: Math.abs(y2 - y1)
+  }
+})
 
 ///////////////////
 // メニューの定義 //
@@ -189,18 +236,19 @@ function onObjectContextMenu(event: MouseEvent, objIndex: number) {
   event.stopPropagation()
 }
 
-///////////////////
-// それぞれの処理 //
-///////////////////
-
-function playPause() {
-  isPlaying.value = !isPlaying.value
-}
+//////////////////////////
+// オブジェクト操作の処理 //
+//////////////////////////
 
 // オブジェクトクリックで選択
 function selectObject(objectId: number) {
   // クリックしたオブジェクトを選択
   timelineStore.selectedObjectId = objectId
+
+  // 選択外のオブジェクトをクリックした場合は複数選択解除
+  if (!timelineStore.selectedObjectIds.includes(objectId)) {
+    timelineStore.selectedObjectIds = []
+  }
 }
 
 // オブジェクトの追加
@@ -232,9 +280,28 @@ function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
 }
 
 function removeObject(objIndex: number) {
-  objectStore.removeObject(objIndex)
+  // 右クリック時にobjIndexのオブジェクトが含まれる想定
+  if (timelineStore.selectedObjectIds.length > 0) {
+    timelineStore.selectedObjectIds.forEach((id) => {
+      objectStore.removeObject(id)
+    })
+    timelineStore.selectedObjectIds = []
+  } else {
+    objectStore.removeObject(objIndex)
+    timelineStore.selectedObjectId = -1
+  }
+
   timelineStore.isRedrawNeeded = true
 }
+
+function clearObjectSelect() {
+  timelineStore.selectedObjectId = -1
+  ;(document.activeElement as HTMLElement)?.blur()
+}
+
+///////////////////
+// そのほかの処理 //
+///////////////////
 
 function findNearestLyrics(offsetX: number = 0): string {
   const markerOffset = timelineStore.musicData.offset
@@ -249,9 +316,34 @@ function findNearestLyrics(offsetX: number = 0): string {
   return nearestMarker.lyric ?? 'サンプル'
 }
 
+function groupMoveFrame(deltaFrame: number) {
+  objectStore.objects.forEach((obj) => {
+    if (timelineStore.selectedObjectIds.includes(obj.id)) {
+      const maxMoveFrame = Math.max(obj.start + deltaFrame, 0) - obj.start // 0未満には移動させない
+      obj.start += maxMoveFrame
+      obj.end += maxMoveFrame
+    }
+  })
+}
+
+function groupMoveLayer(deltaLayer: number) {
+  objectStore.objects.forEach((obj) => {
+    if (timelineStore.selectedObjectIds.includes(obj.id)) {
+      obj.layer = Math.max(
+        0,
+        Math.min(configStore.timelineLayerNumbers - 1, obj.layer + deltaLayer)
+      )
+    }
+  })
+}
+
 ////////////////////////////
 // タイムライン操作用の関数 //
 ////////////////////////////
+
+function playPause() {
+  isPlaying.value = !isPlaying.value
+}
 
 function setWaveformWidth(width: number) {
   waveformWidth.value = width
@@ -265,8 +357,102 @@ function setScrollPosition(position: number) {
   }
 }
 
+function onMouseDown(event: MouseEvent) {
+  isSelecting.value = true
+  const timelineRect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  selectionStartX.value =
+    event.clientX - timelineRect.left + (event.currentTarget as HTMLElement).scrollLeft
+  selectionStartY.value =
+    event.clientY - timelineRect.top + (event.currentTarget as HTMLElement).scrollTop
+  selectionCurrentX.value = selectionStartX.value
+  selectionCurrentY.value = selectionStartY.value
+  event.preventDefault()
+
+  // Add global event listeners
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+}
+
+function onMouseMove(event: MouseEvent) {
+  if (isSelecting.value) {
+    const timelineRect = (
+      document.querySelector('.timeline') as HTMLElement
+    ).getBoundingClientRect()
+    selectionCurrentX.value =
+      event.clientX -
+      timelineRect.left +
+      (document.querySelector('.timeline') as HTMLElement).scrollLeft
+    selectionCurrentY.value =
+      event.clientY -
+      timelineRect.top +
+      (document.querySelector('.timeline') as HTMLElement).scrollTop
+    event.preventDefault()
+  }
+}
+
+function findSelectedObject() {
+  // 領域の開始地点と終了地点を取得(TODO: selectionRectangleを使用でもいいかも)
+  const x1 = Math.min(selectionStartX.value, selectionCurrentX.value)
+  const y1 = Math.min(selectionStartY.value, selectionCurrentY.value)
+  const x2 = Math.max(selectionStartX.value, selectionCurrentX.value)
+  const y2 = Math.max(selectionStartY.value, selectionCurrentY.value)
+
+  // 領域の開始地点をフレームとレイヤーに変換
+  const startFrame = Math.floor((x1 / timelineStore.pxPerSec) * timelineStore.framerate)
+  const startLayer = Math.floor(y1 / configStore.timelineLayerHeight)
+  const endFrame = Math.floor((x2 / timelineStore.pxPerSec) * timelineStore.framerate)
+  const endLayer = Math.floor(y2 / configStore.timelineLayerHeight)
+  // console.log('Selected area:', startFrame, startLayer, endFrame, endLayer)
+
+  // ドラッグした領域内のオブジェクトを抽出する
+  const selectedObjectIds: number[] = []
+  objectStore.objects.forEach((obj) => {
+    if (
+      obj.start < endFrame &&
+      startFrame < obj.end &&
+      startLayer <= obj.layer &&
+      obj.layer <= endLayer
+    ) {
+      selectedObjectIds.push(obj.id)
+    }
+  })
+  // console.log(selectedObjectIds)
+
+  // Update the selected objects in the store
+  timelineStore.selectedObjectIds = selectedObjectIds
+}
+
+function onMouseUp(event: MouseEvent) {
+  if (isSelecting.value) {
+    isSelecting.value = false
+
+    // Remove global event listeners
+    window.removeEventListener('mousemove', onMouseMove)
+    window.removeEventListener('mouseup', onMouseUp)
+
+    findSelectedObject()
+  }
+}
+
+function onSpaceDown(event: KeyboardEvent) {
+  const activeElement = document.activeElement as HTMLElement
+  if (activeElement.tagName === 'INPUT') return
+
+  if (event.key === ' ') {
+    playPause()
+    event.preventDefault()
+  }
+}
+
 onMounted(async () => {
   markerData = await getLyricMarker(timelineStore.musicData.lyricPath)
+
+  // スペースキーが押されたら再生開始
+  window.addEventListener('keydown', onSpaceDown)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', onSpaceDown)
 })
 
 // musicDataの変更を監視
@@ -300,7 +486,6 @@ watch(
 
 .layer {
   display: flex;
-  height: 40px;
   width: 100%; /* layerの幅を親に合わせる */
 }
 
@@ -334,9 +519,16 @@ watch(
   position: absolute; /* 絶対位置を指定 */
   top: 0;
   width: 2px;
-  height: 78vh; /* 親要素の高さに合わせる */
   background-color: #4cabe2;
   z-index: 100; /* z-indexを高く設定して最前面に */
   pointer-events: none; /* クリックイベントを無視 */
+}
+
+.selection-rectangle {
+  position: absolute;
+  border: 1px dashed #4cabe2;
+  background-color: rgba(76, 171, 226, 0.2);
+  pointer-events: none;
+  z-index: 100;
 }
 </style>

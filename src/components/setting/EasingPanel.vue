@@ -19,9 +19,7 @@
               class="d-flex"
               cols="12"
               sm="4"
-              md="3"
               lg="2"
-              xl="2"
             >
               <v-container class="items">
                 <svg
@@ -64,22 +62,22 @@ const height = 120
 const selectedTag = ref('all')
 const tagList = ['加速', '減速', '加減速']
 const easingList = [
-  { name: 'linear', tag: [''] },
+  { name: 'linear', tag: ['加速', '減速', '加減速'] },
   { name: 'sine.in', tag: ['加速'] },
   { name: 'sine.out', tag: ['減速'] },
   { name: 'sine.inOut', tag: ['加減速'] },
-  { name: 'power1.in', tag: ['加速'] },
-  { name: 'power1.out', tag: ['減速'] },
-  { name: 'power1.inOut', tag: ['加減速'] },
-  { name: 'power2.in', tag: ['加速'] },
-  { name: 'power2.out', tag: ['減速'] },
-  { name: 'power2.inOut', tag: ['加減速'] },
-  { name: 'power3.in', tag: ['加速'] },
-  { name: 'power3.out', tag: ['減速'] },
-  { name: 'power3.inOut', tag: ['加減速'] },
-  { name: 'power4.in', tag: ['加速'] },
-  { name: 'power4.out', tag: ['減速'] },
-  { name: 'power4.inOut', tag: ['加減速'] },
+  // { name: 'power1.in', tag: ['加速'] },
+  // { name: 'power1.out', tag: ['減速'] },
+  // { name: 'power1.inOut', tag: ['加減速'] },
+  // { name: 'power2.in', tag: ['加速'] },
+  // { name: 'power2.out', tag: ['減速'] },
+  // { name: 'power2.inOut', tag: ['加減速'] },
+  // { name: 'power3.in', tag: ['加速'] },
+  // { name: 'power3.out', tag: ['減速'] },
+  // { name: 'power3.inOut', tag: ['加減速'] },
+  // { name: 'power4.in', tag: ['加速'] },
+  // { name: 'power4.out', tag: ['減速'] },
+  // { name: 'power4.inOut', tag: ['加減速'] },
   { name: 'circ.in', tag: ['加速'] },
   { name: 'circ.out', tag: ['減速'] },
   { name: 'circ.inOut', tag: ['加減速'] },
@@ -89,9 +87,9 @@ const easingList = [
   { name: 'back.in', tag: ['加速'] },
   { name: 'back.out', tag: ['減速'] },
   { name: 'back.inOut', tag: ['加減速'] },
-  { name: 'elastic.in', tag: ['加速'] },
-  { name: 'elastic.out', tag: ['減速'] },
-  { name: 'elastic.inOut', tag: ['加減速'] },
+  // { name: 'elastic.in', tag: ['加速'] },
+  // { name: 'elastic.out', tag: ['減速'] },
+  // { name: 'elastic.inOut', tag: ['加減速'] },
   { name: 'bounce.in', tag: ['加速'] },
   { name: 'bounce.out', tag: ['減速'] },
   { name: 'bounce.inOut', tag: ['加減速'] }
@@ -118,7 +116,7 @@ function isEasingAlreadySelected(easingName: string): boolean {
       easing.value.easeType === '')
   )
     return true
-  return easing.value.easeType?.includes(easingName) ?? false
+  return easing.value.easeType == easingName
 }
 
 const drawPath = (easingName: string) => {

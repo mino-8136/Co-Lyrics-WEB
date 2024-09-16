@@ -5,43 +5,73 @@
     </template>
 
     <v-list>
-      <v-list-item @click="saveFile()">
+      <v-list-item @click="saveFile('all')">
         <v-list-item-title><v-icon>mdi-download</v-icon> ファイルを保存</v-list-item-title>
+      </v-list-item>
+      <v-list-item
+        @click="saveFile('selected')"
+        :disabled="
+          timelineStore.selectedObjectIds.length == 0 && timelineStore.selectedObjectId == -1
+        "
+      >
+        <v-list-item-title> 複数選択中のオブジェクトのみを保存</v-list-item-title>
       </v-list-item>
       <v-divider></v-divider>
       <v-list-item @click="openFile('open')">
-        <v-list-item-title>別のファイルを開く</v-list-item-title>
+        <v-list-item-title><v-icon>mdi-file-outline</v-icon> 別のファイルを開く</v-list-item-title>
       </v-list-item>
       <v-list-item @click="openFile('add')">
-        <v-list-item-title>別のファイルから追加</v-list-item-title>
+        <v-list-item-title><v-icon>mdi-plus</v-icon> 別のファイルから追加</v-list-item-title>
       </v-list-item>
       <v-divider></v-divider>
-      <v-list-item @click="clearObjects()">
+      <v-list-item @click="deleteDialog = true">
         <v-list-item-title>オブジェクト全削除</v-list-item-title>
       </v-list-item>
     </v-list>
   </v-menu>
+
+  <v-dialog v-model="deleteDialog" class="dialog">
+    <v-card>
+      <v-card-title>本当に削除しますか？</v-card-title>
+      <v-card-actions>
+        <v-btn variant="tonal" @click="deleteDialog = false">いいえ</v-btn>
+        <v-btn variant="tonal" @click="clearObjects()"><v-icon>mdi-delete</v-icon>はい</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
-import {
-  StandardRenderSettings,
-  TextSettings,
-  type RenderObject,
-  createObjectFromJson
-} from '../parameters/objectInfo'
+import { type RenderObject, createObjectFromJson } from '../parameters/objectInfo'
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
+const deleteDialog = ref(false)
 
-const saveFile = () => {
+const saveFile = (state: string = 'all') => {
   // ストアのオブジェクトデータのみをJSONに変換
-  let jsonData = JSON.stringify(objectStore.objects)
+
+  // 保存するオブジェクトを選択
+  let objects: RenderObject[] = []
+  if (state === 'selected') {
+    if (timelineStore.selectedObjectIds.length > 0) {
+      objects = objectStore.objects.filter((obj) =>
+        timelineStore.selectedObjectIds.includes(obj.id)
+      )
+    } else if (timelineStore.selectedObjectId !== -1) {
+      objects = objectStore.objects.filter((obj) => obj.id === timelineStore.selectedObjectId)
+    }
+  } else {
+    objects = objectStore.objects
+  }
+
+  let jsonData = JSON.stringify(objects)
   const blob = new Blob([jsonData], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'data.json' // ダウンロードするファイル名
+  a.download = 'data_' + state + '.json' // ダウンロードするファイル名
 
   // リンクをクリックしてダウンロードをトリガー
   document.body.appendChild(a)
@@ -92,7 +122,14 @@ const openFile = (state: string) => {
 
 const clearObjects = () => {
   objectStore.clearObjects()
+  deleteDialog.value = false
   timelineStore.selectedObjectId = -1
   timelineStore.isRedrawNeeded = true
 }
 </script>
+
+<style scoped>
+.dialog {
+  width: 300px;
+}
+</style>

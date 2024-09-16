@@ -3,9 +3,7 @@
     class="keyframe"
     :class="{ on: props.selected }"
     :style="{ ...objectStyle, position: 'absolute' }"
-    @mousedown="startMove"
-    @mousemove="move"
-    @mouseup="stopMove"
+    @mousedown.stop="startMove"
   ></div>
 </template>
 
@@ -38,7 +36,6 @@ const startMove = (event: MouseEvent) => {
   lastMouseX.value = event.clientX
   lastMouseY.value = event.clientY
   tempPoint.value = point.value.frame
-  event.stopPropagation()
 
   window.addEventListener('mousemove', move)
   window.addEventListener('mouseup', stopMove)

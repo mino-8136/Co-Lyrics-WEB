@@ -2,10 +2,11 @@
   <div
     class="object"
     :style="{ ...objectStyle, position: 'absolute' }"
-    :class="timelineStore.selectedObjectId === baseObject.id ? 'selected' : ''"
-    @mousedown="startMove"
-    @mousemove="move"
-    @mouseup="stopMove"
+    :class="{
+      selected: timelineStore.selectedObjectId === baseObject.id,
+      multiSelected: props.isMultiSelect
+    }"
+    @mousedown.left.stop="startMove"
   >
     <input v-if="baseObject instanceof TextObject" class="text" v-model="text" @mousedown.stop />
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
@@ -27,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useTimelineStore, useConfigStore } from '@/stores/objectStore'
 import {
   BaseObject,
@@ -39,32 +40,37 @@ import {
 } from '../parameters/objectInfo'
 import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
 import KeyframePoint from './KeyframePoint.vue'
-import gsap from 'gsap'
-
-const text = defineModel('text')
-const props = defineProps<{
-  object: RenderObject
-}>()
+import { clClamp } from '../utils/common'
 
 const timelineStore = useTimelineStore()
 const configStore = useConfigStore()
-const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
+const text = defineModel('text')
+const props = defineProps<{
+  object: RenderObject
+  isMultiSelect: boolean
+}>()
+const emits = defineEmits(['callGroupMoveFrame', 'callGroupMoveLayer'])
 
 const baseObject = ref(props.object)
-const tempStart = ref(baseObject.value.start)
-const tempEnd = ref(baseObject.value.end)
+const deltaStartFrame = ref(0)
+const deltaEndFrame = ref(0)
+const deltaLayer = ref(0)
+const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
 
 // ドラッグ時の挙動 : 右端を掴んだらendを変更、左端を掴んだらstartを変更
 const isResizing = ref(false)
 const isMoving = ref(false)
-const lastMouseX = ref(0)
-const lastMouseY = ref(0)
+const initialMouseX = ref(0)
+const initialMouseY = ref(0)
 const side = ref('')
+
+////////////////////////////////////////
 
 // 横幅の定義方法 : end-startで定義する
 const objectStyle = computed(() => ({
-  left: `${Math.floor(tempStart.value) * scaler.value}px`,
-  width: `${(Math.floor(tempEnd.value - Math.floor(tempStart.value)) + 0.5) * scaler.value}px`,
+  left: `${(baseObject.value.start + deltaStartFrame.value) * scaler.value}px`,
+  width: `${(baseObject.value.end + deltaEndFrame.value - (baseObject.value.start + deltaStartFrame.value) + 0.5) * scaler.value}px`,
+  top: isMoving.value ? `${deltaLayer.value * configStore.timelineLayerHeight}px` : 0,
   position: 'absolute',
   background: bgColor.value,
   cursor: isMoving.value ? 'grabbing' : 'grab'
@@ -129,65 +135,106 @@ const sortKeyframe = () => {
 
 const startMove = (event: MouseEvent) => {
   isMoving.value = true
-  lastMouseX.value = event.clientX
-  lastMouseY.value = event.clientY
+  initialMouseX.value = event.clientX
+  initialMouseY.value = event.clientY
+  deltaStartFrame.value = 0
+  deltaEndFrame.value = 0
+  deltaLayer.value = 0
+
+  window.addEventListener('mousemove', move)
+  window.addEventListener('mouseup', stopMove)
 }
 
 const move = (event: MouseEvent) => {
   if (isMoving.value) {
-    const dx = (event.clientX - lastMouseX.value) / scaler.value
-    lastMouseX.value = event.clientX
-    if (tempStart.value + dx >= 0) {
-      tempStart.value += dx
-      tempEnd.value += dx
-    }
-    // レイヤー変更に対応
-    const layerHeight = 40
-    // console.log(lastMouseY.value, event.clientY)
-    if (Math.abs(event.clientY - lastMouseY.value) > layerHeight) {
-      baseObject.value.layer += Math.round((event.clientY - lastMouseY.value) / layerHeight)
-      lastMouseY.value = event.clientY
-      baseObject.value.layer = gsap.utils.clamp(0, 9, baseObject.value.layer)
+    let deltaFrame = Math.round((event.clientX - initialMouseX.value) / scaler.value)
+    deltaFrame = Math.max(deltaFrame, -baseObject.value.start)
+    deltaStartFrame.value = deltaFrame
+    deltaEndFrame.value = deltaFrame
+
+    // レイヤー変更に対応し、横移動をクリアする
+    const pDeltaLayer = deltaLayer.value
+    deltaLayer.value = clClamp(
+      -baseObject.value.layer,
+      configStore.timelineLayerNumbers - 1,
+      Math.round((event.clientY - initialMouseY.value) / configStore.timelineLayerHeight)
+    )
+    if (deltaLayer.value - pDeltaLayer !== 0) {
+      initialMouseX.value = event.clientX
     }
   }
 }
 
 const stopMove = () => {
   if (isMoving.value) {
-    baseObject.value.start = Math.floor(tempStart.value)
-    baseObject.value.end = Math.floor(tempEnd.value)
+    // 複数選択されている場合の移動処理は上の階層に任せる
+    if (props.isMultiSelect) {
+      emits('callGroupMoveFrame', deltaStartFrame.value)
+      emits('callGroupMoveLayer', deltaLayer.value)
+    } else {
+      baseObject.value.start += deltaStartFrame.value
+      baseObject.value.end += deltaEndFrame.value
+      baseObject.value.layer = clClamp(
+        0,
+        configStore.timelineLayerNumbers - 1,
+        (baseObject.value.layer += deltaLayer.value)
+      )
+    }
   }
   isMoving.value = false
+  deltaStartFrame.value = 0
+  deltaEndFrame.value = 0
+  deltaLayer.value = 0
+  timelineStore.isRedrawNeeded = true
+
+  window.removeEventListener('mousemove', move)
+  window.removeEventListener('mouseup', stopMove)
 }
+
+//////////////////////////////////////////////////////////
 
 const startResize = (sideValue: string, event: MouseEvent) => {
   isResizing.value = true
-  lastMouseX.value = event.clientX
   side.value = sideValue
-  event.stopPropagation() // これによりドラッグイベントが起動しないようにする
+  initialMouseX.value = event.clientX
+  deltaStartFrame.value = 0
+  deltaEndFrame.value = 0
+
+  window.addEventListener('mousemove', resize)
+  window.addEventListener('mouseup', stopResize)
 }
 
 const resize = (event: MouseEvent) => {
   if (isResizing.value) {
-    const dx = (event.clientX - lastMouseX.value) / scaler.value
-    lastMouseX.value = event.clientX
+    let deltaFrame = Math.round((event.clientX - initialMouseX.value) / scaler.value)
     if (side.value === 'right') {
-      tempEnd.value += dx
+      deltaEndFrame.value = clClamp(
+        -baseObject.value.end + baseObject.value.start + 1,
+        1000, // 仮置き
+        deltaFrame
+      )
     } else {
-      if (tempStart.value + dx >= 0) {
-        tempStart.value += dx
-      }
+      deltaStartFrame.value = clClamp(
+        -baseObject.value.start,
+        baseObject.value.end - baseObject.value.start - 1,
+        deltaFrame
+      )
     }
   }
 }
 
 const stopResize = () => {
   if (isResizing.value) {
-    baseObject.value.start = Math.floor(tempStart.value)
-    baseObject.value.end = Math.floor(tempEnd.value)
+    baseObject.value.start += deltaStartFrame.value
+    baseObject.value.end += deltaEndFrame.value
   }
   isResizing.value = false
+  deltaStartFrame.value = 0
+  deltaEndFrame.value = 0
   timelineStore.isRedrawNeeded = true // TODO: stopMoveといっしょに読み込まれている
+
+  window.removeEventListener('mousemove', resize)
+  window.removeEventListener('mouseup', stopResize)
 }
 
 watch(
@@ -196,18 +243,6 @@ watch(
     scaler.value = newPxPerSec / timelineStore.framerate
   }
 )
-
-window.addEventListener('mouseup', stopResize)
-window.addEventListener('mousemove', resize)
-window.addEventListener('mouseup', stopMove)
-window.addEventListener('mousemove', move)
-
-onUnmounted(() => {
-  window.removeEventListener('mouseup', stopResize)
-  window.removeEventListener('mousemove', resize)
-  window.removeEventListener('mouseup', stopMove)
-  window.removeEventListener('mousemove', move)
-})
 </script>
 
 <style scoped>
@@ -231,6 +266,11 @@ onUnmounted(() => {
   left: 20px;
   transform: translate(0%, -50%);
   border-bottom: 0.5px solid black;
+}
+
+/* このselectedの順番は絶対変えないこと */
+.object.multiSelected {
+  box-shadow: 0 0 2px 2px rgb(156, 196, 251);
 }
 
 .object.selected {
