@@ -30,7 +30,7 @@
         class="timeline"
         style="overflow-y: auto"
         @click.stop="clearObjectSelect"
-        @mousedown.stop="onMouseDown"
+        @mousedown.left.stop="onMouseDown"
       >
         <div
           class="seekbar"
