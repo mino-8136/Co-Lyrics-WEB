@@ -68,12 +68,14 @@
               v-for="object in objectStore.objects.filter((obj) => obj.layer === layerIndex)"
               :key="object.id"
             >
-              <!-- TextObjectの場合はテキスト変更機能を用意 -->
+              <!-- TextObjectの場合はテキスト変更機能を用意(TODO: objectbarにtemplateを仕込めば統一できる) -->
               <object-bar
                 v-if="object instanceof TextObject"
                 :object="object"
+                :isMultiSelect="timelineStore.selectedObjectIds.includes(object.id)"
                 v-model:text="object.textSettings.text"
-                :class="{ multiSelected: timelineStore.selectedObjectIds.includes(object.id) }"
+                @callGroupMoveFrame="groupMoveFrame"
+                @callGroupMoveLayer="groupMoveLayer"
                 @contextmenu.prevent="onObjectContextMenu($event, object.id)"
                 @click.stop="selectObject(object.id)"
               />
@@ -81,7 +83,9 @@
               <object-bar
                 v-else
                 :object="object"
-                :class="{ multiSelected: timelineStore.selectedObjectIds.includes(object.id) }"
+                :isMultiSelect="timelineStore.selectedObjectIds.includes(object.id)"
+                @callGroupMoveFrame="groupMoveFrame"
+                @callGroupMoveLayer="groupMoveLayer"
                 @contextmenu.prevent="onObjectContextMenu($event, object.id)"
                 @click.stop="selectObject(object.id)"
               />
@@ -301,6 +305,26 @@ function findNearestLyrics(offsetX: number = 0): string {
   return nearestMarker.lyric ?? 'サンプル'
 }
 
+function groupMoveFrame(deltaFrame: number) {
+  objectStore.objects.forEach((obj) => {
+    if (timelineStore.selectedObjectIds.includes(obj.id)) {
+      obj.start = Math.max(obj.start + deltaFrame, 0)
+      obj.end += deltaFrame
+    }
+  })
+}
+
+function groupMoveLayer(deltaLayer: number) {
+  objectStore.objects.forEach((obj) => {
+    if (timelineStore.selectedObjectIds.includes(obj.id)) {
+      obj.layer = Math.max(
+        0,
+        Math.min(configStore.timelineLayerNumbers - 1, obj.layer + deltaLayer)
+      )
+    }
+  })
+}
+
 ////////////////////////////
 // タイムライン操作用の関数 //
 ////////////////////////////
@@ -469,10 +493,6 @@ watch(
   background-color: #4cabe2;
   z-index: 100; /* z-indexを高く設定して最前面に */
   pointer-events: none; /* クリックイベントを無視 */
-}
-
-.multiSelected {
-  box-shadow: 0 0 2px 2px rgb(156, 196, 251);
 }
 
 .selection-rectangle {

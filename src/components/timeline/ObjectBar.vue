@@ -2,11 +2,15 @@
   <div
     class="object"
     :style="{ ...objectStyle, position: 'absolute' }"
-    :class="timelineStore.selectedObjectId === baseObject.id ? 'selected' : ''"
+    :class="{
+      selected: timelineStore.selectedObjectId === baseObject.id,
+      multiSelected: props.isMultiSelect
+    }"
     @mousedown.stop="startMove"
     @mousemove="move"
     @mouseup="stopMove"
   >
+    <p>{{ console.log(props.isMultiSelect) }}</p>
     <input v-if="baseObject instanceof TextObject" class="text" v-model="text" @mousedown.stop />
     <div class="resize-handle left-handle" @mousedown.stop="startResize('left', $event)"></div>
     <div class="resize-handle right-handle" @mousedown.stop="startResize('right', $event)"></div>
@@ -46,11 +50,14 @@ const configStore = useConfigStore()
 const text = defineModel('text')
 const props = defineProps<{
   object: RenderObject
+  isMultiSelect: boolean
 }>()
+const emits = defineEmits(['callGroupMoveFrame', 'callGroupMoveLayer'])
 
 const baseObject = ref(props.object)
 const tempStart = ref(baseObject.value.start)
 const tempEnd = ref(baseObject.value.end)
+const deltaFrame = ref(0)
 const deltaLayer = ref(0)
 const scaler = ref(timelineStore.pxPerSec / timelineStore.framerate)
 
@@ -162,11 +169,18 @@ const stopMove = () => {
     baseObject.value.start = Math.floor(tempStart.value)
     baseObject.value.end = Math.floor(tempEnd.value)
 
-    baseObject.value.layer = gsap.utils.clamp(
-      0,
-      configStore.timelineLayerNumbers - 1,
-      (baseObject.value.layer += deltaLayer.value)
-    )
+    // 複数選択されている場合の移動処理は上の階層に任せる
+    if (props.isMultiSelect) {
+      console.log('callGroupMoveFrame')
+      emits('callGroupMoveFrame', deltaFrame.value)
+      emits('callGroupMoveLayer', deltaLayer.value)
+    } else {
+      baseObject.value.layer = gsap.utils.clamp(
+        0,
+        configStore.timelineLayerNumbers - 1,
+        (baseObject.value.layer += deltaLayer.value)
+      )
+    }
   }
   isMoving.value = false
   deltaLayer.value = 0
@@ -246,6 +260,11 @@ onUnmounted(() => {
   left: 20px;
   transform: translate(0%, -50%);
   border-bottom: 0.5px solid black;
+}
+
+/* このselectedの順番は絶対変えないこと */
+.object.multiSelected {
+  box-shadow: 0 0 2px 2px rgb(156, 196, 251);
 }
 
 .object.selected {
