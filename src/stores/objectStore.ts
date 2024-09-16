@@ -59,6 +59,7 @@ export const useTimelineStore = defineStore('timeline', {
     },
     defaultFont: 'Noto Sans JP Medium',
     defaultBackgroundColor: '#808080',
+    durationFrame: 9999, // 0で未設定
     ////////
     currentFrame: 0,
     canvasScale: 1,
@@ -89,7 +90,7 @@ export const useConfigStore = defineStore('config', {
     upperSideHeight: 400,
     // 非公開設定 //
     timelineLayerNumbers: 20,
-    timelineLayerHeight: 40,
+    timelineLayerHeight: 40
   }),
   actions: {},
   persist: true

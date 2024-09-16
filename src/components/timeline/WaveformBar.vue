@@ -74,6 +74,7 @@ onMounted(() => {
     // 再生直前の処理はここに追加
     wavesurfer.on('ready', () => {
       emits('callGetWaveformWidth', wavesurfer.getWrapper().style.width)
+      timelineStore.durationFrame = Math.round(wavesurfer.getDuration() * timelineStore.framerate)
     })
 
     // マーカーの追加
