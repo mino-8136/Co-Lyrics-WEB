@@ -145,14 +145,22 @@ export const animationList: Animation[] = [
   },
   {
     name: 'ランダム配置',
-    params: { X: 150, Y: 0, Seed: 100, Time: 10 },
-    description: 'オブジェクトをランダムに移動させます',
+    params: {
+      X: new KeyframeSettings([{ frame: 0, value: 0, id: generateUniqueId() }]), // キーフレーム対応
+      Y: new KeyframeSettings([{ frame: 0, value: 150, id: generateUniqueId() }]), // キーフレーム対応
+      Scale: new KeyframeSettings([{ frame: 0, value: 100, id: generateUniqueId() }]), // キーフレーム対応
+      Time: new KeyframeSettings([{ frame: 0, value: 0, id: generateUniqueId() }]),
+      Seed: 100,
+      Side: true
+    },
+    description: 'オブジェクトをランダムに移動させます。[ゆらぎ]を大きくするとゆっくり動きます。',
     tag: ['配置'],
     parameters: {
-      X: { name: 'X', type: UIType.slider, min: -500, max: 500 },
-      Y: { name: 'Y', type: UIType.slider, min: -500, max: 500 },
+      X: { name: 'X', type: UIType.keyframe, min: -2000, max: 2000 },
+      Y: { name: 'Y', type: UIType.keyframe, min: -1000, max: 1000 },
+      Time: { name: 'ゆらぎ', type: UIType.keyframe, min: 0, max: 100 },
       Seed: { name: 'シード値', type: UIType.slider, min: 0, max: 1000 },
-      Time: { name: '進行度', type: UIType.slider, min: 0, max: 60 }
+      Side: { name: '両側', type: UIType.checkbox }
     },
     applyEffect: (
       inform: Inform,
@@ -160,10 +168,16 @@ export const animationList: Animation[] = [
       params: { [key: string]: any }
     ): Transform => {
       const transform = new Transform()
+
+      const lerpX = lerpValue(params.X.keyframes, inform.start, inform.currentFrame)
+      const lerpY = lerpValue(params.Y.keyframes, inform.start, inform.currentFrame)
+      const lerpTime = lerpValue(params.Time.keyframes, inform.start, inform.currentFrame)
+
       if (inform.p5) {
-        inform.p5.noiseSeed(params.Seed)
-        transform.X = inform.p5.noise(inform.index * params.Time + 10000) * params.X
-        transform.Y = inform.p5.noise(inform.index * params.Time + 10000) * params.Y
+        const side = params.Side ? 0.5 : 0
+        inform.p5.noiseSeed(params.Seed + inform.index)
+        transform.X = (inform.p5.noise(10000 + inform.index + lerpTime / 100) - side) * lerpX
+        transform.Y = (inform.p5.noise(10000 + inform.index + lerpTime / 100) - side) * lerpY
       }
       return transform
     }
