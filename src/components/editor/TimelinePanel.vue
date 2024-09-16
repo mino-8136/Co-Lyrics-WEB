@@ -26,14 +26,33 @@
         @callSetScrollPosition="setScrollPosition"
         v-model:isPlaying="isPlaying"
       ></Waveformbar>
-      <div class="timeline" style="overflow-y: auto" @click.stop="clearObjectSelect">
+      <div
+        class="timeline"
+        style="overflow-y: auto"
+        @click.stop="clearObjectSelect"
+        @mousedown.stop="onMouseDown"
+      >
         <div
           class="seekbar"
           :style="{
             left:
-              (timelineStore.currentFrame * timelineStore.pxPerSec) / timelineStore.framerate + 'px'
+              (timelineStore.currentFrame * timelineStore.pxPerSec) / timelineStore.framerate +
+              'px',
+            height: configStore.timelineLayerHeight * configStore.timelineLayerNumbers + 'px'
           }"
         ></div>
+
+        <div
+          v-if="isSelecting"
+          class="selection-rectangle"
+          :style="{
+            left: selectionRectangle.left + 'px',
+            top: selectionRectangle.top + 'px',
+            width: selectionRectangle.width + 'px',
+            height: selectionRectangle.height + 'px'
+          }"
+        ></div>
+
         <div
           class="layer"
           v-for="(layer, layerIndex) in layers"
@@ -54,6 +73,7 @@
                 v-if="object instanceof TextObject"
                 :object="object"
                 v-model:text="object.textSettings.text"
+                :class="{ multiSelected: timelineStore.selectedObjectIds.includes(object.id) }"
                 @contextmenu.prevent="onObjectContextMenu($event, object.id)"
                 @click.stop="selectObject(object.id)"
               />
@@ -61,6 +81,7 @@
               <object-bar
                 v-else
                 :object="object"
+                :class="{ multiSelected: timelineStore.selectedObjectIds.includes(object.id) }"
                 @contextmenu.prevent="onObjectContextMenu($event, object.id)"
                 @click.stop="selectObject(object.id)"
               />
@@ -74,7 +95,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useConfigStore, useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ContextMenu from '@imengyu/vue3-context-menu'
 import ObjectBar from '@/components/timeline/ObjectBar.vue'
@@ -103,6 +124,27 @@ const waveformWidth = ref(900)
 const isPlaying = ref(false)
 const copiedObject = ref<RenderObject>()
 let markerData: Note[] = []
+
+// Reactive properties for selection
+const isSelecting = ref(false)
+const selectionStartX = ref(0)
+const selectionStartY = ref(0)
+const selectionCurrentX = ref(0)
+const selectionCurrentY = ref(0)
+
+// Computed property for selection rectangle
+const selectionRectangle = computed(() => {
+  const x1 = selectionStartX.value
+  const y1 = selectionStartY.value
+  const x2 = selectionCurrentX.value
+  const y2 = selectionCurrentY.value
+  return {
+    left: Math.min(x1, x2),
+    top: Math.min(y1, y2),
+    width: Math.abs(x2 - x1),
+    height: Math.abs(y2 - y1)
+  }
+})
 
 ///////////////////
 // メニューの定義 //
@@ -274,6 +316,83 @@ function setScrollPosition(position: number) {
   }
 }
 
+function onMouseDown(event: MouseEvent) {
+  isSelecting.value = true
+  const timelineRect = (event.currentTarget as HTMLElement).getBoundingClientRect()
+  selectionStartX.value =
+    event.clientX - timelineRect.left + (event.currentTarget as HTMLElement).scrollLeft
+  selectionStartY.value =
+    event.clientY - timelineRect.top + (event.currentTarget as HTMLElement).scrollTop
+  selectionCurrentX.value = selectionStartX.value
+  selectionCurrentY.value = selectionStartY.value
+  event.preventDefault()
+
+  // Add global event listeners
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+}
+
+function onMouseMove(event: MouseEvent) {
+  if (isSelecting.value) {
+    const timelineRect = (
+      document.querySelector('.timeline') as HTMLElement
+    ).getBoundingClientRect()
+    selectionCurrentX.value =
+      event.clientX -
+      timelineRect.left +
+      (document.querySelector('.timeline') as HTMLElement).scrollLeft
+    selectionCurrentY.value =
+      event.clientY -
+      timelineRect.top +
+      (document.querySelector('.timeline') as HTMLElement).scrollTop
+    event.preventDefault()
+  }
+}
+
+function findSelectedObject() {
+  // 領域の開始地点と終了地点を取得(TODO: selectionRectangleを使用でもいいかも)
+  const x1 = Math.min(selectionStartX.value, selectionCurrentX.value)
+  const y1 = Math.min(selectionStartY.value, selectionCurrentY.value)
+  const x2 = Math.max(selectionStartX.value, selectionCurrentX.value)
+  const y2 = Math.max(selectionStartY.value, selectionCurrentY.value)
+
+  // 領域の開始地点をフレームとレイヤーに変換
+  const startFrame = Math.floor((x1 / timelineStore.pxPerSec) * timelineStore.framerate)
+  const startLayer = Math.floor(y1 / configStore.timelineLayerHeight)
+  const endFrame = Math.floor((x2 / timelineStore.pxPerSec) * timelineStore.framerate)
+  const endLayer = Math.floor(y2 / configStore.timelineLayerHeight)
+  // console.log('Selected area:', startFrame, startLayer, endFrame, endLayer)
+
+  // ドラッグした領域内のオブジェクトを抽出する
+  const selectedObjectIds: number[] = []
+  objectStore.objects.forEach((obj) => {
+    if (
+      obj.start < endFrame &&
+      startFrame < obj.end &&
+      startLayer <= obj.layer &&
+      obj.layer <= endLayer
+    ) {
+      selectedObjectIds.push(obj.id)
+    }
+  })
+  // console.log(selectedObjectIds)
+
+  // Update the selected objects in the store
+  timelineStore.selectedObjectIds = selectedObjectIds
+}
+
+function onMouseUp(event: MouseEvent) {
+  if (isSelecting.value) {
+    isSelecting.value = false
+
+    // Remove global event listeners
+    window.removeEventListener('mousemove', onMouseMove)
+    window.removeEventListener('mouseup', onMouseUp)
+
+    findSelectedObject()
+  }
+}
+
 onMounted(async () => {
   markerData = await getLyricMarker(timelineStore.musicData.lyricPath)
 })
@@ -342,9 +461,20 @@ watch(
   position: absolute; /* 絶対位置を指定 */
   top: 0;
   width: 2px;
-  height: 60vh; /* 親要素の高さに合わせる */
   background-color: #4cabe2;
   z-index: 100; /* z-indexを高く設定して最前面に */
   pointer-events: none; /* クリックイベントを無視 */
+}
+
+.multiSelected {
+  box-shadow: 0 0 2px 2px rgb(156, 196, 251);
+}
+
+.selection-rectangle {
+  position: absolute;
+  border: 1px dashed #4cabe2;
+  background-color: rgba(76, 171, 226, 0.2);
+  pointer-events: none;
+  z-index: 100;
 }
 </style>

@@ -3,7 +3,7 @@
     class="object"
     :style="{ ...objectStyle, position: 'absolute' }"
     :class="timelineStore.selectedObjectId === baseObject.id ? 'selected' : ''"
-    @mousedown="startMove"
+    @mousedown.stop="startMove"
     @mousemove="move"
     @mouseup="stopMove"
   >
