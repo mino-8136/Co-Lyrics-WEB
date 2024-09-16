@@ -4,6 +4,7 @@ import {
   ShapeObject,
   ImageObject,
   BaseObject,
+  GroupObject,
   type RenderObject
 } from '@/components/parameters/objectInfo'
 import {
@@ -12,7 +13,8 @@ import {
   TextAlignX,
   TextAlignY,
   lerpValue,
-  convertToPercentage
+  convertToPercentage,
+  Transform
 } from '@/components/parameters/p5Info'
 import { fontListData, setFonts } from '@/components/parameters/fonts'
 
@@ -88,7 +90,32 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
       p.translate(p.width / 2, p.height / 2)
       p.scale(project.canvasScale)
 
+      let region = 0
+      const transformStack: Transform[] = [] // 各GroupObjectの変化量を保持するスタック
+      const totalTransform = { X: 0, Y: 0, angle: 0, scale: 1 } // 合算されたトランスフォーム情報
+
       renderObjects.forEach((object) => {
+        // グループの終了処理
+        if (object.layer > region && transformStack.length > 0) {
+          // トランスフォームをpopして元に戻す
+          const removedTransform = transformStack.pop()
+          if (removedTransform) {
+            totalTransform.X -= removedTransform.X
+            totalTransform.Y -= removedTransform.Y
+            totalTransform.angle -= removedTransform.angle
+            totalTransform.scale /= removedTransform.scale
+          }
+
+          if (transformStack.length === 0) {
+            p.pop() // 全てのgroupが終了したらpop
+          }
+        }
+
+        p.push();
+        p.translate(totalTransform.X, totalTransform.Y)
+        p.rotate(totalTransform.angle)
+        p.scale(totalTransform.scale)
+
         switch (object.type) {
           case 'text':
             renderText(object as TextObject)
@@ -99,12 +126,34 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
           case 'shape':
             renderShape(object as ShapeObject)
             break
+          case 'group': {
+            p.push()
+            const groupTransform = renderGroup(object as GroupObject) // グループのトランスフォームを取得
+            transformStack.push(groupTransform) // トランスフォーム情報をスタックに追加
+
+            // 合算していく
+            totalTransform.X += groupTransform.X
+            totalTransform.Y += groupTransform.Y
+            totalTransform.angle += groupTransform.angle
+            totalTransform.scale *= groupTransform.scale
+
+            region = object.layer + object.groupSettings.affectLayerNum - 1 // 次のレイヤー範囲を設定
+            break
+          }
         }
+        p.pop()
       })
+      // グループの終了処理
+      // 最後に残っているグループの終了処理
+      while (transformStack.length > 0) {
+        p.pop()
+        transformStack.pop()
+      }
 
       if (showCollisionBox) {
         renderObjects.forEach((object) => {
           if (!('standardRenderSettings' in object)) return
+          //if (object.type == 'group') return
           p.push()
           p.strokeWeight(3)
           p.stroke(255, 0, 0)
@@ -118,6 +167,7 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
           p.pop()
         })
       }
+
       p.pop()
 
       if (!isFontLoaded) {
@@ -197,6 +247,24 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
     //////////////////////////
     const renderImage = (object: ImageObject) => {
       return null
+    }
+
+    const renderGroup = (object: GroupObject) => {
+      const transform: Transform = {
+        X: lerpValue(object.standardRenderSettings.X.keyframes, object.start, currentFrame),
+        Y: lerpValue(object.standardRenderSettings.Y.keyframes, object.start, currentFrame),
+        angle: lerpValue(object.standardRenderSettings.angle.keyframes, object.start, currentFrame),
+        opacity: 100,
+        scale: lerpValue(
+          convertToPercentage(object.standardRenderSettings.scale.keyframes),
+          object.start,
+          currentFrame
+        )
+      }
+      console.log(transform)
+
+      // グループ内で使用するレイヤー範囲を返す
+      return transform
     }
 
     //////////////////////////

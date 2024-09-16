@@ -5,6 +5,7 @@
         <v-tab v-if="'standardRenderSettings' in selectedObject" value="basic">基本設定</v-tab>
         <v-tab v-if="'textSettings' in selectedObject" value="text">テキスト</v-tab>
         <v-tab v-if="'shapeSettings' in selectedObject" value="shape">図形</v-tab>
+        <v-tab v-if="'groupSettings' in selectedObject" value="group">グループ</v-tab>
         <v-tab v-if="'styleSettings' in selectedObject" value="style">スタイル</v-tab>
         <v-tab v-if="'animationSettings' in selectedObject" value="animation">アニメーション</v-tab>
       </v-tabs>
@@ -34,6 +35,14 @@
             <SettingsTab
               v-if="'shapeSettings' in selectedObject"
               v-model:params="selectedObject.shapeSettings"
+            >
+            </SettingsTab>
+          </v-tabs-window-item>
+
+          <v-tabs-window-item value="group">
+            <SettingsTab
+              v-if="'groupSettings' in selectedObject"
+              v-model:params="selectedObject.groupSettings"
             >
             </SettingsTab>
           </v-tabs-window-item>
