@@ -1,7 +1,12 @@
-import type { KeyframeSettings } from '@/components/parameters/keyframeInfo'
-import { Inform, Transform } from '@/components/parameters/p5Info'
+import { KeyframeSettings } from '@/components/parameters/keyframeInfo'
+import {
+  Inform,
+  Transform,
+  lerpValue,
+  getAnimationStateAtTime
+} from '@/components/parameters/p5Info'
 import { UIType } from '@/components/parameters/uiInfo'
-import { clClamp } from '@/components/utils/common'
+import { clClamp, generateUniqueId } from '@/components/utils/common'
 
 // この形に従う
 export interface Animation {
@@ -22,7 +27,7 @@ export const animationList: Animation[] = [
     name: '文字送り',
     params: { time: 1, interval: 1, delay: 0 },
     description:
-      '文字を一文字ずつ表示します。[時間]だけをマイナスにすると順番に文字が消えていきます。[遅延]を大きくして[間隔]だけをマイナスにすると後ろから文字が表れます。',
+      '文字を一文字ずつ表示します。[時間]だけをマイナスにすると順番に文字が消えていきます。[遅延]を大きくして[間隔]だけをマイナスにすると後ろから文字が表れます。他のエフェクトと組み合わせて使います。',
     tag: ['登場'],
     parameters: {
       time: { name: '時間(f)', type: UIType.slider, min: -60, max: 60 },
@@ -94,9 +99,9 @@ export const animationList: Animation[] = [
     ): Transform => {
       const transform = new Transform()
 
-      const progress = inform.currentFrame - inform.start - inform.index * params.interval
-      if (progress < 0) transform.opacity = 0
-      else if (progress < params.time && Math.round(progress) % 2 === 0) {
+      const progressFrame = inform.currentFrame - inform.start - inform.index * params.interval
+      if (progressFrame < 0) transform.opacity = 0
+      else if (progressFrame < params.time && Math.round(progressFrame) % 2 === 0) {
         transform.opacity = 0
       }
 
