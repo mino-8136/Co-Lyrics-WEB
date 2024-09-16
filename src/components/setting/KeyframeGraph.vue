@@ -89,7 +89,7 @@
       </g>
     </svg>
   </v-container>
-  <EasingPanel v-model:show="displayEasingPanel" v-model:easing="selectedKeyframe" />
+  <EasingPanel v-model:show="displayEasingPanel" v-model:easing="selectedKeyframe.easeType" />
 </template>
 
 <script setup lang="ts">

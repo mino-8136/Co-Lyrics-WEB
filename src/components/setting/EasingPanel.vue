@@ -50,11 +50,10 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { type KeyframeSetting } from '@/components/parameters/keyframeInfo'
 import gsap from 'gsap'
 
 const showPanel = defineModel<boolean>('show', { required: true })
-const easing = defineModel<KeyframeSetting>('easing', { required: true })
+const easingType = defineModel<String | undefined>('easing', { required: true, default: 'linear' })
 
 const width = 100
 const height = 120
@@ -104,19 +103,19 @@ const filteredEasingList = computed(() => {
 //////////////////////////////////////////////////
 
 const handleButtonClick = (name: string) => {
-  easing.value.easeType = name
+  easingType.value = name
   showPanel.value = false
 }
 
 function isEasingAlreadySelected(easingName: string): boolean {
   if (
     easingName == 'linear' &&
-    (easing.value.easeType === undefined ||
-      easing.value.easeType === 'none' ||
-      easing.value.easeType === '')
+    (easingType.value === undefined ||
+      easingType.value === 'none' ||
+      easingType.value === '')
   )
     return true
-  return easing.value.easeType == easingName
+  return easingType.value == easingName
 }
 
 const drawPath = (easingName: string) => {
