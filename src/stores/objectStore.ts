@@ -89,7 +89,7 @@ export const useConfigStore = defineStore('config', {
     isLoadSubsetFont: false,
     upperSideHeight: 400,
     // 非公開設定 //
-    timelineLayerNumbers: 20,
+    timelineLayerNumbers: 40,
     timelineLayerHeight: 40
   }),
   actions: {},
