@@ -23,7 +23,8 @@
           v-model="configStore.isLoadSubsetFont"
         ></v-checkbox>
 
-        <v-text-field
+        <!--
+          <v-text-field
           type="number"
           variant="outlined"
           density="compact"
@@ -34,11 +35,12 @@
           step="1"
           v-model.number="configStore.timelineLayerNumbers"
           @change="
-            configStore.timelineLayerNumbers = clClamp(20, 50, configStore.timelineLayerNumbers)
+          configStore.timelineLayerNumbers = clClamp(20, 50, configStore.timelineLayerNumbers)
           "
-        >
-          <template v-slot:append>タイムラインのレイヤー数(初期値:20)</template>
+          >
+          <template v-slot:append>タイムラインのレイヤー数(初期値:40)</template>
         </v-text-field>
+        -->
 
         <v-text-field
           type="number"
