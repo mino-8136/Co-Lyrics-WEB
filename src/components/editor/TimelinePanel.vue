@@ -183,7 +183,7 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
         }
       },
       {
-        label: 'グループ制御を追加 (重複させると不具合)',
+        label: 'グループ制御(仮)を追加',
         divided: true,
         onClick: () => {
           addObject(layerIndex, 'group', event.offsetX)
@@ -197,7 +197,6 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
       // }
       {
         label: 'オブジェクトを貼り付け',
-        divided: true,
         disabled: copiedObject.value == null,
         onClick: () => {
           if (copiedObject.value) {
