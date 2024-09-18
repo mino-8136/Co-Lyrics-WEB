@@ -88,8 +88,8 @@ export const useConfigStore = defineStore('config', {
     isShowKeyframe: true,
     isLoadSubsetFont: false,
     upperSideHeight: 400,
+    timelineLayerNumbers: 40,
     // 非公開設定 //
-    timelineLayerNumbers: 20,
     timelineLayerHeight: 40
   }),
   actions: {},
