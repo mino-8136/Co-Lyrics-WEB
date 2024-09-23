@@ -128,7 +128,7 @@ const layers = ref(
 )
 const waveformWidth = ref(900)
 const isPlaying = ref(false)
-const copiedObject = ref<RenderObject>()
+const copiedObject = ref<RenderObject[]>()
 let markerData: Note[] = []
 
 // Reactive properties for selection
@@ -199,19 +199,7 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
         label: 'オブジェクトを貼り付け',
         disabled: copiedObject.value == null,
         onClick: () => {
-          if (copiedObject.value) {
-            let newObj = createObjectFromJson(copiedObject.value)
-            const newObjDuration = newObj.end - newObj.start
-
-            // 最後のIDに次々追加する
-            newObj.start = Math.floor(
-              (event.offsetX / timelineStore.pxPerSec) * timelineStore.framerate
-            )
-            newObj.end = newObj.start + newObjDuration
-            newObj.layer = layerIndex
-
-            objectStore.addNewObject(newObj)
-          }
+          pasteObjects(layerIndex, event.offsetX)
         }
       },
       {
@@ -226,9 +214,8 @@ function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
   event.stopPropagation()
 }
 
-// MenuPanel.vueにあるものとほぼ同一
+// MenuPanel.vueにあるもの途中まで同一
 const openFile = (layerIndex: number, state: string, offsetX: number) => {
-  const offsetFrame = Math.floor((offsetX / timelineStore.pxPerSec) * timelineStore.framerate)
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = 'application/json'
@@ -255,6 +242,7 @@ const openFile = (layerIndex: number, state: string, offsetX: number) => {
       const minLayer = tempObjects.reduce((prev, curr) =>
         curr.layer < prev.layer ? curr : prev
       ).layer
+      const offsetFrame = Math.floor((offsetX / timelineStore.pxPerSec) * timelineStore.framerate)
 
       tempObjects.forEach((obj: RenderObject) => {
         const duration = obj.end - obj.start
@@ -262,7 +250,7 @@ const openFile = (layerIndex: number, state: string, offsetX: number) => {
           0,
           timelineStore.durationFrame - 1 - duration,
           obj.start - minFrame + offsetFrame
-        ) // TODO:最後のフレームを取得する
+        )
         obj.end = obj.start + duration
         obj.layer = clClamp(
           0,
@@ -299,7 +287,7 @@ function onObjectContextMenu(event: MouseEvent, objIndex: number) {
       {
         label: 'オブジェクトをコピー',
         onClick: () => {
-          copiedObject.value = objectStore.objects.find((obj) => obj.id === objIndex)
+          copyObjects(objIndex)
         }
       },
       {
@@ -328,7 +316,7 @@ function selectObject(objectId: number) {
   }
 }
 
-// オブジェクトの追加
+// 新規オブジェクトの追加
 function addObject(layerIndex: number, type: typeString, offsetX: number = 0) {
   const offset = Math.floor((offsetX / timelineStore.pxPerSec) * timelineStore.framerate)
   const settings: BaseSettings = {
@@ -370,6 +358,54 @@ function removeObject(objIndex: number) {
     timelineStore.selectedObjectId = -1
   }
 
+  timelineStore.isRedrawNeeded = true
+}
+
+function copyObjects(baseIndex: number) {
+  // 複数選択されているならそれをコピー、されていないならbaseIndexのオブジェクトをコピー
+  if (timelineStore.selectedObjectIds.length > 0) {
+    copiedObject.value = objectStore.objects.filter((obj) =>
+      timelineStore.selectedObjectIds.includes(obj.id)
+    )
+  } else if (baseIndex >= 0) {
+    const foundObject = objectStore.objects.find((obj) => obj.id === baseIndex)
+    if (foundObject) {
+      copiedObject.value = [foundObject]
+    }
+  }
+}
+
+// TODO: openFileの処理とほぼ同じなので共通化する
+function pasteObjects(layerIndex: number, offsetX: number) {
+  let tempObjects: RenderObject[] = []
+  copiedObject.value?.forEach((obj: RenderObject) => {
+    let newObj = createObjectFromJson(obj)
+    tempObjects.push(newObj)
+  })
+  // 読み込まれたもののなかで最小の開始フレーム・レイヤーを取得し、全体をずらす
+  const minFrame = tempObjects.reduce((prev, curr) => (curr.start < prev.start ? curr : prev)).start
+  const minLayer = tempObjects.reduce((prev, curr) => (curr.layer < prev.layer ? curr : prev)).layer
+  const offsetFrame = Math.floor((offsetX / timelineStore.pxPerSec) * timelineStore.framerate)
+
+  tempObjects.forEach((obj: RenderObject) => {
+    const duration = obj.end - obj.start
+    obj.start = clClamp(
+      0,
+      timelineStore.durationFrame - 1 - duration,
+      obj.start - minFrame + offsetFrame
+    )
+    obj.end = obj.start + duration
+    obj.layer = clClamp(0, configStore.timelineLayerNumbers - 1, obj.layer - minLayer + layerIndex)
+  })
+
+  // 準備を終えたので追加する
+  timelineStore.selectedObjectIds = []
+  tempObjects.forEach((obj: RenderObject) => {
+    objectStore.addNewObject(obj) // カウンターも更新される
+    timelineStore.selectedObjectIds.push(objectStore.objects[objectStore.objects.length - 1].id)
+  })
+
+  timelineStore.selectedObjectId = -1
   timelineStore.isRedrawNeeded = true
 }
 
