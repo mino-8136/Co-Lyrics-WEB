@@ -552,7 +552,7 @@ function onMouseUp(event: MouseEvent) {
 
 function onSpaceDown(event: KeyboardEvent) {
   const activeElement = document.activeElement as HTMLElement
-  if (activeElement.tagName === 'INPUT') return
+  if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') return
 
   if (event.key === ' ') {
     playPause()

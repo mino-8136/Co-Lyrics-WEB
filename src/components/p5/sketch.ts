@@ -34,7 +34,10 @@ let loadedFontName = ''
 let loadedFontCount = 0
 let showCollisionBox = true
 
-const verticalCharacter = ['ー', '−', '～', '~'] // 縦書きにする文字のリスト
+const punctuationCharacter = '、。，．､｡,.'
+const verticalCharacter =
+  'ｰー-‐―─~～=＝;:：；…‥()[]{}｢｣<>（）〔〕［］｛｝〈〉《》「」『』【】＜＞≪≫'
+// 長音(半全)・ハイフン(半全)・ダッシュ・罫線の順
 
 export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
   // 実際はtimelineStoreを引数に取る
@@ -412,6 +415,12 @@ export function defineSketch(project: any, isLoadSubsetFonts: boolean = false) {
             )
             if (verticalCharacter.includes(character)) {
               p.rotate(90)
+              if ('ｰー~～'.includes(character)) {
+                p.scale(1, -1)
+              }
+            }
+            if (punctuationCharacter.includes(character)) {
+              p.textAlign(p.LEFT, p.BOTTOM)
             }
           } else {
             p.translate(
