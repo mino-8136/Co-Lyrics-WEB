@@ -32,7 +32,7 @@ let backgroundColor = '#80'
 let isFontLoaded = false
 let loadedFontName = ''
 let loadedFontCount = 0
-let showCollisionBox = true
+let showCollisionBox = false
 
 const punctuationCharacter = '、。，．､｡,.'
 const verticalCharacter =

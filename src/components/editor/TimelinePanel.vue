@@ -362,19 +362,26 @@ function removeObject(objIndex: number) {
 }
 
 function copyObjects(baseIndex: number) {
+  copiedObject.value = []
+
   // 複数選択されているならそれをコピー、されていないならbaseIndexのオブジェクトをコピー
   if (timelineStore.selectedObjectIds.length > 0) {
-    copiedObject.value = objectStore.objects.filter((obj) =>
-      timelineStore.selectedObjectIds.includes(obj.id)
-    )
+    objectStore.objects.forEach((obj) => {
+      if (timelineStore.selectedObjectIds.includes(obj.id)) {
+        // 深いコピーを行って追加
+        const deepCopiedObj = JSON.parse(JSON.stringify(obj))
+        copiedObject.value?.push(deepCopiedObj)
+      }
+    })
   } else if (baseIndex >= 0) {
     const foundObject = objectStore.objects.find((obj) => obj.id === baseIndex)
     if (foundObject) {
-      copiedObject.value = [foundObject]
+      // 深いコピーを行って追加
+      const deepCopiedObj = JSON.parse(JSON.stringify(foundObject))
+      copiedObject.value.push(deepCopiedObj)
     }
   }
 }
-
 // TODO: openFileの処理とほぼ同じなので共通化する
 function pasteObjects(layerIndex: number, offsetX: number) {
   let tempObjects: RenderObject[] = []
