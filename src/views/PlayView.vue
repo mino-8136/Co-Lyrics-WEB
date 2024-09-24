@@ -1,5 +1,5 @@
 <template>
-  <PreviewPanel />
+  <PreviewPanel :style="{ height: configStore.upperSideHeight + 'px' }"  />
   <v-container class="timeline-panel">
     <div class="header d-flex">
       <p>Frame:</p>
@@ -44,13 +44,14 @@
 
 <script setup lang="ts">
 import { onUnmounted, ref } from 'vue'
-import { useObjectStore, useTimelineStore } from '@/stores/objectStore'
+import { useConfigStore, useObjectStore, useTimelineStore } from '@/stores/objectStore'
 import ObjectNote from '@/components/timeline/ObjectNote.vue'
 import Waveformbar from '@/components/timeline/WaveformBar.vue'
 import PreviewPanel from '@/components/editor/PreviewPanel.vue'
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
+const configStore = useConfigStore()
 const layers = ref(
   Array.from({ length: 1 }, () => ({
     name: 'Layer'
