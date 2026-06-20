@@ -93,13 +93,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { gsap } from 'gsap'
-import ContextMenu from '@imengyu/vue3-context-menu'
-import EasingPanel from '@/components/setting/EasingPanel.vue'
 import { type KeyframeSetting } from '@/components/parameters/keyframeInfo'
-import { generateUniqueId } from '../utils/common'
+import EasingPanel from '@/components/setting/EasingPanel.vue'
 import { useTimelineStore } from '@/stores/objectStore'
+import ContextMenu from '@imengyu/vue3-context-menu'
+import { gsap } from 'gsap'
+import { computed, getCurrentInstance, ref } from 'vue'
+import { generateUniqueId } from '../utils/common'
+
+// ContextMenu の呼び出しをラップする関数。
+// 理由: パッケージのモジュール形式（ESM/CommonJS）や Vue プラグインとしての登録
+// (app.use) によって show 関数の公開方法が変わるため、複数パスを試して安定して動作
+// するようにする。将来的にライブラリが統一された場合は不要になる可能性がある。
+function callContextMenu(options: any, customSlots?: Record<string, any>) {
+  const cm: any = ContextMenu as any
+  if (cm && typeof cm.showContextMenu === 'function')
+    return cm.showContextMenu(options, customSlots)
+  const inst = getCurrentInstance()
+  const gp = inst?.appContext?.config?.globalProperties
+  if (gp && typeof gp.$contextmenu === 'function') return gp.$contextmenu(options, customSlots)
+  if (cm && cm.default && typeof cm.default.showContextMenu === 'function')
+    return cm.default.showContextMenu(options, customSlots)
+  console.warn('Context menu show function not found')
+  return null
+}
 
 const displayEasingPanel = ref(false)
 const keyframes = defineModel<KeyframeSetting[]>('keyframes', { required: true })
@@ -255,7 +272,7 @@ const horizontalLines = computed(() => {
 function onKeyframeContextMenu(event: MouseEvent, index: number) {
   event.preventDefault()
 
-  ContextMenu.showContextMenu({
+  callContextMenu({
     x: event.clientX,
     y: event.clientY,
     items: [
@@ -278,7 +295,7 @@ function onKeyframeContextMenu(event: MouseEvent, index: number) {
 function onGraphContextMenu(event: MouseEvent) {
   event.preventDefault()
 
-  ContextMenu.showContextMenu({
+  callContextMenu({
     x: event.clientX,
     y: event.clientY,
     items: [

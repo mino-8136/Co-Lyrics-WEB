@@ -33,7 +33,7 @@
             "
           >
             <KeyframeParameter
-              v-model="parameters[label]"
+              v-model="(parameters as any)[label]"
               :min="(parameters.constructor as typeof PropertyMethod).getMinValue(label)"
               :max="(parameters.constructor as typeof PropertyMethod).getMaxValue(label)"
             >
@@ -47,7 +47,7 @@
             "
           >
             <SliderParameter
-              v-model="parameters[label]"
+              v-model="(parameters as any)[label]"
               :min="(parameters.constructor as typeof PropertyMethod).getMinValue(label)"
               :max="(parameters.constructor as typeof PropertyMethod).getMaxValue(label)"
             />
@@ -58,7 +58,7 @@
             class="pb-0"
             v-if="(parameters.constructor as typeof PropertyMethod).getUIType(label) == UIType.text"
           >
-            <TextParameter v-model="parameters[label]" class="w-100" />
+            <TextParameter v-model="(parameters as any)[label]" class="w-100" />
           </v-col>
 
           <!-- セレクト型パラメータの場合 -->
@@ -68,7 +68,7 @@
               (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.select
             "
           >
-            <SelectParameter v-model="parameters[label]" :param="label" class="w-100" />
+            <SelectParameter v-model="(parameters as any)[label]" :param="label" class="w-100" />
           </v-col>
 
           <!-- カラー型パラメータの場合 -->
@@ -78,7 +78,7 @@
               (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.color
             "
           >
-            <ColorParameter v-model="parameters[label]"></ColorParameter>
+            <ColorParameter v-model="(parameters as any)[label]"></ColorParameter>
           </v-col>
 
           <!-- チェックボックス型パラメータの場合 -->
@@ -88,7 +88,7 @@
               (parameters.constructor as typeof PropertyMethod).getUIType(label) === UIType.checkbox
             "
           >
-            <CheckboxParameter v-model="parameters[label]"></CheckboxParameter>
+            <CheckboxParameter v-model="(parameters as any)[label]"></CheckboxParameter>
           </v-col>
         </v-row>
       </v-col>
@@ -97,20 +97,20 @@
 </template>
 
 <script setup lang="ts">
-import {
-  StandardRenderSettings,
-  TextSettings,
-  PropertyMethod
-} from '@/components/parameters/objectInfo'
 import { type KeyframeSettings } from '@/components/parameters/keyframeInfo'
+import {
+  PropertyMethod,
+  StandardRenderSettings,
+  TextSettings
+} from '@/components/parameters/objectInfo'
 import { UIType } from '@/components/parameters/uiInfo'
 
+import CheckboxParameter from './dom/CheckboxParameter.vue'
+import ColorParameter from './dom/ColorParameter.vue'
 import KeyframeParameter from './dom/KeyframeParameter.vue'
+import SelectParameter from './dom/SelectParameter.vue'
 import SliderParameter from './dom/SliderParameter.vue'
 import TextParameter from './dom/TextParameter.vue'
-import SelectParameter from './dom/SelectParameter.vue'
-import ColorParameter from './dom/ColorParameter.vue'
-import CheckboxParameter from './dom/CheckboxParameter.vue'
 
 const parameters = defineModel<StandardRenderSettings | TextSettings>('params', { required: true })
 

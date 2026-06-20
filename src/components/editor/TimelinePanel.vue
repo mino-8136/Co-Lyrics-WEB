@@ -99,11 +99,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { useConfigStore, useObjectStore, useTimelineStore } from '@/stores/objectStore'
-import ContextMenu from '@imengyu/vue3-context-menu'
-import ObjectBar from '@/components/timeline/ObjectBar.vue'
-import Waveformbar from '@/components/timeline/WaveformBar.vue'
 import {
   BaseObject,
   BaseSettings,
@@ -115,8 +110,33 @@ import {
   TextObject,
   type typeString
 } from '@/components/parameters/objectInfo'
+import ObjectBar from '@/components/timeline/ObjectBar.vue'
+import Waveformbar from '@/components/timeline/WaveformBar.vue'
+import { useConfigStore, useObjectStore, useTimelineStore } from '@/stores/objectStore'
+import ContextMenu from '@imengyu/vue3-context-menu'
+import { computed, getCurrentInstance, onMounted, onUnmounted, ref, watch } from 'vue'
 import { getLyricMarker, type Note } from '../parameters/musics'
 import { clClamp } from '../utils/common'
+
+// ContextMenu の呼び出しをラップする関数。
+// 理由: パッケージのモジュール形式（ESM/CommonJS）や Vue プラグインとしての登録
+// (app.use) によって show 関数の公開方法が変わるため、複数パスを試して安定して動作
+// するようにする。将来的にライブラリが統一された場合は不要になる可能性がある。
+function callContextMenu(options: any, customSlots?: Record<string, any>) {
+  const cm: any = ContextMenu as any
+  // default export object with method
+  if (cm && typeof cm.showContextMenu === 'function')
+    return cm.showContextMenu(options, customSlots)
+  // installed via app.use -> global property
+  const inst = getCurrentInstance()
+  const gp = inst?.appContext?.config?.globalProperties
+  if (gp && typeof gp.$contextmenu === 'function') return gp.$contextmenu(options, customSlots)
+  // CommonJS interop
+  if (cm && cm.default && typeof cm.default.showContextMenu === 'function')
+    return cm.default.showContextMenu(options, customSlots)
+  console.warn('Context menu show function not found')
+  return null
+}
 
 const objectStore = useObjectStore()
 const timelineStore = useTimelineStore()
@@ -159,7 +179,7 @@ const selectionRectangle = computed(() => {
 // タイムラインメニュー
 function onTimelineContextMenu(event: MouseEvent, layerIndex: number) {
   event.preventDefault()
-  ContextMenu.showContextMenu({
+  callContextMenu({
     x: event.clientX,
     y: event.clientY,
     zIndex: 1000,
@@ -280,7 +300,7 @@ const openFile = (layerIndex: number, state: string, offsetX: number) => {
 function onObjectContextMenu(event: MouseEvent, objIndex: number) {
   event.preventDefault()
   selectObject(objIndex)
-  ContextMenu.showContextMenu({
+  callContextMenu({
     x: event.clientX,
     y: event.clientY,
     items: [
